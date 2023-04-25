@@ -47,6 +47,23 @@ const createScene = (canvas) => {
     camera.setPosition(new Vector3(0, -15, 15))
     camera.wheelPrecision=40
 
+    class VoxelPosition {
+        #state = {state:0}
+        constructor(flatObject = {}) {
+            var { state = 0, color } = flatObject
+        }
+        get state() { return this.#state.state }
+        set state(s) { 
+            this.#state.state = s
+            return s
+        }
+        set color(c) {
+            this.#state.color = c
+        }
+        get color() {
+            return this.#state.color
+        }
+    } // end class VoxelPositionState
 
 // Data model. Voxel is the 3D voxelspace. Voxel can be empty, filled, or variable
     class Voxel {
@@ -60,13 +77,11 @@ const createScene = (canvas) => {
         get z() { return this._dimensions.z}
         set z(v) { this.setSize(this.x, this.y, v); return v }
 
-        constructor(x, y, z, state) {
+        constructor(x, y, z, stateString) {
             this.setSize(x, y, z)
-            if (state) this.stateString = state
+            if (stateString) this.stateString = stateString
         }
-        getVoxelState(x, y, z) { return this._state[x][y][z].state}
-        setVoxelState(x, y, z, s) { this._state[x][y][z].state=s}
-        getVoxelObject(x, y, z) { return this._state[x][y][z]}
+        getVoxelPosition(x, y, z) { return this._state[x][y][z]}
         setSize(x, y, z) { 
             this._dimensions={x:x, y:y, z:z}
             for (let x=0;x<=this.x-1;x++) {
@@ -74,7 +89,7 @@ const createScene = (canvas) => {
                 for (let y=0;y<=this.y-1;y++) {
                     if (this._state[x][y] == undefined) this._state[x][y]=[];
                     for (let z=0;z<=this.z-1;z++) {
-                        if (this._state[x][y][z] == undefined) this._state[x][y][z]={state:0}
+                        if (this._state[x][y][z] == undefined) this._state[x][y][z]=new VoxelPosition()
                     }
                 }
             }
@@ -254,7 +269,7 @@ const createScene = (canvas) => {
                     for (let z=0;z<=this.z-1;z++) {
                         this._layerIsActive.z[z]=true
                         if (this._boxes[x][y][z] == undefined) { 
-                            this._boxes[x][y][z]=new Box(x,y,z,this._voxel.getVoxelObject(x,y,z), this._parent)
+                            this._boxes[x][y][z]=new Box(x,y,z,this._voxel.getVoxelPosition(x,y,z), this._parent)
                         }
                     }
                 }
