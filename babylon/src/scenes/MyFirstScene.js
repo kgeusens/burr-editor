@@ -16,6 +16,7 @@ import {
   HighlightLayer
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
+import { VoxelPosition } from "@kgeusens/burr-data"
 
 const createScene = (canvas) => {
   const engine = new Engine(canvas);
@@ -46,24 +47,6 @@ const createScene = (canvas) => {
     camera.upVector=Vector3.Forward()
     camera.setPosition(new Vector3(0, -15, 15))
     camera.wheelPrecision=40
-
-    class VoxelPosition {
-        #state = {state:0}
-        constructor(flatObject = {}) {
-            var { state = 0, color } = flatObject
-        }
-        get state() { return this.#state.state }
-        set state(s) { 
-            this.#state.state = s
-            return s
-        }
-        set color(c) {
-            this.#state.color = c
-        }
-        get color() {
-            return this.#state.color
-        }
-    } // end class VoxelPositionState
 
 // Data model. Voxel is the 3D voxelspace. Voxel can be empty, filled, or variable
     class Voxel {
