@@ -16,7 +16,7 @@ import {
   HighlightLayer
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
-import { VoxelPosition } from "@kgeusens/burr-data"
+import { Voxel } from "@kgeusens/burr-data"
 
 const createScene = (canvas) => {
   const engine = new Engine(canvas);
@@ -39,86 +39,11 @@ const createScene = (canvas) => {
     // Default intensity is 1. Let's dim the light a small amount
     light.intensity = 0.7;
 
-    // Our built-in 'sphere' shape.
-////////////////////////////////////////////////////////////////////////////
-// KG START
 // Fix for conversion to rightHanded. Swap axis, and change up position
     scene.useRightHandedSystem = true
     camera.upVector=Vector3.Forward()
     camera.setPosition(new Vector3(0, -15, 15))
     camera.wheelPrecision=40
-
-// Data model. Voxel is the 3D voxelspace. Voxel can be empty, filled, or variable
-    class Voxel {
-        _dimensions={x:0, y:0, z:0}
-        _state=[]
-
-        get x() { return this._dimensions.x}
-        set x(v) { this.setSize(v, this.y, this.z); return v }
-        get y() { return this._dimensions.y}
-        set y(v) { this.setSize(this.x, v, this.z); return v }
-        get z() { return this._dimensions.z}
-        set z(v) { this.setSize(this.x, this.y, v); return v }
-
-        constructor(x, y, z, stateString) {
-            this.setSize(x, y, z)
-            if (stateString) this.stateString = stateString
-        }
-        getVoxelPosition(x, y, z) { return this._state[x][y][z]}
-        setSize(x, y, z) { 
-            this._dimensions={x:x, y:y, z:z}
-            for (let x=0;x<=this.x-1;x++) {
-                if (this._state[x] == undefined) this._state[x]=[];
-                for (let y=0;y<=this.y-1;y++) {
-                    if (this._state[x][y] == undefined) this._state[x][y]=[];
-                    for (let z=0;z<=this.z-1;z++) {
-                        if (this._state[x][y][z] == undefined) this._state[x][y][z]=new VoxelPosition()
-                    }
-                }
-            }
-        }
-        get stateString() {
-            var ss = ""
-            for (z=0;z<=this.z-1;z++) {
-                for (y=0;y<=this.y-1;y++) {
-                    for (x=0;x<=this.x-1;x++) {
-                        switch(this._state[x][y][z].state) {
-                            case 0:
-                                ss+="_"
-                                break;
-                            case 1:
-                                ss+="#"
-                                break;
-                            default:
-                                ss+="+"
-                        }
-                    }
-                }
-            }
-            return ss
-        }
-        set stateString(s) {
-            let colorlessStateString = s.replace(/\d+/g,"")
-            let tv=0
-            for (let x=0;x<=this.x-1;x++) {
-                for (let y=0;y<=this.y-1;y++) {
-                    for (let z=0;z<=this.z-1;z++) {
-                        tv=colorlessStateString[x + y*this.x + z*this.x*this.y]
-                        switch(tv) {
-                            case "+":
-                                this._state[x][y][z].state=2
-                                break;
-                            case "#":
-                                this._state[x][y][z].state=1
-                                break;
-                            default:
-                                this._state[x][y][z].state=0
-                        }
-                    }
-                }
-            }
-        }
-    } // end of class Voxel
 
 // From here on we have the visual representation using Babylonjs.
 // Box maps to the voxels. Clicking the box changes the state (empty->filled->variable->empty...)
@@ -508,7 +433,7 @@ const createScene = (canvas) => {
 
     const rootNode = new TransformNode("root");
     rootNode.position=new Vector3(0,0,0)
-    var shape=new Voxel(4,3,2,"#######_##__+++_++__#___") // (width, height, depth)
+    var shape=new Voxel({"@attributes": {x:4,y:3,z:2},text: "#######_##__+++_++__#___"})
     var grid=new Grid(shape, rootNode)
     var controls=new GridControls(grid)
 

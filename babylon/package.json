@@ -4,14 +4,14 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite --host --port 3000",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@babylonjs/core": "^5.54.0",
     "@babylonjs/gui": "^5.54.0",
-    "@kgeusens/burr-data": "^0.1.6",
+    "@kgeusens/burr-data": "^0.1.11",
     "vue": "^3.2.47"
   },
   "devDependencies": {
