@@ -10,11 +10,12 @@ const port = 3001;
 //////////
 
 async function listFiles(path) {
-  let result = [];
-  const dir = await fs.promises.opendir(path);
-  for await (const dirent of dir) {
-    result.push(dirent);
-  }
+//  let result = [];
+//  const dir = await fs.promises.opendir(path);
+//  for await (const dirent of dir) {
+//    result.push(dirent);
+//  }
+  let result = fs.readdirSync(path)
   return result;
 }
 
@@ -24,8 +25,8 @@ async function listFiles(path) {
 
 app.use(express.static(path.resolve(__dirname, '../babylon/dist')))
 
-app.get("/api", (req, res) => {
-  listFiles("./").then((r) => res.send(Object.values(r)));
+app.get("/api/puzzles/list", (req, res) => {
+  listFiles("./xmpuzzles").then((r) => res.send(Object.values(r)));
 });
 
 app.get('*', (req, res) => {res.sendFile(path.resolve(__dirname, '../babylon/dist', 'index.html'))})
