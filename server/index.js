@@ -27,9 +27,11 @@ app.use(express.static(path.resolve(__dirname, '../babylon/dist')))
 
 app.get("/api/puzzles/list", (req, res) => {
   listFiles("./xmpuzzles").then(
-    (r) => res.send(Object.values(r)
+    (r) =>  { 
+      res.set('Access-Control-Allow-Origin', '*');
+      res.send(Object.values(r)
       .filter(fn => { return /\.xmpuzzle$/.test(fn)})
-      .map(fn => { return fn.replace(/\.xmpuzzle$/i, "")}))
+      .map(fn => { return fn.replace(/\.xmpuzzle$/i, "")})) }
     );
 });
 
