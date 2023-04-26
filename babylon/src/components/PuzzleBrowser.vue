@@ -18,9 +18,8 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
-  const fileList = ref([])
-  const selectedFile = ref('')
+  import { reactive, computed } from 'vue'
+  const DATA= reactive({fileList: [], selectedFile: '', loadedFile: {} })
   function loadFileList() {
     selectedFile.value = ''
     const res = 
@@ -33,7 +32,16 @@
     const res = 
       fetch('http://localhost:3001/api/puzzles/get/' + selectedFile.value, { mode: "cors" })
       .catch(error => console.log(error))
-      .then(res => res.json()).then(obj => {console.log(obj);})
+      .then(res => res.json()).then(obj => {console.log(obj)})
       .catch(error => console.log(error))
   }
+  const fileList = computed({
+    get: () => DATA.fileList, 
+    set: (val) => DATA.fileList = val
+  })
+  const selectedFile = computed({
+    get: () => DATA.selectedFile, 
+    set: (val) => DATA.selectedFile = val
+  })
+
 </script>
