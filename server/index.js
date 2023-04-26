@@ -26,7 +26,11 @@ async function listFiles(path) {
 app.use(express.static(path.resolve(__dirname, '../babylon/dist')))
 
 app.get("/api/puzzles/list", (req, res) => {
-  listFiles("./xmpuzzles").then((r) => res.send(Object.values(r)));
+  listFiles("./xmpuzzles").then(
+    (r) => res.send(Object.values(r)
+      .filter(fn => { return /\.xmpuzzle$/.test(fn)})
+      .map(fn => { return fn.replace(/\.xmpuzzle$/i, "")}))
+    );
 });
 
 app.get('*', (req, res) => {res.sendFile(path.resolve(__dirname, '../babylon/dist', 'index.html'))})
