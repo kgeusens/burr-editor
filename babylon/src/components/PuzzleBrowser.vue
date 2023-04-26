@@ -10,6 +10,9 @@
       :items="fileList"
       >
     </v-combobox>
+    <v-btn v-if="fileList.includes(selectedFile)" @click="loadFile">
+      Load File
+    </v-btn>
   </v-card>
 </div>
 </template>
@@ -24,6 +27,13 @@
       fetch('http://localhost:3001/api/puzzles/list', { mode: "cors" })
       .catch(error => console.log(error))
       .then(res => res.json()).then(obj => {fileList.value = obj;})
+      .catch(error => console.log(error))
+  }
+  function loadFile() {
+    const res = 
+      fetch('http://localhost:3001/api/puzzles/get/' + selectedFile.value, { mode: "cors" })
+      .catch(error => console.log(error))
+      .then(res => res.json()).then(obj => {console.log(obj);})
       .catch(error => console.log(error))
   }
 </script>
