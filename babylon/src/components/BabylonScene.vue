@@ -13,8 +13,7 @@
     if (bjsCanvas.value) {
       createScene(bjsCanvas.value);
     }
-    console.log(props.shape)
   });
 
-  watch(() => props.shape, (newv, oldv) => {console.log(setShape(newv))} )
+  watch(() => props.shape, (newv, oldv) => {setShape(newv)} )
 </script>

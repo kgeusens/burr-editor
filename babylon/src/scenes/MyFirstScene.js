@@ -19,7 +19,10 @@ import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
 import { Voxel } from "@kgeusens/burr-data"
 
 var grid
-export function setShape(s) { grid.voxel = new Voxel(s);grid.render() }
+export function setShape(s) { 
+    grid.voxel = new Voxel(s);
+//    grid.render() 
+}
 export function getShape() { return grid }
 export const createScene = (canvas) => {
   const engine = new Engine(canvas);
@@ -70,21 +73,30 @@ export const createScene = (canvas) => {
     }
     class Box {
         //position
+        _parentGrid={}
         _position={x:0, y:0, z:0}
         _isActive=true // is it pickable/editable?
         _isHighlighted=false // is it highlighted?
         _isVisible=true // is it Visible?
         _mesh=null
-        _stateObject=null
         _readOnly=false
         _offset=0
         get materials() { return BoxMaterials }
         get x() { return this._position.x }
         get y() { return this._position.y }
         get z() { return this._position.z }
-        constructor(x=0,y=0,z=0,state, parent) {
+        get state() {
+            let vp = this._parentGrid.voxel.getVoxelPosition(this.x, this.y, this.z)
+            return vp ? vp.state : 0
+        }
+        set state(s) {
+            s%=3;
+            this._parentGrid.voxel.getVoxelPosition(this.x, this.y, this.z).state = s
+            return s
+        }
+        constructor(x=0,y=0,z=0,parentGrid, parent) {
+            this._parentGrid=parentGrid
             this._position = {x:x, y:y, z:z}
-            this._stateObject=state
             this._mesh=MeshBuilder.CreateBox("box", {size:1-2*this._offset}, scene)
             if (parent) this._mesh.parent=parent
             this._mesh.position=new Vector3(x, y, z)
@@ -97,8 +109,7 @@ export const createScene = (canvas) => {
                         x=evt.source.position.x
                         y=evt.source.position.y
                         z=evt.source.position.z
-                        this._stateObject.state+=1;
-                        this._stateObject.state%=3;
+                        this.state+=1;
                         this.render()
                     }
                 )
@@ -121,7 +132,7 @@ export const createScene = (canvas) => {
         render(readOnly=this._readOnly) {
             this._readOnly=readOnly
             let type=readOnly?"RO":"RW"
-            let m=this.materials[type][this._stateObject.state].material
+            let m=this.materials[type][this.state].material
             this._mesh.isVisible=this._isVisible
             this._mesh.material=m
             this._mesh.isPickable=(this._isActive && !readOnly) || (readOnly && m.alpha == 1)
@@ -131,7 +142,7 @@ export const createScene = (canvas) => {
                 if (this._isActive) {
                     this._mesh.enableEdgesRendering()
                 } else { 
-                    this._mesh.material=this.materials["HIDDEN"][this._stateObject.state].material
+                    this._mesh.material=this.materials["HIDDEN"][this.stateObject.state].material
                     this._mesh.disableEdgesRendering()
                 }
             }
@@ -144,10 +155,6 @@ export const createScene = (canvas) => {
                 hl.addMesh(this._mesh, Color3.White(), true)
             else
                 hl.removeMesh(this._mesh)
-        }
-        setState(val) {
-            this._stateObject.state=val;
-            this._stateObject.state%=3;
         }
     }
 
@@ -171,6 +178,7 @@ export const createScene = (canvas) => {
             this.setSize(voxel.x, voxel.y, voxel.z)
             this.render()
         }
+        get voxel() { return this._voxel }
         setSize(x, y, z) {
             this._dimensions = {x:x, y:y, z:z}
             this._voxel.setSize(this.x,this.y,this.z)
@@ -183,7 +191,7 @@ export const createScene = (canvas) => {
                     for (let z=0;z<=this.z-1;z++) {
                         this._layerIsActive.z[z]=true
                         if (this._boxes[x][y][z] == undefined) { 
-                            this._boxes[x][y][z]=new Box(x,y,z,this._voxel.getVoxelPosition(x,y,z), this._parent)
+                            this._boxes[x][y][z]=new Box(x,y,z,this, this._parent)
                         }
                     }
                 }
@@ -232,7 +240,7 @@ export const createScene = (canvas) => {
             for (let x=xmin;x<=xmax;x++) {
                 for (let y=ymin;y<=ymax;y++) {
                     for (let z=zmin;z<=zmax;z++) {
-                        this._boxes[x][y][z].setState(state)
+                        this._boxes[x][y][z].state=state
                     } 
                 }
             }
@@ -441,7 +449,7 @@ export const createScene = (canvas) => {
     rootNode.position=new Vector3(0,0,0)
     grid=new Grid(new Voxel({}), rootNode)
     var controls=new GridControls(grid)
-    setShape({ "@attributes" : {x: 1, y: 2, z: 3}})
+    setShape({})
 
     engine.runRenderLoop(() => {
     scene.render();

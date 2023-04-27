@@ -21,7 +21,6 @@ export default {
   },
   watch:{
     shape(newv, oldv) { 
-      console.log("watch shape in App.vue")
     }
   }
 };
