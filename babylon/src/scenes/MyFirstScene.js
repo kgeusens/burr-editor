@@ -171,14 +171,17 @@ export const createScene = (canvas) => {
         _parent=null
         _controls=null
         get x() { return this._dimensions.x }
+        set x(v) { this._dimensions.x = v}
         get y() { return this._dimensions.y }
+        set y(v) { this._dimensions.y = v}
         get z() { return this._dimensions.z }
+        set z(v) { this._dimensions.z = v}
         get dimensions() { return this._dimensions }
         set dimensions(obj) { this._dimensions = obj }
         get parent() { return this._parent }
         set parent(p) { this._parent = p}
         get readOnly() { return this._readOnly }
-        set readOnly(b) { this._readOnly = b }
+        set readOnly(b) { this._readOnly = b; this.render() }
 
         constructor(voxel, parent=null) {
             this.parent=parent
@@ -187,12 +190,14 @@ export const createScene = (canvas) => {
         }
         set voxel(voxel) {
             this._voxel=voxel
+            this.setSize(voxel.x, voxel.y, voxel.z)
+            this.render()
             this._controls.setSize(voxel.x, voxel.y, voxel.z)
-//            this.render()
+            this._controls.render()
         }
         get voxel() { return this._voxel }
         setSize(x, y, z) {
-            this._dimensions = {x:x, y:y, z:z}
+            this.x=x*1; this.y=y*1; this.z=z*1
             this._voxel.setSize(this.x,this.y,this.z)
             for (let x=0;x<=this.x-1;x++) {
                 this._layerIsActive.x[x]=false
@@ -225,7 +230,7 @@ export const createScene = (canvas) => {
                     }
                 }
             }
-            this._controls.render()
+//            this._controls.render()
         }
         highlight(layerName, layerNumber=0, state=false) {
             // if layerName is not either "x" or "y" or "z" the highlight will apply to the full grid
@@ -288,14 +293,13 @@ export const createScene = (canvas) => {
         get z() { return this.dimensions.z }
         get parent() { return this._grid.parent }
         get readOnly() { return this._grid.readOnly}
-        set readOnly(b) { this._grid.readOnly = b}
+        set readOnly(b) { this._grid.readOnly = b; this.render()}
         reSize(axisName, newSize) { 
             this.dimensions[axisName]=newSize
+            this._grid.setSize(this.x, this.y, this.z)
             this.setSize(this.x, this.y, this.z)
         } 
         setSize(x, y, z) {
-//            this.dimensions={x:x, y:y, z:z}
-            this._grid.setSize(x,y,z)
             for (let axis of ["x","y","z"]) {
                 for (let idx=0; idx < this.dimensions[axis];idx++) {
                     // create the layer selectors (only) if needed
@@ -355,7 +359,7 @@ export const createScene = (canvas) => {
                 new ExecuteCodeAction(
                     ActionManager.OnRightPickTrigger, (evt) => {
                         this.readOnly=!this.readOnly
-                        this.render()
+//                        this.render()
                     }
                 )
             )
@@ -394,6 +398,7 @@ export const createScene = (canvas) => {
                         this.setLabel(axis,targetP.toString());
                         this.reSize(axis,targetP); 
                         this.render();
+                        this._grid.render()
                     }
                 })
                 drag.onDragEndObservable.add((e)=>{
@@ -438,7 +443,8 @@ export const createScene = (canvas) => {
         render() {
             for (let axis of ["x","y","z"]) {
                 // resize the axis
-                this._controls.axis[axis].scaling = new Vector3(1,this.dimensions[axis]+this._offsetControls,1)
+                let scale = 0 + this.dimensions[axis] + this._offsetControls
+                this._controls.axis[axis].scaling = new Vector3(1,scale,1)
                 // move the scalers to the end of the axis
                 let p=this._controls.scalers[axis].getPositionExpressedInLocalSpace()
                 this._controls.scalers[axis].setPositionWithLocalVector(new Vector3(p.x, this.dimensions[axis], p.z))
@@ -453,8 +459,6 @@ export const createScene = (canvas) => {
                     }
                 }
             }
-            // render the child grid
-//            this._grid.render()
         }
     } // end of class GridControls
 
