@@ -30,6 +30,7 @@
   import { reactive, computed } from 'vue'
   import { Puzzle, Voxel } from "@kgeusens/burr-data"
 
+  const emit = defineEmits(["newShape"])
   const DATA= reactive({fileList: [], selectedFile: '', loadedFile: {}, selectedShape: {} })
   function loadFileList() {
     selectedFile.value = ''
@@ -51,7 +52,7 @@
         selectedShape.value = {}
       }).catch(error => console.log(error))
   }
-  function selectShape(p) { selectedShape.value = p }
+  function selectShape(s) { selectedShape.value = s; emit("newShape", s) }
   const fileList = computed({
     get: () => DATA.fileList, 
     set: (val) => DATA.fileList = val

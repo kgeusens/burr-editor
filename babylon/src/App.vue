@@ -1,6 +1,6 @@
 <template>
-  <PuzzleBrowser />
-  <BabylonScene />
+  <PuzzleBrowser @newShape="test"/>
+  <BabylonScene :shape="shape"/>
 </template>
 
 <script>
@@ -9,9 +9,20 @@ import PuzzleBrowser from "./components/PuzzleBrowser.vue"
 
 export default {
   name: "App",
+  data() {
+    return { shape: {text:"hello world"} }
+  },
   components: {
     PuzzleBrowser,
     BabylonScene,
   },
+  methods: {
+    test(s) { this.shape = s },
+  },
+  watch:{
+    shape(newv, oldv) { 
+      console.log("watch shape in App.vue")
+    }
+  }
 };
 </script>

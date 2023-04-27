@@ -18,7 +18,10 @@ import {
 import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
 import { Voxel } from "@kgeusens/burr-data"
 
-const createScene = (canvas) => {
+var grid
+export function setShape(s) { grid.voxel = new Voxel(s);grid.render() }
+export function getShape() { return grid }
+export const createScene = (canvas) => {
   const engine = new Engine(canvas);
     // This creates a basic Babylon Scene object (non-mesh)
     var scene = new Scene(engine);
@@ -154,14 +157,17 @@ const createScene = (canvas) => {
         _voxel=null
         _boxes=[] // will become a 3 dimensional array [x][y][z]
         _layerIsActive={x:[false], y:[false], z:[false]}
-        _readOnly=false
+        _readOnly=true
         _parent=null
         get x() { return this._dimensions.x }
         get y() { return this._dimensions.y }
         get z() { return this._dimensions.z }
-        constructor(voxel, parent=null) {
-            this._voxel=voxel
+        constructor(voxel = { "@attributes" : {x: 1, y: 1, z: 1}} , parent=null) {
             this._parent=parent
+            this.voxel =voxel
+        }
+        set voxel(voxel) {
+            this._voxel=voxel
             this.setSize(voxel.x, voxel.y, voxel.z)
             this.render()
         }
@@ -231,8 +237,7 @@ const createScene = (canvas) => {
                 }
             }
         }
-    } // end of class Voxel
-
+    } // end of class Grid
 
     var advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("BurrUI");
     advancedTexture.layer.layerMask=1
@@ -305,6 +310,7 @@ const createScene = (canvas) => {
         }
         constructor(grid){
             this._grid=grid;
+            this._readOnly=grid._readOnly
             this._parent=grid._parent
             // The layer selectors (created in setSize)
             this.setSize(grid.x, grid.y, grid.z)
@@ -433,13 +439,13 @@ const createScene = (canvas) => {
 
     const rootNode = new TransformNode("root");
     rootNode.position=new Vector3(0,0,0)
-    var shape=new Voxel({"@attributes": {x:4,y:3,z:2},text: "#######_##__+++_++__#___"})
-    var grid=new Grid(shape, rootNode)
+    grid=new Grid(new Voxel({}), rootNode)
     var controls=new GridControls(grid)
+    setShape({ "@attributes" : {x: 1, y: 2, z: 3}})
 
     engine.runRenderLoop(() => {
     scene.render();
   });
 };
 
-export { createScene };
+// export { createScene };
