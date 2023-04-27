@@ -21,6 +21,7 @@ import { Voxel } from "@kgeusens/burr-data"
 var grid
 export function setShape(s) { 
     grid.voxel = new Voxel(s);
+    grid.render()
 //    grid.render() 
 }
 export function getShape() { return grid }
@@ -85,6 +86,8 @@ export const createScene = (canvas) => {
         get x() { return this._position.x }
         get y() { return this._position.y }
         get z() { return this._position.z }
+        get readOnly() { return this._readOnly}
+        set readOnly(b) { this._readOnly = b }
         get state() {
             let vp = this._parentGrid.voxel.getVoxelPosition(this.x, this.y, this.z)
             return vp ? vp.state : 0
@@ -105,7 +108,7 @@ export const createScene = (canvas) => {
             this._mesh.actionManager.registerAction(
                 new ExecuteCodeAction(
                     ActionManager.OnLeftPickTrigger, (evt) => {
-                        if (this._readOnly) return
+                        if (this.readOnly) return
                         x=evt.source.position.x
                         y=evt.source.position.y
                         z=evt.source.position.z
@@ -129,8 +132,8 @@ export const createScene = (canvas) => {
                 )
             )
         }
-        render(readOnly=this._readOnly) {
-            this._readOnly=readOnly
+        render(readOnly=this.readOnly) {
+            this.readOnly=readOnly
             let type=readOnly?"RO":"RW"
             let m=this.materials[type][this.state].material
             this._mesh.isVisible=this._isVisible
@@ -166,17 +169,26 @@ export const createScene = (canvas) => {
         _layerIsActive={x:[false], y:[false], z:[false]}
         _readOnly=true
         _parent=null
+        _controls=null
         get x() { return this._dimensions.x }
         get y() { return this._dimensions.y }
         get z() { return this._dimensions.z }
-        constructor(voxel = { "@attributes" : {x: 1, y: 1, z: 1}} , parent=null) {
-            this._parent=parent
-            this.voxel =voxel
+        get dimensions() { return this._dimensions }
+        set dimensions(obj) { this._dimensions = obj }
+        get parent() { return this._parent }
+        set parent(p) { this._parent = p}
+        get readOnly() { return this._readOnly }
+        set readOnly(b) { this._readOnly = b }
+
+        constructor(voxel, parent=null) {
+            this.parent=parent
+            this._voxel=voxel
+            this._controls = new GridControls(this)
         }
         set voxel(voxel) {
             this._voxel=voxel
-            this.setSize(voxel.x, voxel.y, voxel.z)
-            this.render()
+            this._controls.setSize(voxel.x, voxel.y, voxel.z)
+//            this.render()
         }
         get voxel() { return this._voxel }
         setSize(x, y, z) {
@@ -191,11 +203,12 @@ export const createScene = (canvas) => {
                     for (let z=0;z<=this.z-1;z++) {
                         this._layerIsActive.z[z]=true
                         if (this._boxes[x][y][z] == undefined) { 
-                            this._boxes[x][y][z]=new Box(x,y,z,this, this._parent)
+                            this._boxes[x][y][z]=new Box(x,y,z,this, this.parent)
                         }
                     }
                 }
             }
+            scene.activeCamera.setTarget(new Vector3((this.x-1)/2, (this.y-1)/2, (this.z-1)/2));
         }
         render() {
             let cx=this._layerIsActive.x.length;
@@ -207,11 +220,12 @@ export const createScene = (canvas) => {
                         if ( this._boxes[x] !== undefined && this._boxes[x][y] !== undefined && this._boxes[x][y][z] !== undefined) {
                             this._boxes[x][y][z]._isVisible=( x < this.x && y < this.y && z < this.z )
                             this._boxes[x][y][z]._isActive= ( this._layerIsActive.x[x] || this._layerIsActive.y[y] || this._layerIsActive.z[z])
-                            this._boxes[x][y][z].render(this._readOnly)
+                            this._boxes[x][y][z].render(this.readOnly)
                         }
                     }
                 }
             }
+            this._controls.render()
         }
         highlight(layerName, layerNumber=0, state=false) {
             // if layerName is not either "x" or "y" or "z" the highlight will apply to the full grid
@@ -258,33 +272,36 @@ export const createScene = (canvas) => {
     for (let i in ControlMaterials) {
             ControlMaterials[i].material.diffuseColor = ControlMaterials[i].color
     }
+
     class GridControls {
         _grid=null
-        _dimensions={x:0, y:0, z:0}
+//        _dimensions={x:0, y:0, z:0}
         _controlSize=0.3
         _offsetControls=0.3/2 + 0.5
         _controls={x:[], y:[], z:[], origin:null, scalers:{x:null, y:null, z:null}, axis:{x:null, y:null, z:null}, scalerLabels:{x:null, y:null, z:null}}
-        _readOnly=false
-        _parent=null
-        get dimensions() { return this._dimensions }
+        get dimensions() { return this._grid.dimensions }
+        set dimensions(obj) { this._grid.dimensions = obj}
         get materials() { return ControlMaterials }
-        get x() { return this._dimensions.x }
-        set x(val) { this._dimensions.x=val }
-        get y() { return this._dimensions.y }
-        get z() { return this._dimensions.z }
+        get x() { return this.dimensions.x }
+        set x(val) { this.dimensions.x=val }
+        get y() { return this.dimensions.y }
+        get z() { return this.dimensions.z }
+        get parent() { return this._grid.parent }
+        get readOnly() { return this._grid.readOnly}
+        set readOnly(b) { this._grid.readOnly = b}
         reSize(axisName, newSize) { 
-            this._dimensions[axisName]=newSize
+            this.dimensions[axisName]=newSize
             this.setSize(this.x, this.y, this.z)
         } 
         setSize(x, y, z) {
-            this._dimensions={x:x, y:y, z:z}
+//            this.dimensions={x:x, y:y, z:z}
             this._grid.setSize(x,y,z)
             for (let axis of ["x","y","z"]) {
                 for (let idx=0; idx < this.dimensions[axis];idx++) {
                     // create the layer selectors (only) if needed
                     if (this._controls[axis][idx] == undefined) { 
                         this._controls[axis][idx]=MeshBuilder.CreateBox("box", {width:this._controlSize, height:0.1, depth:this._controlSize}, scene)
-                        this._controls[axis][idx].parent=this._parent
+                        this._controls[axis][idx].parent=this.parent
                         this._controls[axis][idx].material = this.materials[axis].material
                         this._controls[axis][idx].rotation = this.materials[axis].rotation
                         this._controls[axis][idx].position=new Vector3(-this._offsetControls, -this._offsetControls, -this._offsetControls)
@@ -318,14 +335,11 @@ export const createScene = (canvas) => {
         }
         constructor(grid){
             this._grid=grid;
-            this._readOnly=grid._readOnly
-            this._parent=grid._parent
             // The layer selectors (created in setSize)
-            this.setSize(grid.x, grid.y, grid.z)
-            scene.activeCamera.setTarget(new Vector3((this.x-1)/2, (this.y-1)/2, (this.z-1)/2));
+//            this.setSize(grid.x, grid.y, grid.z)
             // The Origin
             this._controls.origin=MeshBuilder.CreateSphere("origin", {diameter:this._controlSize} , scene)
-            this._controls.origin.parent=this._parent
+            this._controls.origin.parent=this.parent
             let m=this.materials.origin.material
             this._controls.origin.material=m
             this._controls.origin.position=new Vector3(-this._offsetControls, -this._offsetControls, -this._offsetControls)
@@ -333,15 +347,14 @@ export const createScene = (canvas) => {
             this._controls.origin.actionManager.registerAction(
                 new ExecuteCodeAction(
                     ActionManager.OnLeftPickTrigger, (evt) => {
-                        scene.activeCamera.setTarget(new Vector3(this._parent.position.x+(this.x-1)/2, this._parent.position.y+(this.y-1)/2, this._parent.position.z+(this.z-1)/2));
+                        scene.activeCamera.setTarget(new Vector3(this.parent.position.x+(this.x-1)/2, this.parent.position.y+(this.y-1)/2, this.parent.position.z+(this.z-1)/2));
                     }
                 )
             )
             this._controls.origin.actionManager.registerAction(
                 new ExecuteCodeAction(
                     ActionManager.OnRightPickTrigger, (evt) => {
-                        this._readOnly=!this._readOnly
-                        this._grid._readOnly=this._readOnly
+                        this.readOnly=!this.readOnly
                         this.render()
                     }
                 )
@@ -349,7 +362,7 @@ export const createScene = (canvas) => {
             // The Axis
             for (let axis of ["x","y","z"]) {
                 this._controls.axis[axis]=MeshBuilder.CreateCylinder("axis_"+axis, {diameter:this._controlSize/5, height:1}, scene)
-                this._controls.axis[axis].parent=this._parent
+                this._controls.axis[axis].parent=this.parent
                 this._controls.axis[axis].material = this.materials[axis].material
                 this._controls.axis[axis].setPivotMatrix(Matrix.Translation(0,0.5,0), false);
                 this._controls.axis[axis].position=new Vector3(-this._offsetControls, -this._offsetControls, -this._offsetControls)
@@ -359,7 +372,7 @@ export const createScene = (canvas) => {
             // The Scalers
             for (let axis of ["x","y","z"]) {
                 this._controls.scalers[axis]=MeshBuilder.CreateCylinder("scaler_"+axis, {diameterBottom:this._controlSize, diameterTop:0, height:0.5}, scene)
-                this._controls.scalers[axis].parent=this._parent
+                this._controls.scalers[axis].parent=this.parent
                 this._controls.scalers[axis].material = this.materials[axis].material
                 this._controls.scalers[axis].rotation = this.materials[axis].rotation
                 this._controls.scalers[axis].position=new Vector3(-this._offsetControls, -this._offsetControls, -this._offsetControls)
@@ -416,7 +429,7 @@ export const createScene = (canvas) => {
                 lr.isVisible=false
                 this._controls.scalerLabels[axis] = lr
             }
-            this.render()
+//            this.render()
         }
         setLabel(axis, text) {
             let l=this._controls.scalerLabels[axis].getChildByName("label")
@@ -429,10 +442,10 @@ export const createScene = (canvas) => {
                 // move the scalers to the end of the axis
                 let p=this._controls.scalers[axis].getPositionExpressedInLocalSpace()
                 this._controls.scalers[axis].setPositionWithLocalVector(new Vector3(p.x, this.dimensions[axis], p.z))
-                this._controls.scalers[axis].isVisible=!this._readOnly
+                this._controls.scalers[axis].isVisible=!this.readOnly
                 // show/hide the layer selectors
                 for (let idx=0;idx<this._controls[axis].length;idx++) {
-                    this._controls[axis][idx].isVisible=(idx < this.dimensions[axis] && !this._readOnly)
+                    this._controls[axis][idx].isVisible=(idx < this.dimensions[axis] && !this.readOnly)
                     if (this._grid._layerIsActive[axis][idx]) {
                         this._controls[axis][idx].material = this.materials.layerSelected.material
                     } else {
@@ -441,14 +454,13 @@ export const createScene = (canvas) => {
                 }
             }
             // render the child grid
-            this._grid.render()
+//            this._grid.render()
         }
     } // end of class GridControls
 
     const rootNode = new TransformNode("root");
     rootNode.position=new Vector3(0,0,0)
     grid=new Grid(new Voxel({}), rootNode)
-    var controls=new GridControls(grid)
     setShape({})
 
     engine.runRenderLoop(() => {
