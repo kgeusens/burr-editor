@@ -11,7 +11,7 @@
   "dependencies": {
     "@babylonjs/core": "^5.54.0",
     "@babylonjs/gui": "^5.54.0",
-    "@kgeusens/burr-data": "^0.1.11",
+    "@kgeusens/burr-data": "^0.1.12",
     "vue": "^3.2.47",
     "vuetify": "^3.1.15"
   },
