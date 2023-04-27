@@ -145,7 +145,7 @@ export const createScene = (canvas) => {
                 if (this._isActive) {
                     this._mesh.enableEdgesRendering()
                 } else { 
-                    this._mesh.material=this.materials["HIDDEN"][this.stateObject.state].material
+                    this._mesh.material=this.materials["HIDDEN"][this.state].material
                     this._mesh.disableEdgesRendering()
                 }
             }
@@ -316,6 +316,7 @@ export const createScene = (canvas) => {
                                 ActionManager.OnLeftPickTrigger, (evt) => {
                                     this._grid._layerIsActive[axis][idx]=!this._grid._layerIsActive[axis][idx]
                                     this.render()
+                                    this._grid.render()
                                 }
                             )
                         )
