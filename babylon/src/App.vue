@@ -1,6 +1,10 @@
 <template>
-  <PuzzleBrowser @newShape="test"/>
-  <BabylonScene :shape="shape"/>
+  <v-app>
+    <v-main>
+    <PuzzleBrowser @newShape="test"/>
+    <BabylonScene :shape="shape"/>
+    </v-main>
+  </v-app>
 </template>
 
 <script>

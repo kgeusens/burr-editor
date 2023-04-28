@@ -21,17 +21,48 @@
           <v-list-item-title v-text="item.name"></v-list-item-title>
         </v-list-item>
       </v-list>
+      <v-card v-if="selectedShape.x">
+        <v-text-field
+        v-model="selectedShape.name"
+        hide-details
+        label="name"
+        style="width: 150px"
+      ></v-text-field>
+        <v-text-field
+        v-model="selectedShape.x"
+        hide-details
+        label="x"
+        type="number"
+        style="width: 70px"
+      ></v-text-field>
+      <v-text-field
+        v-model="selectedShape.y"
+        hide-details
+        label="y"
+        density="compact"
+        type="number"
+        style="width: 70px"
+      ></v-text-field>
+      <v-text-field
+        v-model="selectedShape.z"
+        hide-details
+        label="z"
+        density="compact"
+        type="number"
+        style="width: 70px"
+      ></v-text-field>
+      </v-card>
     </v-card>
   </v-card>
 </div>
 </template>
 
 <script setup>
-  import { reactive, computed } from 'vue'
+  import { reactive, computed, watch } from 'vue'
   import { Puzzle, Voxel } from "@kgeusens/burr-data"
 
   const emit = defineEmits(["newShape"])
-  const DATA= reactive({fileList: [], selectedFile: '', loadedFile: {}, selectedShape: {} })
+  const DATA= reactive({fileList: [], selectedFile: '', loadedFile: {}, selectedShape: new Voxel() })
   function loadFileList() {
     selectedFile.value = ''
     const res = 
@@ -52,7 +83,7 @@
         selectedShape.value = {}
       }).catch(error => console.log(error))
   }
-  function selectShape(s) { selectedShape.value = s; emit("newShape", s) }
+  function selectShape(s) { selectedShape.value=s }
   const fileList = computed({
     get: () => DATA.fileList, 
     set: (val) => DATA.fileList = val
@@ -69,5 +100,9 @@
     get: () => DATA.selectedShape,
     set: (val) => DATA.selectedShape = val
   })
-
+  watch(
+    () => DATA.selectedShape.x, 
+    (newval, oldval) => {console.log(newval)} 
+    )
+  watch(selectedShape, (newval, oldval) => {emit("newShape", newval)})
 </script>
