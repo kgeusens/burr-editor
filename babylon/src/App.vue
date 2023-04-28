@@ -11,7 +11,9 @@
         <PuzzleBrowser @newShape="test"/>
       </v-navigation-drawer>
     <v-main>
-    <BabylonScene :shape="shape"/>
+      <v-card id="babylon" height="700px" :title="getWidth()">
+        <BabylonScene :shape="shape"/>
+       </v-card>
     </v-main>
   </v-app>
 </template>
@@ -31,6 +33,7 @@ export default {
   },
   methods: {
     test(s) { this.shape = s },
+    getWidth() { let el = document.getElementById("babylon"); return el?el.clientWidth + " ":"0" }
   },
   watch:{
     shape(newv, oldv) { 

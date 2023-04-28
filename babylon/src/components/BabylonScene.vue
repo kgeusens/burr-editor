@@ -1,5 +1,5 @@
 <template>
-  <canvas ref="bjsCanvas" width="500" height="500" />
+  <canvas id="myCanvas" ref="bjsCanvas" width="500" height="500" />
 </template>
 
 <script setup>
@@ -12,8 +12,13 @@
   onMounted(() => {
     if (bjsCanvas.value) {
       createScene(bjsCanvas.value);
+      console.log(document.getElementById(bjsCanvas.value.id).parentElement.clientHeight)
     }
   });
+
+  function parentWidth() {
+    if (bjsCanvas.value) return document.getElementById(bjsCanvas.value.id).parentElement.clientWidth
+  }
 
   watch(() => props.shape, (newv, oldv) => {setShape(newv)} )
 </script>
