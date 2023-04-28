@@ -1,6 +1,5 @@
 <template>
-  <h1> Hello World {{ selectedFile }} </h1>
-  <div>
+  <v-toolbar-title>{{ selectedFile }}</v-toolbar-title>
   <v-btn prepend-icon="mdi-cloud-download" @click="loadFileList">
     Load Files 
   </v-btn>
@@ -54,7 +53,6 @@
       </v-card>
     </v-card>
   </v-card>
-</div>
 </template>
 
 <script setup>
