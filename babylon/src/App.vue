@@ -10,9 +10,9 @@
       >
         <PuzzleBrowser @newShape="test"/>
       </v-navigation-drawer>
-    <v-main>
-      <v-card id="babylon" height="700px" :title="width + ' '">
-        <BabylonScene :width="width" :shape="shape"/>
+    <v-main id="main">
+      <v-card height="100%" title="Hello World">
+        <BabylonScene width=300 height=300 :shape="shape"/>
        </v-card>
     </v-main>
   </v-app>
@@ -25,7 +25,7 @@ import PuzzleBrowser from "./components/PuzzleBrowser.vue"
 export default {
   name: "App",
   data() {
-    return { shape: {text:"hello world"}, drawer: false, width:500 }
+    return { shape: {text:"hello world"}, drawer: false }
   },
   components: {
     PuzzleBrowser,
@@ -33,16 +33,12 @@ export default {
   },
   methods: {
     test(s) { this.shape = s },
-    getWidth() { let el = document.getElementById("babylon"); return el?el.clientWidth + " ":"0" }
   },
   watch:{
     shape(newv, oldv) { 
     }
   },
   mounted() { 
-    let el = document.getElementById("babylon");
-    this.width = el?el.clientWidth + " ":"0" 
-    console.log(this.width)
   }
 };
 </script>
