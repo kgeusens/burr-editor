@@ -9,8 +9,7 @@
   const props = defineProps({ 
     shape: Object, 
     height: { type: String, default: "150"}, 
-    width: { type: String, default: "150" }, 
-    dynamic: {type: Boolean, default: false} 
+    width: { type: String, default: "150" } 
   })
   const bjsCanvas = ref(null);
   const parentWidth = ref(0);
@@ -18,21 +17,17 @@
 
   const ro = new ResizeObserver( entry => { 
     if (bjsCanvas.value && bjsCanvas.value.parentElement) {
-//      parentWidth.value = bjsCanvas.value.parentElement.getBoundingClientRect().width - bjsCanvas.value.offsetLeft
-//      parentHeight.value = bjsCanvas.value.parentElement.getBoundingClientRect().height - bjsCanvas.value.offsetTop
-//      console.log(bjsCanvas.value.parentElement.getBoundingClientRect())
-//      console.log(width)
       let cr = bjsCanvas.value.parentElement.getBoundingClientRect()
-      parentHeight.value=props.height == "parent"?cr.height - cr.top:props.height
-      parentWidth.value=props.width == "parent"?cr.width - cr.left:props.width
-//      parentWidth.value=cr.width -cr.left
+      console.log(entry[0].contentRect.height, bjsCanvas.value.offsetTop, cr.height)
+      parentHeight.value=props.height == "parent"?cr.height - bjsCanvas.value.offsetTop - 7:props.height
+      parentWidth.value=props.width == "parent"?cr.width:props.width
     }
   })
   
   onMounted(() => {
     if (bjsCanvas.value) {
       createScene(bjsCanvas.value);
-      ro.observe(bjsCanvas.value.parentElement.parentElement)
+      ro.observe(bjsCanvas.value.parentElement)
     }
   });
 

@@ -6,14 +6,14 @@
     </v-app-bar>
     <v-navigation-drawer
         v-model="drawer"
-        temporary
+        permanent
       >
         <PuzzleBrowser @newShape="test"/>
       </v-navigation-drawer>
     <v-main id="main">
-      <v-card  height="100%" title="Hello World">
+      <v-card width="100%" height="100%" title="title">
         <BabylonScene height="parent" width="parent" :shape="shape"/>
-       </v-card>
+      </v-card>
     </v-main>
   </v-app>
 </template>
