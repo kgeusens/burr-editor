@@ -15,7 +15,9 @@
     if (bjsCanvas.value && bjsCanvas.value.parentElement) {
       parentWidth.value = bjsCanvas.value.parentElement.getBoundingClientRect().width - bjsCanvas.value.offsetLeft
 //      parentHeight.value = bjsCanvas.value.parentElement.getBoundingClientRect().height - bjsCanvas.value.offsetTop
-      parentHeight.value=entry[0].contentRect.height - entry[0].contentRect.top
+      console.log(bjsCanvas.value.parentElement.getBoundingClientRect())
+      let cr = bjsCanvas.value.parentElement.getBoundingClientRect()
+      parentHeight.value=cr.height - cr.top
     }
   })
   

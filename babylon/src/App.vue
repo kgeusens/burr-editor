@@ -11,8 +11,8 @@
         <PuzzleBrowser @newShape="test"/>
       </v-navigation-drawer>
     <v-main id="main">
-      <v-card height="100%" title="Hello World">
-        <BabylonScene width=300 height=300 :shape="shape"/>
+      <v-card  height="100%" title="Hello World">
+        <BabylonScene width=300 height=400 :shape="shape"/>
        </v-card>
     </v-main>
   </v-app>
