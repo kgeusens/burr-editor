@@ -15,7 +15,7 @@
         <BabylonEngine>
           <BabylonScene>
             <BabylonCamera id="1">
-              <BabylonView>
+              <BabylonView width="300" height="300">
               </BabylonView>
             </BabylonCamera>
           </BabylonScene>

@@ -5,7 +5,7 @@
 
 <script setup>
     import { ref, inject, watch, onMounted } from "@vue/runtime-core";
-    import { createScene, setShape } from "../scenes/MyFirstScene";
+//    import { createScene, setShape } from "../scenes/MyFirstScene";
 
     const theCamera = inject("camera")
     const theEngine = inject("engine")
