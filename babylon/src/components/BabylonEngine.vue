@@ -15,6 +15,5 @@
     })
 
     onMounted(() => {
-//    console.log(myEngine)
     });
 </script>

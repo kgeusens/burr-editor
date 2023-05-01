@@ -4,9 +4,9 @@
 
 <script setup>
     import { onMounted, inject } from "@vue/runtime-core";
-//    import { View } from "@babylonjs/core";
-
-    const theEngine = inject("engine")
+    
+    const theCamera = inject("camera")
+    console.log(theCamera)
 
     const props = defineProps({ 
     })

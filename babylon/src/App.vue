@@ -12,14 +12,17 @@
       </v-navigation-drawer>
     <v-main id="main">
       <v-card width="100%" height="100%" title="title">
-<!--        
         <BabylonEngine>
-          <BabylonView>
-            
-          </BabylonView>
+          <BabylonScene>
+            <BabylonCamera id="1">
+              <BabylonView>
+              </BabylonView>
+            </BabylonCamera>
+          </BabylonScene>
         </BabylonEngine>
--->
+<!--        
         <BabylonMainScene height="parent" width="parent" :shape="shape"/>
+-->
       </v-card>
     </v-main>
   </v-app>
@@ -30,6 +33,8 @@ import BabylonMainScene from "./components/BabylonMainScene.vue";
 import PuzzleBrowser from "./components/PuzzleBrowser.vue"
 
 import BabylonEngine from "./components/BabylonEngine.vue";
+import BabylonScene from "./components/BabylonScene.vue";
+import BabylonCamera from "./components/BabylonCamera.vue";
 import BabylonView from "./components/BabylonView.vue";
 
 export default {
@@ -40,7 +45,9 @@ export default {
   components: {
     PuzzleBrowser,
     BabylonMainScene,
+    BabylonScene,
     BabylonEngine,
+    BabylonCamera,
     BabylonView,
   },
   methods: {
