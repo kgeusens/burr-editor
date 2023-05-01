@@ -18,7 +18,6 @@
   const ro = new ResizeObserver( entry => { 
     if (bjsCanvas.value && bjsCanvas.value.parentElement) {
       let cr = bjsCanvas.value.parentElement.getBoundingClientRect()
-//      console.log(bjsCanvas.value.offsetTop, cr.height)
       parentHeight.value=props.height == "parent"?cr.height - bjsCanvas.value.offsetTop:props.height
       parentWidth.value=props.width == "parent"?cr.width:props.width
     }

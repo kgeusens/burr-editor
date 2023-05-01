@@ -12,6 +12,13 @@
       </v-navigation-drawer>
     <v-main id="main">
       <v-card width="100%" height="100%" title="title">
+<!--        
+        <BabylonEngine>
+          <BabylonView>
+            
+          </BabylonView>
+        </BabylonEngine>
+-->
         <BabylonScene height="parent" width="parent" :shape="shape"/>
       </v-card>
     </v-main>
@@ -22,6 +29,9 @@
 import BabylonScene from "./components/BabylonScene.vue";
 import PuzzleBrowser from "./components/PuzzleBrowser.vue"
 
+import BabylonEngine from "./components/BabylonEngine.vue";
+import BabylonView from "./components/BabylonView.vue";
+
 export default {
   name: "App",
   data() {
@@ -30,6 +40,8 @@ export default {
   components: {
     PuzzleBrowser,
     BabylonScene,
+    BabylonEngine,
+    BabylonView,
   },
   methods: {
     test(s) { this.shape = s },
