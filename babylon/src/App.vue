@@ -19,14 +19,14 @@
           </BabylonView>
         </BabylonEngine>
 -->
-        <BabylonScene height="parent" width="parent" :shape="shape"/>
+        <BabylonMainScene height="parent" width="parent" :shape="shape"/>
       </v-card>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import BabylonScene from "./components/BabylonScene.vue";
+import BabylonMainScene from "./components/BabylonMainScene.vue";
 import PuzzleBrowser from "./components/PuzzleBrowser.vue"
 
 import BabylonEngine from "./components/BabylonEngine.vue";
@@ -39,7 +39,7 @@ export default {
   },
   components: {
     PuzzleBrowser,
-    BabylonScene,
+    BabylonMainScene,
     BabylonEngine,
     BabylonView,
   },
