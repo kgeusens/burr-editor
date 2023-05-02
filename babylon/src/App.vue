@@ -8,8 +8,8 @@
         v-model="drawer"
         permanent
       >
-        <PuzzleBrowser @newShape="test"/>
-      </v-navigation-drawer>
+        <PuzzleBrowser @newShape="loadShape"/>
+    </v-navigation-drawer>
     <v-main id="main">
       <v-card width="100%" height="100%" title="title">
         <BabylonEngine>
@@ -51,7 +51,7 @@ export default {
     BabylonView,
   },
   methods: {
-    test(s) { this.shape = s },
+    loadShape(s) { this.shape = s },
   },
   watch:{
     shape(newv, oldv) { 
