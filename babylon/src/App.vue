@@ -14,6 +14,8 @@
       <v-card width="100%" height="100%" title="title">
         <BabylonEngine>
           <BabylonScene>
+            <BabylonSceneModel :model=VoxelBuilder>
+            </BabylonSceneModel>
             <BabylonCamera id="1">
               <BabylonView width="300" height="300">
               </BabylonView>
@@ -29,23 +31,26 @@
 </template>
 
 <script>
-import BabylonMainScene from "./components/BabylonMainScene.vue";
+//import BabylonMainScene from "./components/BabylonMainScene.vue";
+import { sceneBuilder } from "./scenes/ShapeEditor.js";
 import PuzzleBrowser from "./components/PuzzleBrowser.vue"
-
 import BabylonEngine from "./components/BabylonEngine.vue";
 import BabylonScene from "./components/BabylonScene.vue";
+import BabylonSceneModel from "./components/BabylonSceneModel.vue";
 import BabylonCamera from "./components/BabylonCamera.vue";
 import BabylonView from "./components/BabylonView.vue";
+// import { Voxel } from "@kgeusens/burr-data"
 
 export default {
   name: "App",
   data() {
-    return { shape: {text:"hello world"}, drawer: false }
+    return { shape: { text: "hello world" }, VoxelBuilder: sceneBuilder, drawer: false,  }
   },
   components: {
     PuzzleBrowser,
-    BabylonMainScene,
+//    BabylonMainScene,
     BabylonScene,
+    BabylonSceneModel,
     BabylonEngine,
     BabylonCamera,
     BabylonView,

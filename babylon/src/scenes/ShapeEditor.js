@@ -14,6 +14,11 @@ import {
 import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
 import { Voxel } from "@kgeusens/burr-data"
 
+var scene
+var BoxMaterials
+var ControlMaterials
+var advancedTexture
+
 class Box {
     //position
     _parentGrid={}
@@ -155,7 +160,7 @@ class Grid {
                 }
             }
         }
-        scene.activeCamera.setTarget(new Vector3((this.x-1)/2, (this.y-1)/2, (this.z-1)/2));
+        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((this.x-1)/2, (this.y-1)/2, (this.z-1)/2));
     }
     render() {
         let cx=this._layerIsActive.x.length;
@@ -282,7 +287,7 @@ class GridControls {
         this._controls.origin.actionManager.registerAction(
             new ExecuteCodeAction(
                 ActionManager.OnLeftPickTrigger, (evt) => {
-                    scene.activeCamera.setTarget(new Vector3(this.parent.position.x+(this.x-1)/2, this.parent.position.y+(this.y-1)/2, this.parent.position.z+(this.z-1)/2));
+                    if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3(this.parent.position.x+(this.x-1)/2, this.parent.position.y+(this.y-1)/2, this.parent.position.z+(this.z-1)/2));
                 }
             )
         )
@@ -391,44 +396,42 @@ class GridControls {
     }
 } // end of class GridControls
 
+
 export class sceneBuilder {
     grid
-    constructor(flatObject) {
-        const rootNode = new TransformNode("root");
-        rootNode.position=new Vector3(0,0,0)
-        this.grid=new Grid(new Voxel({}), rootNode)
-        this.setScene({})
-    }
-    setScene(s) {
-        this.grid.voxel = new Voxel(s);
-        this.grid.render()
-    }
-    createScene(canvas) {
-        // From here on we have the visual representation using Babylonjs.
-        // Box maps to the voxels. Clicking the box changes the state (empty->filled->variable->empty...)
-        const BoxMaterials={RW: [   {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 0, 0)}, // empty
-                                        {material: new StandardMaterial("myMaterial", scene), alpha: 1, color: new Color3(0, 1, 0)}, // filled
-                                        {material: new StandardMaterial("myMaterial", scene), alpha: 1, color: new Color3(1, 1, 0)}, // variable
-                                    ],  
-                            RO: [ {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 0, 0)},
-                                        {material: new StandardMaterial("myMaterial", scene), alpha: 1, color: new Color3(0, 1, 0)},
-                                        {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 1, 0)},
-                            ],
-                            HIDDEN: [   {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 0, 0)},
-                                        {material: new StandardMaterial("myMaterial", scene), alpha: 0.2, color: new Color3(0, 1, 0)},
-                                        {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 1, 0)},
-                    ]};
+//    scene
+//    rootNode
+    constructor(sc) {
+        scene = sc
+        BoxMaterials={
+            RW: 
+            [   
+                {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 0, 0)}, // empty
+                {material: new StandardMaterial("myMaterial", scene), alpha: 1, color: new Color3(0, 1, 0)}, // filled
+                {material: new StandardMaterial("myMaterial", scene), alpha: 1, color: new Color3(1, 1, 0)}, // variable
+            ],  
+            RO: 
+            [   
+                {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 0, 0)},
+                {material: new StandardMaterial("myMaterial", scene), alpha: 1, color: new Color3(0, 1, 0)},
+                {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 1, 0)},
+            ],
+            HIDDEN: 
+            [   
+                {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 0, 0)},
+                {material: new StandardMaterial("myMaterial", scene), alpha: 0.2, color: new Color3(0, 1, 0)},
+                {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 1, 0)},
+            ]
+        };
         for (let i=0; i<3;i++) {
             for (let type in BoxMaterials) {
                 BoxMaterials[type][i].material.diffuseColor = BoxMaterials[type][i].color
                 BoxMaterials[type][i].material.alpha = BoxMaterials[type][i].alpha
             }
         }
-    
-    
-        var advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("BurrUI");
+        advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("BurrUI");
         advancedTexture.layer.layerMask=1
-        const ControlMaterials={ x: {material: new StandardMaterial("xMaterial", scene), alpha: 1, color: new Color3(1, 0, 0), rotation: new Vector3(0,0,-Math.PI/2)},
+        ControlMaterials={ x: {material: new StandardMaterial("xMaterial", scene), alpha: 1, color: new Color3(1, 0, 0), rotation: new Vector3(0,0,-Math.PI/2)},
                         y: {material: new StandardMaterial("yMaterial", scene), alpha: 1, color: new Color3(0, 1, 0), rotation: new Vector3(0,0,0)},
                         z: {material: new StandardMaterial("zMaterial", scene), alpha: 1, color: new Color3(0, 0, 1), rotation: new Vector3(Math.PI/2,0,0)},
                         origin: {material: new StandardMaterial("originMaterial", scene), alpha: 1, color: new Color3(1, 1, 1)},
@@ -437,6 +440,15 @@ export class sceneBuilder {
         for (let i in ControlMaterials) {
                 ControlMaterials[i].material.diffuseColor = ControlMaterials[i].color
         }
-    
-    };
+//        this.scene = sc
+        const rootNode = new TransformNode("root");
+        rootNode.position=new Vector3(0,0,0)
+        this.grid=new Grid(new Voxel({}), rootNode)
+        this.setOptions({ shape: {} })
+    }
+    setOptions(flatObject) {
+        var { shape = {} } = flatObject
+        this.grid.voxel = new Voxel(shape);
+        this.grid.render()
+    }
 }
