@@ -13,10 +13,16 @@
         detail: Object, 
     })
 
-    const test = new props.model(theScene)
-    console.log(test)
+    const myModel = new props.model(theScene)
+//    console.log(myModel)
 
     onMounted(() => {
     });
+
+    watch(
+        () => props.detail, 
+        (newval,oldval) => myModel.setOptions(newval)
+    )
+
 
 </script>

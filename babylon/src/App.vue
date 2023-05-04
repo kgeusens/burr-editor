@@ -14,7 +14,7 @@
       <v-card width="100%" height="100%" title="title">
         <BabylonEngine>
           <BabylonScene>
-            <BabylonSceneModel :model=VoxelBuilder>
+            <BabylonSceneModel :model=VoxelEditor :detail=shape>
             </BabylonSceneModel>
             <BabylonCamera id="1">
               <BabylonView width="300" height="300">
@@ -44,7 +44,7 @@ import BabylonView from "./components/BabylonView.vue";
 export default {
   name: "App",
   data() {
-    return { shape: { text: "hello world" }, VoxelBuilder: sceneBuilder, drawer: false,  }
+    return { shape: {}, VoxelEditor: sceneBuilder, drawer: false,  }
   },
   components: {
     PuzzleBrowser,

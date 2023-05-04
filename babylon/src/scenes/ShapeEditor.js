@@ -440,14 +440,12 @@ export class sceneBuilder {
         for (let i in ControlMaterials) {
                 ControlMaterials[i].material.diffuseColor = ControlMaterials[i].color
         }
-//        this.scene = sc
         const rootNode = new TransformNode("root");
         rootNode.position=new Vector3(0,0,0)
         this.grid=new Grid(new Voxel({}), rootNode)
-        this.setOptions({ shape: {} })
+        this.setOptions({})
     }
-    setOptions(flatObject) {
-        var { shape = {} } = flatObject
+    setOptions(shape) {
         this.grid.voxel = new Voxel(shape);
         this.grid.render()
     }
