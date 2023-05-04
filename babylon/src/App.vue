@@ -1,23 +1,43 @@
 <template>
   <v-app>
-    <v-app-bar>
+    <v-app-bar extension-height="48" density="compact">
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>Burr Editor</v-toolbar-title>
+      <v-toolbar-title>
+        Burr Editor
+      </v-toolbar-title>
+      <template v-slot:extension>
+        <v-tabs mandatory color="purple" height=32 v-model="tab" align-tabs="title">
+          <v-tab key="1" value="puzzle">
+            Puzzle
+          </v-tab>
+          <v-tab key="2" value="problems">
+            Problems
+          </v-tab>
+          <v-tab key="3" value="solution">
+            Solution
+          </v-tab>
+        </v-tabs>
+      </template>
     </v-app-bar>
-    <v-navigation-drawer
+    <v-navigation-drawer class="pa-2"
         v-model="drawer"
-        permanent
+        temporary
       >
         <PuzzleBrowser @newShape="loadShape"/>
     </v-navigation-drawer>
     <v-main id="main">
-      <v-card width="100%" height="100%" title="title">
+      <v-layout-item model-value position="top" class="text-start" size="0">
+        <div class="ma-4">
+          <v-btn @click.stop="drawer = !drawer" icon="mdi-arrow-right" size="small" elevation="4" />
+        </div>
+      </v-layout-item>
+      <v-card width="100%" height="100%">
         <BabylonEngine>
           <BabylonScene>
             <BabylonSceneModel :model=VoxelEditor :detail=shape>
             </BabylonSceneModel>
             <BabylonCamera id="1">
-              <BabylonView width="parent" height="300">
+              <BabylonView width="parent" height="parent">
               </BabylonView>
             </BabylonCamera>
           </BabylonScene>
@@ -44,7 +64,7 @@ import BabylonView from "./components/BabylonView.vue";
 export default {
   name: "App",
   data() {
-    return { shape: {}, VoxelEditor: sceneBuilder, drawer: false,  }
+    return { shape: {}, VoxelEditor: sceneBuilder, drawer: false, rail: true, tab: "puzzle" }
   },
   components: {
     PuzzleBrowser,
@@ -60,7 +80,8 @@ export default {
   },
   watch:{
     shape(newv, oldv) { 
-    }
+    },
+    tab(newv, oldv) { console.log(newv)}
   },
   mounted() { 
   }
