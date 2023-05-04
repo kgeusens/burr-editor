@@ -17,7 +17,7 @@
             <BabylonSceneModel :model=VoxelEditor :detail=shape>
             </BabylonSceneModel>
             <BabylonCamera id="1">
-              <BabylonView width="300" height="300">
+              <BabylonView width="parent" height="300">
               </BabylonView>
             </BabylonCamera>
           </BabylonScene>

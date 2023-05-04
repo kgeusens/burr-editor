@@ -9,6 +9,7 @@
 
     const theCamera = inject("camera")
     const theEngine = inject("engine")
+    const theScene = inject("scene")
 
     const props = defineProps({ 
         shape: Object, 
@@ -31,6 +32,10 @@
     if (bjsCanvas.value) {
         ro.observe(bjsCanvas.value.parentElement)
         theEngine.registerView(bjsCanvas.value, theCamera)
+            theCamera.attachControl(bjsCanvas.value, true)
+            theScene.detachControl();
+            theEngine.inputElement = bjsCanvas.value;
+            theScene.attachControl();
     }
     });
 

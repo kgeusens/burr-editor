@@ -401,7 +401,7 @@ export class sceneBuilder {
     grid
 //    scene
 //    rootNode
-    constructor(sc) {
+    constructor(sc, options = {}) {
         scene = sc
         BoxMaterials={
             RW: 
@@ -443,7 +443,7 @@ export class sceneBuilder {
         const rootNode = new TransformNode("root");
         rootNode.position=new Vector3(0,0,0)
         this.grid=new Grid(new Voxel({}), rootNode)
-        this.setOptions({})
+        this.setOptions(options)
     }
     setOptions(shape) {
         this.grid.voxel = new Voxel(shape);
