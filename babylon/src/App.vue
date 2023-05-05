@@ -5,7 +5,7 @@
       <v-toolbar-title>
         {{ fileName ? fileName.replace(/\.xmpuzzle$/i, "") : "Bur Editor"}}
       </v-toolbar-title>
-      <template v-slot:extension>
+      <template v-if="puzzle.shapes" v-slot:extension>
         <v-tabs grow color="purple" v-model="tab">
           <v-tab key="1" value="puzzle" :border="tab == 'puzzle'" >
             Puzzle
@@ -35,7 +35,7 @@
     <LocalFileDialog :show="showLoadLocalFile" @newShape="loadPuzzle" @newName="setFilename">
     </LocalFileDialog>
 
-    <v-main v-show="tab == 'puzzle'">
+    <v-main v-show="tab == 'puzzle' && puzzle.shapes">
       <v-navigation-drawer 
         class="pa-2"
         v-model="drawer"
@@ -84,7 +84,7 @@ export default {
       fileName: "", 
       VoxelEditor: sceneBuilder, 
       drawer: false, 
-      tab: null,
+      tab: "",
       showLoadLocalFile: 0
     }
   },
