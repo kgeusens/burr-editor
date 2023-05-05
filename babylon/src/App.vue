@@ -65,7 +65,6 @@ export default {
   },
   components: {
     PuzzleBrowser,
-//    BabylonMainScene,
     BabylonScene,
     BabylonSceneModel,
     BabylonEngine,
