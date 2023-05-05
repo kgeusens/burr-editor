@@ -51,11 +51,11 @@
 
 <script>
 import PuzzleBrowser from "./components/PuzzleBrowser.vue"
-import BabylonEngine from "./components/BabylonEngine.vue";
-import BabylonScene from "./components/BabylonScene.vue";
-import BabylonSceneModel from "./components/BabylonSceneModel.vue";
-import BabylonCamera from "./components/BabylonCamera.vue";
-import BabylonView from "./components/BabylonView.vue";
+import BabylonEngine from "./components/babylon/BabylonEngine.vue";
+import BabylonScene from "./components/babylon/BabylonScene.vue";
+import BabylonSceneModel from "./components/babylon/BabylonSceneModel.vue";
+import BabylonCamera from "./components/babylon/BabylonCamera.vue";
+import BabylonView from "./components/babylon/BabylonView.vue";
 import { sceneBuilder } from "./scenes/ShapeEditor.js";
 
 export default {
