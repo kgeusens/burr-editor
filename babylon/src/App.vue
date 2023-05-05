@@ -103,7 +103,6 @@ export default {
     shape(newv, oldv) { 
     },
     showLoadLocalFile(newv, oldv) {
-      console.log(newv)
     }
   },
   mounted() { 
