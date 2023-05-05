@@ -3,7 +3,7 @@
     <v-app-bar density="compact">
       <v-app-bar-nav-icon id="main-menu-activator" variant="text"></v-app-bar-nav-icon>
       <v-toolbar-title>
-        Burr Editor
+        {{ fileName ? fileName.replace(/\.xmpuzzle$/i, "") : "Bur Editor"}}
       </v-toolbar-title>
       <template v-slot:extension>
         <v-tabs grow color="purple" v-model="tab">
@@ -32,7 +32,7 @@
       </v-list>
     </v-menu>
 
-    <LocalFileDialog :show="showLoadLocalFile">
+    <LocalFileDialog :show="showLoadLocalFile" @newShape="loadPuzzle" @newName="setFilename">
     </LocalFileDialog>
 
     <v-main v-show="tab == 'puzzle'">
@@ -41,7 +41,7 @@
         v-model="drawer"
         temporary
         >
-        <PuzzleDrawer @newShape="loadShape"/>
+        <PuzzleDrawer :puzzle="puzzle" @newShape="loadShape"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -80,7 +80,8 @@ export default {
   data() {
     return { 
       puzzle: {}, 
-      shape: {}, 
+      shape: {},
+      fileName: "", 
       VoxelEditor: sceneBuilder, 
       drawer: false, 
       tab: null,
@@ -97,7 +98,15 @@ export default {
     BabylonView,
   },
   methods: {
-    loadShape(s) { this.shape = s },
+    loadShape(s) { 
+      this.shape = s 
+    },
+    loadPuzzle(p) {
+      this.puzzle = p
+    },
+    setFilename(f) {
+      this.fileName = f
+    }
   },
   watch:{
     shape(newv, oldv) { 

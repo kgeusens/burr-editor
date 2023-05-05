@@ -13,7 +13,7 @@
           </v-btn>
           <v-btn
               :disabled="!DATA.puzzle.shapes"
-              @click="dialog = false"
+              @click="loadFile()"
               variant="tonal"
             >
             Load file
@@ -31,32 +31,11 @@
 </template>
 
 <script setup>
-  const XMLAlwaysArrayName = [
-    "voxel",
-    "shape",
-    "problem",
-    "solution",
-    "separation",
-    "state"
-  ];
-        
-  const XMLoptions = { 
-    textNodeName: "text", 
-    format: true, 
-    ignoreAttributes: false, 
-    indentBy: " ", 
-    suppressEmptyNode: true, 
-    alwaysCreateTextNode: true, 
-    attributesGroupName: "@attributes", 
-    attributeNamePrefix: '',
-      isArray: (name, jpath, isLeafNode, isAttribute) => { 
-      if( XMLAlwaysArrayName.indexOf(name) !== -1) return true;
-      }
-  }
-
   import { ref, reactive, computed, watch } from 'vue'
   import { Puzzle } from '@kgeusens/burr-data'
 
+  const emit = defineEmits(["newShape", "newName"])
+  
   const props = defineProps(
     { 
         show: { type: Number, default: 0}, 
@@ -65,6 +44,12 @@
   const chosenFile = ref([])
   const dialog = ref(false)
   const DATA = reactive( { puzzle: {} })
+
+  function loadFile() {
+    emit( "newShape", DATA.puzzle )
+    emit( "newName", chosenFile.value[0].name)
+    dialog.value=false
+  }
 
   watch(
     () => props.show, 
@@ -77,9 +62,9 @@
     async (newv) => { 
       if (newv[0]) {
         var reader = new FileReader()
-        reader.onload = () => { 
-          console.log(reader.result)
-        }
+//        reader.onload = () => { 
+//          console.log(reader.result)
+//        }
         const ds = new DecompressionStream("gzip")
         const gunzipStream = newv[0].stream().pipeThrough(ds)
         const puzzleXML = await new Response(gunzipStream).text()
