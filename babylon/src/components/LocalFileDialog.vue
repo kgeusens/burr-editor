@@ -1,21 +1,31 @@
 <template>
   <v-dialog max-width="500" v-model="dialog" persistent>
+    <v-toolbar color="primary" title="open local file"></v-toolbar>
     <v-card>
-      <v-file-input v-model="chosenFile" accept=".xmpuzzle" label="xmpuzzle file"></v-file-input>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn
-            @click="dialog = false"
+      <v-card class="ma-3">
+        <v-file-input v-model="chosenFile" accept=".xmpuzzle" label="xmpuzzle file"></v-file-input>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+              @click="dialog = false"
+            >
+            Cancel
+          </v-btn>
+          <v-btn
+              :disabled="!DATA.puzzle.shapes"
+              @click="dialog = false"
+              variant="tonal"
+            >
+            Load file
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+      <v-card  class="ma-3" v-if="DATA.puzzle.shapes" 
+          title="Puzzle" 
+          :subtitle="DATA.puzzle.shapes.voxel.length + ' shapes defined'"
+          :text="DATA.puzzle.largestShape.x + 'x' + DATA.puzzle.largestShape.y + 'x' + DATA.puzzle.largestShape.z"
           >
-          Cancel
-        </v-btn>
-        <v-btn
-            :disabled="!chosenFile[0]"
-            @click="dialog = false"
-          >
-          Load file
-        </v-btn>
-      </v-card-actions>
+      </v-card>
     </v-card>
   </v-dialog>
 </template>
@@ -54,6 +64,7 @@
     );
   const chosenFile = ref([])
   const dialog = ref(false)
+  const DATA = reactive( { puzzle: {} })
 
   watch(
     () => props.show, 
@@ -72,7 +83,10 @@
         const ds = new DecompressionStream("gzip")
         const gunzipStream = newv[0].stream().pipeThrough(ds)
         const puzzleXML = await new Response(gunzipStream).text()
-        const puzzle = Puzzle.puzzleFromXML(puzzleXML)
+        DATA.puzzle = Puzzle.puzzleFromXML(puzzleXML)
+      }
+      else {
+        DATA.puzzle = {}
       }
     }
   )
