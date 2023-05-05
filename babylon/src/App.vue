@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar density="compact">
-      <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon id="main-menu-activator" variant="text"></v-app-bar-nav-icon>
       <v-toolbar-title>
         Burr Editor
       </v-toolbar-title>
@@ -19,6 +19,21 @@
         </v-tabs>
       </template>
     </v-app-bar>
+
+    <v-menu activator="#main-menu-activator">
+      <v-list>
+        <v-list-item value="new" prependIcon="mdi-file-outline" title="New puzzle"/>
+        <v-divider></v-divider>
+        <v-list-item value="load" prependIcon="mdi-folder-open" title="Load local puzzle" @click="showLoadLocalFile++"/>
+        <v-list-item :disabled="!puzzle.shapes" value="save" prependIcon="mdi-folder" title="Save local puzzle"/>
+        <v-divider></v-divider>
+        <v-list-item value="download" prependIcon="mdi-download" title="Download puzzle"/>
+        <v-list-item :disabled=true value="upload" prependIcon="mdi-upload" title="Upload puzzle"/>
+      </v-list>
+    </v-menu>
+
+    <LocalFileDialog :show="showLoadLocalFile">
+    </LocalFileDialog>
 
     <v-main v-show="tab == 'puzzle'">
       <v-navigation-drawer 
@@ -51,20 +66,30 @@
 
 <script>
 import PuzzleDrawer from "./components/PuzzleDrawer.vue"
+import LocalFileDialog from "./components/LocalFileDialog.vue"
 import BabylonEngine from "./components/babylon/BabylonEngine.vue";
 import BabylonScene from "./components/babylon/BabylonScene.vue";
 import BabylonSceneModel from "./components/babylon/BabylonSceneModel.vue";
 import BabylonCamera from "./components/babylon/BabylonCamera.vue";
 import BabylonView from "./components/babylon/BabylonView.vue";
 import { sceneBuilder } from "./scenes/ShapeEditor.js";
+import { nextTick } from "vue";
 
 export default {
   name: "App",
   data() {
-    return { puzzle: {}, shape: {}, VoxelEditor: sceneBuilder, drawer: false, rail: true, tab: null }
+    return { 
+      puzzle: {}, 
+      shape: {}, 
+      VoxelEditor: sceneBuilder, 
+      drawer: false, 
+      tab: null,
+      showLoadLocalFile: 0
+    }
   },
   components: {
     PuzzleDrawer,
+    LocalFileDialog,
     BabylonScene,
     BabylonSceneModel,
     BabylonEngine,
@@ -77,6 +102,9 @@ export default {
   watch:{
     shape(newv, oldv) { 
     },
+    showLoadLocalFile(newv, oldv) {
+      console.log(newv)
+    }
   },
   mounted() { 
   }
