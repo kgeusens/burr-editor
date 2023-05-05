@@ -6,7 +6,7 @@
         Burr Editor
       </v-toolbar-title>
       <template v-slot:extension>
-        <v-tabs color="purple" v-model="tab" align-tabs="title">
+        <v-tabs grow color="purple" v-model="tab">
           <v-tab key="1" value="puzzle" :border="tab == 'puzzle'" >
             Puzzle
           </v-tab>
@@ -26,7 +26,7 @@
         v-model="drawer"
         temporary
         >
-        <PuzzleBrowser @newShape="loadShape"/>
+        <PuzzleDrawer @newShape="loadShape"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import PuzzleBrowser from "./components/PuzzleBrowser.vue"
+import PuzzleDrawer from "./components/PuzzleDrawer.vue"
 import BabylonEngine from "./components/babylon/BabylonEngine.vue";
 import BabylonScene from "./components/babylon/BabylonScene.vue";
 import BabylonSceneModel from "./components/babylon/BabylonSceneModel.vue";
@@ -64,7 +64,7 @@ export default {
     return { puzzle: {}, shape: {}, VoxelEditor: sceneBuilder, drawer: false, rail: true, tab: null }
   },
   components: {
-    PuzzleBrowser,
+    PuzzleDrawer,
     BabylonScene,
     BabylonSceneModel,
     BabylonEngine,
