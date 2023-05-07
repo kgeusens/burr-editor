@@ -13,8 +13,8 @@
     <v-toolbar color="primary" title="open local file"></v-toolbar>
     <v-card>
       <v-card class="ma-3">
-        <v-combobox :items="designers">
-        </v-combobox>
+        <v-autocomplete class="ma-3" variant=outlined :items="designers" label="Designer" chips clearable>
+        </v-autocomplete>
         <v-virtual-scroll
           :items="puzzleList"
           height="400"
