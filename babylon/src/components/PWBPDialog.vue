@@ -22,7 +22,7 @@
           > 
           <template v-slot:default="{ item, index }">
             <v-list-item
-                :title="item.attributes.ename"
+                :title="item.ename"
                 :subtitle="index"
                 >
               <template v-slot:prepend>
@@ -87,13 +87,13 @@
     const res = 
       fetch('http://localhost:3001/api/PWBP/index', { mode: "cors" })
       .catch(error => console.log(error))
-      .then(res => res.json()).then(obj => {puzzleList.value = obj;})
+      .then(res => res.json()).then(obj => {puzzleList.value = obj.map(el => el.attributes);})
       .catch(error => console.log(error))
   }
 
   function getUniqueAttrVals(attrName) {
     if (puzzleList.value.length) {
-      return puzzleList.value.map(el => el.attributes[attrName]).filter( (it, idx, ar) => ar.indexOf(it) === idx  ).sort()
+      return puzzleList.value.map(el => el[attrName]).filter( (it, idx, ar) => ar.indexOf(it) === idx  ).sort()
     } else {
       return []
     }
