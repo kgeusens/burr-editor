@@ -36,11 +36,6 @@ const XMLoptions = {
 }
 
 async function listFiles(path) {
-//  let result = [];
-//  const dir = await fs.promises.opendir(path);
-//  for await (const dirent of dir) {
-//    result.push(dirent);
-//  }
   let result = fs.readdirSync(path)
   return result;
 }
@@ -53,6 +48,25 @@ function loadPuzzle(xmpuzzle) {
 		var result = parser.parse(xmlContent)
 		return result
 	}
+
+async function loadPWBPindex() {
+	const XMLoptions = { 
+		textNodeName: "text", 
+		format: true, 
+		ignoreAttributes: false, 
+		indentBy: " ", 
+		suppressEmptyNode: false, 
+		alwaysCreateTextNode: true, 
+		attributesGroupName: "attributes", 
+		attributeNamePrefix: '',
+	}
+	const parser = new XML.XMLParser(XMLoptions)
+	let result=fetch('https://puzzlewillbeplayed.com/-/puzzle-index.xml', { mode: "cors" })
+		.catch(error => console.log(error))
+		.then(res => res.text())
+		.then(xml => parser.parse(xml)["puzzle-index"].puzzle)
+	return result
+}
 
 //////////
 // app.get
@@ -78,6 +92,19 @@ app.get("/api/puzzles/get/:file", (req, res) => {
   res.send(obj);
 });
 
+app.get(
+	"/api/PWBP/index", 
+	(req, res) => {
+			loadPWBPindex().then
+			(
+				(r) =>  { 
+				  res.set('Access-Control-Allow-Origin', '*');
+				  res.send(r)
+				}
+				);
+			}
+);
+		
 app.get('*', (req, res) => {res.sendFile(path.resolve(__dirname, '../babylon/dist', 'index.html'))})
 
 //////////

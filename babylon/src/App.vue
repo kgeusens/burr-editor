@@ -25,6 +25,7 @@
         <v-list-item value="new" prependIcon="mdi-file-outline" title="New puzzle"/>
         <v-divider></v-divider>
         <v-list-item value="load" prependIcon="mdi-folder-open" title="Load local puzzle" @click="showLoadLocalFile++"/>
+        <v-list-item value="loadPWBP" prependIcon="mdi-folder-open" title="Explore PuzzleWillBePlayed " @click="showPWBPDialog++"/>
         <v-list-item :disabled="!puzzle.shapes" value="save" prependIcon="mdi-folder" title="Save local puzzle"/>
         <v-divider></v-divider>
         <v-list-item value="download" prependIcon="mdi-download" title="Download puzzle"/>
@@ -34,6 +35,9 @@
 
     <LocalFileDialog :show="showLoadLocalFile" @newShape="loadPuzzle" @newName="setFilename">
     </LocalFileDialog>
+
+    <PWBPDialog :show="showPWBPDialog" @newShape="loadPuzzle" @newName="setFilename">
+    </PWBPDialog>
 
     <v-main v-show="tab == 'puzzle' && puzzle.shapes">
       <v-navigation-drawer 
@@ -67,13 +71,13 @@
 <script>
 import PuzzleDrawer from "./components/PuzzleDrawer.vue"
 import LocalFileDialog from "./components/LocalFileDialog.vue"
+import PWBPDialog from './components/PWBPDialog.vue'
 import BabylonEngine from "./components/babylon/BabylonEngine.vue";
 import BabylonScene from "./components/babylon/BabylonScene.vue";
 import BabylonSceneModel from "./components/babylon/BabylonSceneModel.vue";
 import BabylonCamera from "./components/babylon/BabylonCamera.vue";
 import BabylonView from "./components/babylon/BabylonView.vue";
 import { sceneBuilder } from "./scenes/ShapeEditor.js";
-import { nextTick } from "vue";
 
 export default {
   name: "App",
@@ -85,12 +89,14 @@ export default {
       VoxelEditor: sceneBuilder, 
       drawer: false, 
       tab: "",
-      showLoadLocalFile: 0
+      showLoadLocalFile: 0,
+      showPWBPDialog: 0,
     }
   },
   components: {
     PuzzleDrawer,
     LocalFileDialog,
+    PWBPDialog,
     BabylonScene,
     BabylonSceneModel,
     BabylonEngine,

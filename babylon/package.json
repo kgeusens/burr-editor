@@ -14,7 +14,7 @@
     "@kgeusens/burr-data": "^0.1.15",
     "fast-xml-parser": "^4.2.2",
     "vue": "^3.2.47",
-    "vuetify": "^3.1.15"
+    "vuetify": "^3.2.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
