@@ -13,32 +13,20 @@
     <v-toolbar color="primary" title="open local file"></v-toolbar>
     <v-card>
       <v-card class="ma-3">
-        <v-autocomplete class="ma-3" variant=outlined :items="designers" label="Designer" chips clearable>
+        <v-autocomplete v-model="DATA.filterObjects.designer" class="mx-3 mt-3" variant=outlined :items="designers" label="Designer" chips clearable>
         </v-autocomplete>
-        <v-virtual-scroll
+        <v-text-field v-model="DATA.filterObjects.name" class="mx-3" label="Quicksearch" prepend-inner-icon="mdi-magnify" clearable>
+        </v-text-field>
+        <v-data-table-virtual
+          :headers="puzzleHeaders"
           :items="puzzleList"
+          :search="filterString"
+          class="elevation-1"
           height="400"
-          item-height="48"
-          > 
-          <template v-slot:default="{ item, index }">
-            <v-list-item
-                :title="item.name"
-                :subtitle="index"
-                >
-              <template v-slot:prepend>
-                <v-icon class="bg-primary">mdi-account</v-icon>
-              </template>
-
-              <template v-slot:append>
-                <v-btn
-                  icon="mdi-pencil"
-                  size="x-small"
-                  variant="tonal"
-                ></v-btn>
-              </template>
-            </v-list-item>
-          </template>
-        </v-virtual-scroll>
+          fixed-header
+          :custom-filter="filterComplex"
+        >
+        </v-data-table-virtual>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
@@ -67,6 +55,7 @@
 
 <script setup>
   import { ref, reactive, computed, watch } from 'vue'
+  import { VDataTableVirtual } from 'vuetify/labs/VDataTable'
   import { Puzzle } from '@kgeusens/burr-data'
   import { XMLParser } from 'fast-xml-parser'
 
@@ -80,7 +69,19 @@
   const puzzleList = ref([])
   const selectedPuzzle = ref({})
   const dialog = ref(false)
-  const DATA = reactive( { puzzle: {} })
+  const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null} })
+  const searchName = ref("")
+
+  const puzzleHeaders = [
+          {
+            title: 'Puzzle name',
+            align: 'start',
+            sortable: true,
+            key: 'name',
+          },
+          { title: 'Designer', key: 'designer' },
+        ]
+  const puzzleGroup = [ {key: 'designer' }]
 
   function loadPuzzleList() {
     selectedPuzzle.value = ''
@@ -108,6 +109,12 @@
     dialog.value=false
   }
 
+  function filterComplex (value, query, item) {
+    let q=JSON.parse(query)
+
+    return (!q.designer || q.designer == item.columns.designer) && (!q.name || (value.toString().indexOf(q.name) !== -1) )
+  }
+
   watch(
     () => props.show, 
     (newv) => {
@@ -119,13 +126,15 @@
     selectedPuzzle, 
     async (newv) => { 
       if (newv != "") {
-        console.log(newv)
       }
       else {
         DATA.puzzle = {}
       }
     }
   )
+  const filterString = computed({
+    get: () => JSON.stringify(DATA.filterObjects)
+  })
   const designers = computed({
     get: () => getUniqueAttrVals('designer')
   })
