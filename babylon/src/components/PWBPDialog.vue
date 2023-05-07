@@ -22,7 +22,7 @@
           > 
           <template v-slot:default="{ item, index }">
             <v-list-item
-                :title="item.ename"
+                :title="item.name"
                 :subtitle="index"
                 >
               <template v-slot:prepend>
@@ -87,7 +87,10 @@
     const res = 
       fetch('http://localhost:3001/api/PWBP/index', { mode: "cors" })
       .catch(error => console.log(error))
-      .then(res => res.json()).then(obj => {puzzleList.value = obj.map(el => el.attributes);})
+      .then(res => res.json())
+      .then(obj => {puzzleList.value = obj.map(el => 
+        { return { name: el.attributes.ename, designer : el.attributes.dsgn } }
+        )})
       .catch(error => console.log(error))
   }
 
@@ -101,7 +104,7 @@
 
   function loadFile() {
     emit( "newShape", DATA.puzzle )
-    emit( "newName", selectedPuzzle.value.attributes.ename)
+    emit( "newName", selectedPuzzle.value.attributes.name)
     dialog.value=false
   }
 
@@ -124,6 +127,6 @@
     }
   )
   const designers = computed({
-    get: () => getUniqueAttrVals('dsgn')
+    get: () => getUniqueAttrVals('designer')
   })
 </script>
