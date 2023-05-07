@@ -13,6 +13,8 @@
     <v-toolbar color="primary" title="open local file"></v-toolbar>
     <v-card>
       <v-card class="ma-3">
+        <v-combobox :items="designers">
+        </v-combobox>
         <v-virtual-scroll
           :items="puzzleList"
           height="400"
@@ -89,6 +91,14 @@
       .catch(error => console.log(error))
   }
 
+  function getUniqueAttrVals(attrName) {
+    if (puzzleList.value.length) {
+      return puzzleList.value.map(el => el.attributes[attrName]).filter( (it, idx, ar) => ar.indexOf(it) === idx  ).sort()
+    } else {
+      return []
+    }
+  }
+
   function loadFile() {
     emit( "newShape", DATA.puzzle )
     emit( "newName", selectedPuzzle.value.attributes.ename)
@@ -113,4 +123,7 @@
       }
     }
   )
+  const designers = computed({
+    get: () => getUniqueAttrVals('dsgn')
+  })
 </script>
