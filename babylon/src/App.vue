@@ -3,7 +3,7 @@
     <v-app-bar density="compact">
       <v-app-bar-nav-icon id="main-menu-activator" variant="text"></v-app-bar-nav-icon>
       <v-toolbar-title>
-        {{ fileName ? fileName.replace(/\.xmpuzzle$/i, "") : "Bur Editor"}}
+        {{ fileName ? fileName.replace(/\.xmpuzzle$/i, "") : "Burr Editor"}}
       </v-toolbar-title>
       <template v-if="puzzle.shapes" v-slot:extension>
         <v-tabs grow color="purple" v-model="tab">

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog max-width="500" v-model="dialog" persistent>
+  <v-dialog max-width="1200" v-model="dialog" persistent>
     <v-overlay
       :model-value="puzzleList == ''"
       class="align-center justify-center"
@@ -10,7 +10,7 @@
         size="64"
       ></v-progress-circular>
     </v-overlay>    
-    <v-toolbar color="primary" title="open local file"></v-toolbar>
+    <v-toolbar color="primary" title="Puzzle Will Be Played"></v-toolbar>
     <v-card>
       <v-card class="ma-3">
         <v-autocomplete v-model="DATA.filterObjects.designer" class="mx-3 mt-3" variant=outlined :items="designers" label="Designer" chips clearable>
@@ -25,6 +25,8 @@
           height="400"
           fixed-header
           :custom-filter="filterComplex"
+          density="compact"
+          @click:row="clickRow"
         >
         </v-data-table-virtual>
         <v-card-actions>
@@ -78,8 +80,10 @@
             align: 'start',
             sortable: true,
             key: 'name',
+            width: "250"
           },
-          { title: 'Designer', key: 'designer' },
+          { title: 'Designer', key: 'designer', width: "150" },
+          { title: 'Moves', key: 'moves', width: "50"}
         ]
   const puzzleGroup = [ {key: 'designer' }]
 
@@ -89,8 +93,18 @@
       fetch('http://localhost:3001/api/PWBP/index', { mode: "cors" })
       .catch(error => console.log(error))
       .then(res => res.json())
-      .then(obj => {puzzleList.value = obj.map(el => 
-        { return { name: el.attributes.ename, designer : el.attributes.dsgn } }
+      .then(obj => {puzzleList.value = obj.filter(el => el.attributes.cat === "I").map(el => 
+        { return { 
+            name: el.attributes.ename, 
+            designer : el.attributes.dsgn,
+            date: el.attributes.date,
+            shape: el.attributes.shape,
+            moves: el.attributes.moves ?el.attributes.moves.match(/\d*/):0,
+            uri: el.attributes.uri,
+            goal: el.attributes.goal,
+            category: el.attributes.cat,
+            subcategory: el.attributes.subcat
+          } }
         )})
       .catch(error => console.log(error))
   }
@@ -101,6 +115,11 @@
     } else {
       return []
     }
+  }
+
+  function clickRow(event, row) {
+    console.log(row.item.value.uri)
+    window.open("https://puzzlewillbeplayed.com/"+row.item.value.uri)
   }
 
   function loadFile() {
