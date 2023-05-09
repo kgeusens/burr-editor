@@ -175,6 +175,9 @@ function IdToVoxel(p) {
             l=p[2].length
             h='0x'+p[2]
             switch (true) {
+                case ( (x==6) && (l<6)):
+                    retval=LCapped(x,y,z,p[2])
+                    break
                 case ( (x==7) && (l==6)  ):
                     retval=ICapped(x,y,z,h)
                     break
