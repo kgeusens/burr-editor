@@ -86,7 +86,7 @@ function ICapped(x,y,z,hex) {
 
     const lpa=prefixString.substring(0,2*y*z).match(/.{2}/g)
     const spa=prefixString.substring(2*y*z).match(/.{2}/g)
-    const ssa=shortString.match(shortRE)
+    const ssa=shortLength?shortString.match(shortRE):[]
     const lsa=longString.match(longRE)
 
     var almostRows=[]
@@ -153,11 +153,14 @@ function IdToVoxel(p) {
     let x=0; let y=0; let z=0
     let retval;
     switch (true) {
-        case ( p[0] == "Burrs" &&  /\d*\.\d*\.\d*-/.test(p[2])): // Name is in 3.2.1-0D43 format
+        case ( p[0] == "Burrs" &&  /\d*\.\d*\.\d*-/.test(p[2]) ): // Name is in 3.2.1-0D43 format
         case ( p[0] == "Polyominoes" ):
             tv=p[2].split('-')
             dims=tv[0].split('.')
-            x=dims[0]; y=dims[1]; z=dims[2]
+            l=dims.length
+            if (l<3) x=1 
+            else x=dims[l-3]; 
+            y=dims[l-2]; z=dims[l-1]
             h='0x' + tv[1]
             retval = Poly(x,y,z,h)
             break;
@@ -176,6 +179,9 @@ function IdToVoxel(p) {
             h='0x'+p[2]
             switch (true) {
                 case ( (x==6) && (l<6)):
+                    retval=LCapped(x,y,z,p[2])
+                    break
+                case ( (x==4) ):
                     retval=LCapped(x,y,z,p[2])
                     break
                 case ( (x==7) && (l==6)  ):
