@@ -108,7 +108,6 @@
         )})
       .catch(error => console.log(error))
   }
-
   function getUniqueAttrVals(attrName) {
     if (puzzleList.value.length) {
       return puzzleList.value.map(el => el[attrName]).filter( (it, idx, ar) => ar.indexOf(it) === idx  ).sort()
@@ -116,22 +115,26 @@
       return []
     }
   }
-
-  function clickRow(event, row) {
-    console.log(row.item.value.uri)
-    window.open("https://puzzlewillbeplayed.com/"+row.item.value.uri)
-  }
-
   function loadFile() {
     emit( "newShape", DATA.puzzle )
     emit( "newName", selectedPuzzle.value.attributes.name)
     dialog.value=false
   }
-
   function filterComplex (value, query, item) {
     let q=JSON.parse(query)
 
     return (!q.designer || q.designer == item.columns.designer) && (!q.name || (value.toString().indexOf(q.name) !== -1) )
+  }
+  function clickRow(event,row) {
+    selectedPuzzle.value = ''
+    const res = 
+      fetch('http://localhost:3001/api/PWBP/puzzle/'+row.item.value.uri, { mode: "cors" })
+      .catch(error => console.log(error))
+      .then(res => res.json())
+      .then(obj => { 
+        console.log(obj)
+      })
+      .catch(error => console.log(error))
   }
 
   watch(
@@ -151,6 +154,7 @@
       }
     }
   )
+
   const filterString = computed({
     get: () => JSON.stringify(DATA.filterObjects)
   })

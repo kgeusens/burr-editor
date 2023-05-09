@@ -12,42 +12,39 @@ const puzzleDir = "./xmpuzzles"
 // functions
 //////////
 
-const XMLAlwaysArrayName = [
-	"voxel",
-	"shape",
-	"problem",
-	"solution",
-	"separation",
-	"state"
-];
-      
-const XMLoptions = { 
-	textNodeName: "text", 
-	format: true, 
-	ignoreAttributes: false, 
-	indentBy: " ", 
-	suppressEmptyNode: true, 
-	alwaysCreateTextNode: true, 
-	attributesGroupName: "@attributes", 
-	attributeNamePrefix: '',
-  	isArray: (name, jpath, isLeafNode, isAttribute) => { 
-		if( XMLAlwaysArrayName.indexOf(name) !== -1) return true;
-  	}
-}
-
 async function listFiles(path) {
   let result = fs.readdirSync(path)
   return result;
 }
 
 function loadPuzzle(xmpuzzle) {
-  //load the file
-    const xmpuzzleFile = fs.readFileSync(xmpuzzle);
-		const parser = new XML.XMLParser(XMLoptions);
-		const xmlContent = ZIP.gunzipSync(xmpuzzleFile)
-		var result = parser.parse(xmlContent)
-		return result
+	const XMLAlwaysArrayName = [
+		"voxel",
+		"shape",
+		"problem",
+		"solution",
+		"separation",
+		"state"
+	];
+	const XMLoptions = { 
+		textNodeName: "text", 
+		format: true, 
+		ignoreAttributes: false, 
+		indentBy: " ", 
+		suppressEmptyNode: true, 
+		alwaysCreateTextNode: true, 
+		attributesGroupName: "@attributes", 
+		attributeNamePrefix: '',
+		isArray: (name, jpath, isLeafNode, isAttribute) => { 
+			if( XMLAlwaysArrayName.indexOf(name) !== -1) return true;
+		}
 	}
+    const xmpuzzleFile = fs.readFileSync(xmpuzzle);
+	const parser = new XML.XMLParser(XMLoptions);
+	const xmlContent = ZIP.gunzipSync(xmpuzzleFile)
+	var result = parser.parse(xmlContent)
+	return result
+}
 
 async function loadPWBPindex() {
 	const XMLoptions = { 
@@ -65,6 +62,53 @@ async function loadPWBPindex() {
 		.catch(error => console.log(error))
 		.then(res => res.text())
 		.then(xml => parser.parse(xml)["puzzle-index"].puzzle)
+	return result
+}
+
+async function loadPWBPpuzzle(shape, name) {
+	const XMLAlwaysArrayName = [
+		"table",
+		"tr",
+		"td",
+	];
+	const XMLoptions = { 
+		textNodeName: "text", 
+		format: true, 
+		ignoreAttributes: false, 
+		indentBy: " ", 
+		suppressEmptyNode: false, 
+		attributesGroupName: "attributes", 
+		alwaysCreateTextNode: true, 
+		attributeNamePrefix: '',
+		isArray: (name, jpath, isLeafNode, isAttribute) => { 
+			if( XMLAlwaysArrayName.indexOf(name) !== -1) return true;
+		}
+	}
+	const parser = new XML.XMLParser(XMLoptions)
+	let result=fetch('https://puzzlewillbeplayed.com/'+shape+"/"+name, { mode: "no-cors" })
+		.catch(error => console.log(error))
+		.then(res => res.text())
+		.then(
+			xml => { 
+				let arr=parser.parse(xml).html.body.table
+					.find(el => el.attributes ? el.attributes.summary == "pieces" : false )
+					.tr[0].td[0].table
+				let img=[]
+				let count={}
+				let subTables=[]
+				arr.forEach(t => t.tr.forEach(tr => tr.td.forEach(td =>  { 
+					if (td.img) if (img.indexOf(td.img.attributes.src)== -1 ) {img.push(td.img.attributes.src );count[td.img.attributes.src]=1} else count[td.img.attributes.src]++ 
+					if (td.table) subTables.push(...td.table)
+				})))
+				subTables.forEach(t => t.tr.forEach(tr => tr.td.forEach(td =>  { 
+					if (td.img) if (img.indexOf(td.img.attributes.src)== -1 ) {img.push(td.img.attributes.src );count[td.img.attributes.src]=1} else count[td.img.attributes.src]++ 
+				})))
+				return img.map(el => { return {path : el.split('/').slice(2), count: count[el]} })
+			}
+		)
+			
+		
+//		arr.forEach(t => t.tr.forEach(tr => tr.td.forEach(td => res.push(td.img.attributes.src))))		
 	return result
 }
 
@@ -100,6 +144,20 @@ app.get(
 				(r) =>  { 
 				  res.set('Access-Control-Allow-Origin', '*');
 				  res.send(r)
+				}
+				);
+			}
+);
+
+app.get(
+	"/api/PWBP/puzzle/:shape/:name", 
+	(req, res) => {
+			loadPWBPpuzzle(req.params.shape, req.params.name).then
+			(
+				(r) =>  { 
+					console.log(JSON.stringify(r))
+				  	res.set('Access-Control-Allow-Origin', '*');
+				  	res.send(r)
 				}
 				);
 			}
