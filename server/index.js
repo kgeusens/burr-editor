@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const ZIP = require('zlib');
 const XML = require('fast-xml-parser');
+const PWBP = require('./PWBP/convert.js')
 
 const app = express();
 const port = 3001;
@@ -109,7 +110,10 @@ async function loadPWBPpuzzle(shape, name) {
 						if (img.indexOf(idx)== -1 ) {img.push(idx);count[idx]=1} else count[idx]++ 
 					}
 				})))
-				return img.map(el => { return {path : el.split('/').slice(2), count: count[el]} })
+				return img.map(el => { 
+					let p=el.replaceAll("../","").split('/')
+					return {path : p, count: count[el], converted: PWBP.convert(p)} 
+				})
 			}
 		)
 	return result
@@ -153,9 +157,11 @@ app.get(
 );
 
 app.get(
-	"/api/PWBP/puzzle/:shape/:name", 
+	"/api/PWBP/puzzle/:shape/:name/:optional?", 
 	(req, res) => {
-			loadPWBPpuzzle(req.params.shape, req.params.name).then
+			let p = req.params.name
+			if (req.params.optional) p=p+"/"+req.params.optional
+			loadPWBPpuzzle(req.params.shape, p).then
 			(
 				(r) =>  { 
 				  	res.set('Access-Control-Allow-Origin', '*');

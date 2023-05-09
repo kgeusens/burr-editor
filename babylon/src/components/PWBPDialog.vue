@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-  import { ref, reactive, computed, watch } from 'vue'
+  import { ref, reactive, computed, watch, popScopeId } from 'vue'
   import { VDataTableVirtual } from 'vuetify/labs/VDataTable'
   import { Puzzle } from '@kgeusens/burr-data'
   import { XMLParser } from 'fast-xml-parser'
@@ -119,7 +119,7 @@
   }
   function loadFile() {
     emit( "newShape", DATA.puzzle )
-    emit( "newName", selectedPuzzle.value.attributes.name)
+    emit( "newName", selectedPuzzle.value)
     dialog.value=false
   }
   function filterComplex (value, query, item) {
@@ -129,13 +129,20 @@
   }
   function clickRow(event,row) {
     selectedPuzzle.value = ''
+    let p = new Puzzle()
     const res = 
       fetch('http://localhost:3001/api/PWBP/puzzle/'+row.item.value.uri, { mode: "cors" })
       .catch(error => console.log(error))
       .then(res => res.json())
       .then(obj => { 
-        console.log(obj)
-        console.log(row.item.raw)
+        let i=0
+        obj.forEach(el => {
+          i=p.addShape();
+          p.getShape(i).setSize(el.converted.x,el.converted.y,el.converted.z)
+          p.getShape(i).stateString=el.converted.stateString
+        })
+        selectedPuzzle.value=row.item.value.name
+        DATA.puzzle = p
       })
       .catch(error => console.log(error))
   }
