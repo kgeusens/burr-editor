@@ -137,7 +137,6 @@
       .then(obj => { 
         let i=0
         obj.forEach(el => {
-          console.log(el)
           i=p.addShape();
           p.getShape(i).setSize(el.converted.x,el.converted.y,el.converted.z)
           p.getShape(i).stateString=el.converted.stateString
