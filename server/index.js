@@ -97,18 +97,21 @@ async function loadPWBPpuzzle(shape, name) {
 				let count={}
 				let subTables=[]
 				arr.forEach(t => t.tr.forEach(tr => tr.td.forEach(td =>  { 
-					if (td.img) if (img.indexOf(td.img.attributes.src)== -1 ) {img.push(td.img.attributes.src );count[td.img.attributes.src]=1} else count[td.img.attributes.src]++ 
+					if (td.img) {
+						idx=td.img.attributes.src.replace(/(-.)?\.gif/,"")
+						if (img.indexOf(idx)== -1 ) {img.push(idx);count[idx]=1} else count[idx]++ 
+					}
 					if (td.table) subTables.push(...td.table)
 				})))
 				subTables.forEach(t => t.tr.forEach(tr => tr.td.forEach(td =>  { 
-					if (td.img) if (img.indexOf(td.img.attributes.src)== -1 ) {img.push(td.img.attributes.src );count[td.img.attributes.src]=1} else count[td.img.attributes.src]++ 
+					if (td.img) {
+						idx=td.img.attributes.src.replace(/(-.)?\.gif/,"")
+						if (img.indexOf(idx)== -1 ) {img.push(idx);count[idx]=1} else count[idx]++ 
+					}
 				})))
 				return img.map(el => { return {path : el.split('/').slice(2), count: count[el]} })
 			}
 		)
-			
-		
-//		arr.forEach(t => t.tr.forEach(tr => tr.td.forEach(td => res.push(td.img.attributes.src))))		
 	return result
 }
 
@@ -155,7 +158,6 @@ app.get(
 			loadPWBPpuzzle(req.params.shape, req.params.name).then
 			(
 				(r) =>  { 
-					console.log(JSON.stringify(r))
 				  	res.set('Access-Control-Allow-Origin', '*');
 				  	res.send(r)
 				}

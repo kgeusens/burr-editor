@@ -18,10 +18,10 @@
         <v-text-field v-model="DATA.filterObjects.name" class="mx-3" label="Quicksearch" prepend-inner-icon="mdi-magnify" clearable>
         </v-text-field>
         <v-data-table-virtual
+          hover
           :headers="puzzleHeaders"
           :items="puzzleList"
           :search="filterString"
-          class="elevation-1"
           height="400"
           fixed-header
           :custom-filter="filterComplex"
@@ -83,7 +83,9 @@
             width: "250"
           },
           { title: 'Designer', key: 'designer', width: "150" },
-          { title: 'Moves', key: 'moves', width: "50"}
+          { title: 'Moves', key: 'moves', width: "50"},
+          { title: 'Date', key: 'date', width: "50"},
+          { title: 'Subtype', key: 'subcategory', width: "50"},
         ]
   const puzzleGroup = [ {key: 'designer' }]
 
@@ -133,6 +135,7 @@
       .then(res => res.json())
       .then(obj => { 
         console.log(obj)
+        console.log(row.item.raw)
       })
       .catch(error => console.log(error))
   }
