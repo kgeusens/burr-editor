@@ -55,7 +55,7 @@
       <v-card width="100%" height="100%">
         <BabylonEngine>
           <BabylonScene>
-            <BabylonSceneModel :model=VoxelEditor :detail=shape>
+            <BabylonSceneModel :model=VoxelEditor :detail=shapeDetail >
             </BabylonSceneModel>
             <BabylonCamera id="1">
               <BabylonView width="parent" height="parent">
@@ -104,21 +104,32 @@ export default {
     BabylonView,
   },
   methods: {
-    loadShape(s) { 
-      this.shape = s 
+    loadShape(s) {
+      this.shape = s
     },
     loadPuzzle(p) {
       this.puzzle = p
     },
     setFilename(f) {
       this.fileName = f
+    },
+  },
+  computed: {
+    shapeSize() {
+        return { x: this.shape.x, y: this.shape.y, z: this.shape.z }
+    },
+    shapeDetail() {
+      return { shape: this.shape, size: this.shapeSize }
     }
   },
   watch:{
     shape(newv, oldv) { 
     },
     showLoadLocalFile(newv, oldv) {
-    }
+    },
+    shapeSize(newv) {
+      console.log("watch shapeSize", newv)
+    },
   },
   mounted() { 
   }

@@ -62,9 +62,6 @@
     async (newv) => { 
       if (newv[0]) {
         var reader = new FileReader()
-//        reader.onload = () => { 
-//          console.log(reader.result)
-//        }
         const ds = new DecompressionStream("gzip")
         const gunzipStream = newv[0].stream().pipeThrough(ds)
         const puzzleXML = await new Response(gunzipStream).text()

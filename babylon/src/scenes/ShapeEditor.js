@@ -445,8 +445,8 @@ export class sceneBuilder {
         this.grid=new Grid(new Voxel({}), rootNode)
         this.setOptions(options)
     }
-    setOptions(shape) {
-        this.grid.voxel = new Voxel(shape);
+    setOptions(options) {
+        this.grid.voxel = new Voxel(options.shape);
         this.grid.render()
     }
 }

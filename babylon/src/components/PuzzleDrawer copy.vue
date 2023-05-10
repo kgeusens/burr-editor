@@ -7,7 +7,7 @@
           <v-list-item-title v-text="item.name"></v-list-item-title>
         </v-list-item>
       </v-list>
-      <v-card v-if="selectedShape">
+      <v-card v-if="selectedShape.x">
         <v-text-field
         v-model="selectedShape.name"
         hide-details
@@ -59,7 +59,5 @@
     get: () => DATA.selectedShape,
     set: (val) => DATA.selectedShape = val
   })
-  watch(selectedShape, (newval, oldval) => {
-    emit("newShape", newval)
-    })
+  watch(selectedShape, (newval, oldval) => {emit("newShape", newval)})
 </script>
