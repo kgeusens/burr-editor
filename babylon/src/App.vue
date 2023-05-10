@@ -128,7 +128,6 @@ export default {
     showLoadLocalFile(newv, oldv) {
     },
     shapeSize(newv) {
-      console.log("watch shapeSize", newv)
     },
   },
   mounted() { 

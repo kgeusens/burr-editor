@@ -3,7 +3,8 @@
 </template>
 
 <script setup>
-    import { reactive, inject, watch, onMounted } from "@vue/runtime-core";
+    import { SubEmitter } from "@babylonjs/core";
+import { reactive, inject, watch, onMounted } from "@vue/runtime-core";
 
     const theScene = inject("scene")
 
@@ -11,8 +12,13 @@
         model: Function, 
         detail: Object,
     })
+    const emit = defineEmits(["newState"])
 
-    const myModel = new props.model(theScene)
+    const stateCallback = function(state) {
+        emit("newState", state)
+    }
+
+    const myModel = new props.model(theScene, stateCallback)
 
     onMounted(() => {
     });

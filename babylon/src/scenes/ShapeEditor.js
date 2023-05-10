@@ -399,10 +399,12 @@ class GridControls {
 
 export class sceneBuilder {
     grid
+    stateCallback
 //    scene
 //    rootNode
-    constructor(sc, options = {}) {
+    constructor(sc, callbackFunction, options = {}) {
         scene = sc
+        this.stateCallback=callbackFunction
         BoxMaterials={
             RW: 
             [   
