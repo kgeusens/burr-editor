@@ -1,8 +1,8 @@
 <template>
   <v-card width="700">
     <v-card v-if="props.puzzle.shapes">
-      <v-list>
-        <v-list-item  v-for="(item, i) in props.puzzle.shapes.voxel" :key="i" :value="item" @click="selectShape(item)">
+      <v-list v-model:selected="DATA.selectedItem">
+        <v-list-item  v-for="(item, i) in props.puzzle.shapes.voxel" :key="i" :value="item">
           <template v-slot:prepend>{{ i }}</template>
           <v-list-item-title v-text="item.name"></v-list-item-title>
         </v-list-item>
@@ -53,13 +53,13 @@
     }
     );
 
-  const DATA= reactive({fileList: [], selectedFile: '', loadedFile: {}, selectedShape: new Voxel() })
-  function selectShape(s) { selectedShape.value=s }
+  const DATA= reactive({fileList: [], selectedItem: [] })
   const selectedShape = computed({
-    get: () => DATA.selectedShape,
-    set: (val) => DATA.selectedShape = val
+    get: () => DATA.selectedItem[0],
+    set: (val) => DATA.selectedItem = [val]
   })
   watch(selectedShape, (newval, oldval) => {
     emit("newShape", newval)
     })
+  watch(() => props.puzzle, (newval) => DATA.selectedItem=[newval.shapes.voxel[0]])
 </script>
