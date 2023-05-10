@@ -3,7 +3,7 @@
     <v-card v-if="props.puzzle.shapes">
       <v-list v-model:selected="DATA.selectedItem">
         <v-list-item  v-for="(item, i) in props.puzzle.shapes.voxel" :key="i" :value="item">
-          <template v-slot:prepend>{{ i }}</template>
+          <template v-slot:prepend><v-icon :icon="`mdi-numeric-${i}-box-outline`"></v-icon></template>
           <v-list-item-title v-text="item.name"></v-list-item-title>
         </v-list-item>
       </v-list>
