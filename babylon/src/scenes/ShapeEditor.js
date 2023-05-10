@@ -396,6 +396,29 @@ class GridControls {
     }
 } // end of class GridControls
 
+const handler = {
+    get(target, property) {
+        if (property == "getVoxelPosition") {
+            return function(...args) {
+                let s = target[property].apply(target,args)
+                return new Proxy(s,handler)
+            }
+        }
+        if (typeof target[property] == "function") {
+            return function(...args) {
+                return target[property].apply(target,args)
+            }
+        }
+        else return target[property];
+    },
+    set(target, property, value) {
+        target[property] = value
+        if (property == "state") {
+            console.log("intercepted", property, value)
+        }
+        return true
+    }
+}
 
 export class sceneBuilder {
     grid
@@ -447,8 +470,10 @@ export class sceneBuilder {
         this.grid=new Grid(new Voxel({}), rootNode)
         this.setOptions(options)
     }
+    get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
-        this.grid.voxel = new Voxel(options.shape);
+        let vox=new Voxel(options.shape)
+        this.grid.voxel = new Proxy(vox,handler)
         this.grid.render()
     }
 }
