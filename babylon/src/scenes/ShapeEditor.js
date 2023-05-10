@@ -36,12 +36,12 @@ class Box {
     get readOnly() { return this._readOnly}
     set readOnly(b) { this._readOnly = b }
     get state() {
-        let vp = this._parentGrid.voxel.getVoxelPosition(this.x, this.y, this.z)
-        return vp ? vp.state : 0
+        let vp = this._parentGrid.voxel.getVoxelState(this.x, this.y, this.z)
+        return vp ? vp : 0
     }
     set state(s) {
         s%=3;
-        this._parentGrid.voxel.getVoxelPosition(this.x, this.y, this.z).state = s
+        this._parentGrid.voxel.setVoxelState(this.x, this.y, this.z,s)
         return s
     }
     constructor(x=0,y=0,z=0,parentGrid, parent) {
@@ -398,15 +398,11 @@ class GridControls {
 
 const handler = {
     get(target, property) {
-        if (property == "getVoxelPosition") {
-            return function(...args) {
-                let s = target[property].apply(target,args)
-                return new Proxy(s,handler)
-            }
-        }
         if (typeof target[property] == "function") {
             return function(...args) {
-                return target[property].apply(target,args)
+                let res = target[property].apply(target,args)
+                if (property == "setVoxelState") target["callback"](target)
+                return res
             }
         }
         else return target[property];
@@ -423,8 +419,6 @@ const handler = {
 export class sceneBuilder {
     grid
     stateCallback
-//    scene
-//    rootNode
     constructor(sc, callbackFunction, options = {}) {
         scene = sc
         this.stateCallback=callbackFunction
@@ -473,6 +467,7 @@ export class sceneBuilder {
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
         let vox=new Voxel(options.shape)
+        vox.callback = this.stateCallback
         this.grid.voxel = new Proxy(vox,handler)
         this.grid.render()
     }

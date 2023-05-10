@@ -55,7 +55,7 @@
       <v-card width="100%" height="100%">
         <BabylonEngine>
           <BabylonScene>
-            <BabylonSceneModel :model=VoxelEditor :detail=shapeDetail >
+            <BabylonSceneModel :model=VoxelEditor :detail=shapeDetail @newState=updateShapeState>
             </BabylonSceneModel>
             <BabylonCamera id="1">
               <BabylonView width="parent" height="parent">
@@ -112,6 +112,10 @@ export default {
     },
     setFilename(f) {
       this.fileName = f
+    },
+    updateShapeState(s) {
+      this.shape.stateString = s.stateString
+      console.log(s)
     },
   },
   computed: {
