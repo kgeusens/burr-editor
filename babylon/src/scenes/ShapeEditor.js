@@ -402,6 +402,7 @@ const handler = {
             return function(...args) {
                 let res = target[property].apply(target,args)
                 if (property == "setVoxelState") target["callback"](target)
+                if (property == "setSize") target["callback"](target)
                 return res
             }
         }

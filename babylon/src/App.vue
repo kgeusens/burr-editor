@@ -84,7 +84,7 @@ export default {
   data() {
     return { 
       puzzle: {}, 
-      shape: {},
+      shape: null,
       fileName: "", 
       VoxelEditor: sceneBuilder, 
       drawer: false, 
@@ -114,13 +114,17 @@ export default {
       this.fileName = f
     },
     updateShapeState(s) {
-      this.shape.stateString = s.stateString
-      console.log(s)
+//      this.shape.setSize(s.x, s.y, s.z)
+      if (this.shape) {
+        if ( this.shape.x !== s.x || this.shape.y !== s.y || this.shape.z !== s.z ) this.shape.setSize(s.x, s.y, s.z)
+        this.shape.stateString = s.stateString
+      }
     },
   },
   computed: {
     shapeSize() {
-        return { x: this.shape.x, y: this.shape.y, z: this.shape.z }
+      if (this.shape) return { x: this.shape.x, y: this.shape.y, z: this.shape.z }
+      else return { x:0, y:0, z:0 }
     },
     shapeDetail() {
       return { shape: this.shape, size: this.shapeSize }
