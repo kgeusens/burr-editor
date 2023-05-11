@@ -27,7 +27,7 @@
         </v-list-item>
       </v-list>
       <v-card-actions><v-spacer></v-spacer>
-        <v-btn @click="deleteShape">Delete</v-btn>
+        <v-btn v-if="shapes.length>1" @click="deleteShape">Delete</v-btn>
         <v-btn @click="addShape">New</v-btn>
       </v-card-actions>
     </v-card>

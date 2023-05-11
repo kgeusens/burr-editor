@@ -3,7 +3,7 @@
     <v-app-bar density="compact">
       <v-app-bar-nav-icon id="main-menu-activator" variant="text"></v-app-bar-nav-icon>
       <v-toolbar-title>
-        {{ fileName ? fileName.replace(/\.xmpuzzle$/i, "") : "Burr Editor"}}
+        {{ fileName ? fileName : "Burr Editor"}}
       </v-toolbar-title>
       <template v-if="puzzle.shapes" v-slot:extension>
         <v-tabs grow color="purple" v-model="tab">
@@ -26,7 +26,7 @@
         <v-divider></v-divider>
         <v-list-item value="load" prependIcon="mdi-folder-open" title="Load local puzzle" @click="showLoadLocalFile++"/>
         <v-list-item value="loadPWBP" prependIcon="mdi-folder-open" title="Explore PuzzleWillBePlayed " @click="showPWBPDialog++"/>
-        <v-list-item :disabled="!puzzle.shapes" value="save" prependIcon="mdi-folder" title="Save local puzzle"/>
+        <v-list-item :disabled="!puzzle.shapes" value="save" prependIcon="mdi-folder" title="Save local puzzle" @click="saveLocal"/>
         <v-divider></v-divider>
         <v-list-item value="download" prependIcon="mdi-download" title="Download puzzle"/>
         <v-list-item :disabled=true value="upload" prependIcon="mdi-upload" title="Upload puzzle"/>
@@ -115,11 +115,20 @@ export default {
       this.fileName = f
     },
     updateShapeState(s) {
-//      this.shape.setSize(s.x, s.y, s.z)
       if (this.shape) {
         if ( this.shape.x !== s.x || this.shape.y !== s.y || this.shape.z !== s.z ) this.shape.setSize(s.x, s.y, s.z)
         this.shape.stateString = s.stateString
       }
+    },
+    saveLocal() {
+      console.log("saving")
+      let a = document.createElement("a")
+      let blob = new Blob([this.puzzle.saveToXML()], { type: 'text/plain' });
+      let url = window.URL.createObjectURL(blob)
+      a.href = url
+      a.download = this.fileName + ".xml"
+      a.click()
+      window.URL.revokeObjectURL(url)
     },
   },
   computed: {
