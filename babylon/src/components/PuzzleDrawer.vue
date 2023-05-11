@@ -2,13 +2,13 @@
   <v-card class="overflow-y-auto" max-height="400">
     <v-card variant="outlined" v-if="props.puzzle.shapes">
       <v-list mandatory v-model:selected="DATA.selectedItem">
-        <v-list-item  v-for="(item, i) in props.puzzle.shapes.voxel" class="py-0" :key="i" :value="item" :title="item.name">
+        <v-list-item  v-for="(item, i) in shapes" class="py-0" :key="i" :value="i">
           <v-list-item-title><v-container fluid><v-row align="center">
             <v-col class="pa-0 v-col-2"><v-chip>
               {{ i }}
             </v-chip></v-col>
             <v-col class="pa-0 v-col-3"><v-text-field
-              v-model="selectedShape.name"
+              v-model="item.name"
               hide-details
               label="name"
               density="compact"
@@ -26,7 +26,10 @@
           </v-row></v-container></v-list-item-title>
         </v-list-item>
       </v-list>
-      <v-card-actions><v-spacer></v-spacer><v-btn>Delete</v-btn><v-btn>New</v-btn></v-card-actions>
+      <v-card-actions><v-spacer></v-spacer>
+        <v-btn @click="deleteShape">Delete</v-btn>
+        <v-btn @click="addShape">New</v-btn>
+      </v-card-actions>
     </v-card>
   </v-card>
 </template>
@@ -38,17 +41,38 @@
   const emit = defineEmits(["newShape"])
   const props = defineProps(
     { 
-        puzzle: { type: Object, default: {} }, 
+        puzzle: { type: Object, default: null }, 
     }
     );
+  const DATA= reactive({ selectedItem: [] })
 
-  const DATA= reactive({fileList: [], selectedItem: [] })
+  function addShape() {
+    let idx=props.puzzle.addShape()
+    DATA.selectedItem=[idx]
+  }
+  function deleteShape() {
+    if (shapes.value.length > 1) { 
+      let idx = selectedIndex.value
+      if (idx == (shapes.value.length - 1)) selectedIndex.value-=1
+      props.puzzle.deleteShape(idx) 
+    }
+  }
+
   const selectedShape = computed({
-    get: () => DATA.selectedItem[0],
-    set: (val) => DATA.selectedItem = [val]
+    get: () => shapes.value[selectedIndex.value]
   })
+
+  const selectedIndex = computed({
+    get: () => DATA.selectedItem[0],
+    set: (val) => DATA.selectedItem[0] = val
+  })
+
+  const shapes = computed({
+    get: () => props.puzzle.shapes ? props.puzzle.shapes.voxel : []
+  })
+
   watch(selectedShape, (newval, oldval) => {
     emit("newShape", newval)
     })
-  watch(() => props.puzzle, (newval) => DATA.selectedItem=[newval.shapes.voxel[0]])
+  watch(() => props.puzzle, (newval) => DATA.selectedItem=[0])
 </script>
