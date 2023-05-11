@@ -47,7 +47,7 @@
 
   function loadFile() {
     emit( "newShape", DATA.puzzle )
-    emit( "newName", chosenFile.value[0].name)
+    emit( "newName", chosenFile.value[0].name.replace(/\.xmpuzzle$/,""))
     dialog.value=false
   }
 

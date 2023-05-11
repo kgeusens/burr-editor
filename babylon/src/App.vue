@@ -41,7 +41,7 @@
 
     <v-main v-show="tab == 'puzzle' && puzzle.shapes">
       <v-navigation-drawer
-        width="400"
+        width="450"
         class="pa-2"
         v-model="drawer"
         temporary
@@ -121,7 +121,6 @@ export default {
       }
     },
     saveLocal() {
-      console.log("saving")
       let a = document.createElement("a")
       let blob = new Blob([this.puzzle.saveToXML()], { type: 'text/plain' });
       let url = window.URL.createObjectURL(blob)
