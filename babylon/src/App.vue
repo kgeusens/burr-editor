@@ -120,12 +120,17 @@ export default {
         this.shape.stateString = s.stateString
       }
     },
-    saveLocal() {
+    async saveLocal() {
+      console.log("saving")
       let a = document.createElement("a")
       let blob = new Blob([this.puzzle.saveToXML()], { type: 'text/plain' });
-      let url = window.URL.createObjectURL(blob)
+      const cs = new CompressionStream("gzip")
+      const gzipStream = blob.stream().pipeThrough(cs)
+      const xmpuzzle = await new Response(gzipStream).blob()
+
+      let url = window.URL.createObjectURL(xmpuzzle)
       a.href = url
-      a.download = this.fileName + ".xml"
+      a.download = this.fileName + ".xmpuzzle"
       a.click()
       window.URL.revokeObjectURL(url)
     },
