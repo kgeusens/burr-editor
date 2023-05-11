@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card class="overflow-y-auto" max-height="400">
     <v-card variant="outlined" v-if="props.puzzle.shapes">
       <v-list mandatory v-model:selected="DATA.selectedItem">
         <v-list-item  v-for="(item, i) in props.puzzle.shapes.voxel" class="py-0" :key="i" :value="item" :title="item.name">
@@ -26,6 +26,7 @@
           </v-row></v-container></v-list-item-title>
         </v-list-item>
       </v-list>
+      <v-card-actions><v-spacer></v-spacer><v-btn>Delete</v-btn><v-btn>New</v-btn></v-card-actions>
     </v-card>
   </v-card>
 </template>
