@@ -40,7 +40,8 @@
     </PWBPDialog>
 
     <v-main v-show="tab == 'puzzle' && puzzle.shapes">
-      <v-navigation-drawer 
+      <v-navigation-drawer
+        width="400"
         class="pa-2"
         v-model="drawer"
         temporary

@@ -1,43 +1,31 @@
 <template>
-  <v-card width="700">
-    <v-card v-if="props.puzzle.shapes">
-      <v-list v-model:selected="DATA.selectedItem">
-        <v-list-item  v-for="(item, i) in props.puzzle.shapes.voxel" :key="i" :value="item">
-          <template v-slot:prepend><v-icon :icon="`mdi-numeric-${i}-box-outline`"></v-icon></template>
-          <v-list-item-title v-text="item.name"></v-list-item-title>
+  <v-card>
+    <v-card variant="outlined" v-if="props.puzzle.shapes">
+      <v-list mandatory v-model:selected="DATA.selectedItem">
+        <v-list-item  v-for="(item, i) in props.puzzle.shapes.voxel" class="py-0" :key="i" :value="item" :title="item.name">
+          <v-list-item-title><v-container fluid><v-row align="center">
+            <v-col class="pa-0 v-col-2"><v-chip>
+              {{ i }}
+            </v-chip></v-col>
+            <v-col class="pa-0 v-col-3"><v-text-field
+              v-model="selectedShape.name"
+              hide-details
+              label="name"
+              density="compact"
+              variant="outlined"
+            ></v-text-field></v-col>
+            <v-col v-for="dim in ['x', 'y', 'z']" class="pa-0"><v-text-field
+              v-model="item[dim]"
+              hide-details
+              :label="dim"
+              type="number"
+              density="compact"
+              variant="outlined"
+            >
+            </v-text-field></v-col>
+          </v-row></v-container></v-list-item-title>
         </v-list-item>
       </v-list>
-      <v-card v-if="selectedShape">
-        <v-text-field
-        v-model="selectedShape.name"
-        hide-details
-        label="name"
-        style="width: 150px"
-      ></v-text-field>
-        <v-text-field
-        v-model="selectedShape.x"
-        hide-details
-        label="x"
-        type="number"
-        style="width: 70px"
-      ></v-text-field>
-      <v-text-field
-        v-model="selectedShape.y"
-        hide-details
-        label="y"
-        density="compact"
-        type="number"
-        style="width: 70px"
-      ></v-text-field>
-      <v-text-field
-        v-model="selectedShape.z"
-        hide-details
-        label="z"
-        density="compact"
-        type="number"
-        style="width: 70px"
-      ></v-text-field>
-      </v-card>
     </v-card>
   </v-card>
 </template>
