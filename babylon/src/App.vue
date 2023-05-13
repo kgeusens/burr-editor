@@ -26,9 +26,9 @@
         <v-divider></v-divider>
         <v-list-item value="load" prependIcon="mdi-folder-open" title="Load local puzzle" @click="showLoadLocalFile++"/>
         <v-list-item value="loadPWBP" prependIcon="mdi-folder-open" title="Explore PuzzleWillBePlayed " @click="showPWBPDialog++"/>
-        <v-list-item :disabled="!puzzle.shapes" value="save" prependIcon="mdi-folder" title="Save local puzzle" @click="saveLocal"/>
+        <v-list-item value="loadServer" prependIcon="mdi-folder-open" title="Load from server" @click="showServerDialog++"/>
         <v-divider></v-divider>
-        <v-list-item value="download" prependIcon="mdi-download" title="Download puzzle"/>
+        <v-list-item :disabled="!puzzle.shapes" value="download" prependIcon="mdi-download" title="Download puzzle" @click="saveLocal"/>
         <v-list-item :disabled=true value="upload" prependIcon="mdi-upload" title="Upload puzzle"/>
       </v-list>
     </v-menu>
@@ -92,6 +92,7 @@ export default {
       tab: "",
       showLoadLocalFile: 0,
       showPWBPDialog: 0,
+      showServerDialog: 0,
     }
   },
   components: {
