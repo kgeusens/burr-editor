@@ -138,9 +138,9 @@ class Grid {
     set voxel(voxel) {
         this._voxel=voxel
         this.setSize(voxel.x, voxel.y, voxel.z)
-        this.render()
+//        this.render()
         this._controls.setSize(voxel.x, voxel.y, voxel.z)
-        this._controls.render()
+//        this._controls.render()
     }
     get voxel() { return this._voxel }
     setSize(x, y, z) {
@@ -177,7 +177,7 @@ class Grid {
                 }
             }
         }
-//            this._controls.render()
+        this._controls.render()
     }
     highlight(layerName, layerNumber=0, state=false) {
         // if layerName is not either "x" or "y" or "z" the highlight will apply to the full grid
@@ -469,6 +469,7 @@ export class sceneBuilder {
     setOptions(options) {
         let vox=new Voxel(options.shape)
         vox.callback = this.stateCallback
+        this.grid.readOnly = options.readOnly
         this.grid.voxel = new Proxy(vox,handler)
         this.grid.render()
     }

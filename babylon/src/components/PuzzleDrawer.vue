@@ -7,6 +7,10 @@
       <v-btn icon @click="addShape">
         <v-icon>mdi-playlist-plus</v-icon>
       </v-btn>
+      <v-btn icon @click="DATA.readOnly = !DATA.readOnly">
+        <v-icon v-if="DATA.readOnly">mdi-lock-outline</v-icon>
+        <v-icon v-if="!DATA.readOnly">mdi-lock-open-variant-outline</v-icon>
+      </v-btn>
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
       <v-list mandatory v-model:selected="DATA.selectedItem">
@@ -45,13 +49,13 @@
   import { reactive, computed, watch, nextTick } from 'vue'
   import { Puzzle, Voxel } from "@kgeusens/burr-data"
 
-  const emit = defineEmits(["newShape"])
+  const emit = defineEmits(["newShape", "setReadOnly"])
   const props = defineProps(
     { 
         puzzle: { type: Object, default: null }, 
     }
     );
-  const DATA= reactive({ selectedItem: [] })
+  const DATA= reactive({ selectedItem: [], readOnly: true })
 
   function addShape() {
     let idx=props.puzzle.addShape()
@@ -82,4 +86,7 @@
     emit("newShape", newval)
     })
   watch(() => props.puzzle, (newval) => DATA.selectedItem=[0])
+  watch(() => DATA.readOnly, (newval) => {
+    emit("setReadOnly", newval)
+    })
 </script>

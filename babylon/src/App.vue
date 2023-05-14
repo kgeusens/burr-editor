@@ -46,7 +46,7 @@
         v-model="drawer"
         temporary
         >
-        <PuzzleDrawer :puzzle="puzzle" @newShape="loadShape"/>
+        <PuzzleDrawer :puzzle="puzzle" @newShape="loadShape" @setReadOnly="setReadOnly"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -93,6 +93,7 @@ export default {
       showLoadLocalFile: 0,
       showPWBPDialog: 0,
       showServerDialog: 0,
+      readOnly: true,
     }
   },
   components: {
@@ -108,6 +109,10 @@ export default {
   methods: {
     loadShape(s) {
       this.shape = s
+    },
+    setReadOnly(b) {
+      this.readOnly = b
+      console.log(b)
     },
     loadPuzzle(p) {
       this.puzzle = p
@@ -142,7 +147,7 @@ export default {
       else return { x:0, y:0, z:0 }
     },
     shapeDetail() {
-      return { shape: this.shape, size: this.shapeSize }
+      return { shape: this.shape, size: this.shapeSize, readOnly: this.readOnly }
     }
   },
   watch:{
