@@ -3,12 +3,9 @@
     <v-toolbar density="compact" color="primary" :title="`${props.puzzle.shapes.voxel.length} Shapes`"></v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
       <v-list mandatory v-model:selected="DATA.selectedItem">
-        <v-list-item  v-for="(item, i) in shapes" class="py-0" :key="i" :value="i">
-          <template v-if="DATA.selectedItem[0] == i" v-slot:prepend>
-            <v-icon @click="deleteShape" icon="mdi-delete"></v-icon>
-          </template>
+        <v-list-item  v-for="(item, i) in shapes" class="py-0 px-1" :key="i" :value="i">
           <v-list-item-title><v-container fluid><v-row align="center">
-            <v-col class="pa-0 v-col-2"><v-chip>
+            <v-col class="pa-0" align="center"><v-chip>
               {{ i }}
             </v-chip></v-col>
             <v-col class="pa-0 v-col-3"><v-text-field
@@ -18,7 +15,7 @@
               density="compact"
               variant="outlined"
             ></v-text-field></v-col>
-            <v-col v-for="dim in ['x', 'y', 'z']" class="pa-0"><v-text-field
+            <v-col v-for="dim in ['x', 'y', 'z']" class="pa-0 v-col-2"><v-text-field
               v-model="item[dim]"
               hide-details
               :label="dim"
@@ -27,11 +24,13 @@
               variant="outlined"
             >
             </v-text-field></v-col>
+            <v-col class = "pa-0" align="right">
+              <v-icon v-if="DATA.selectedItem[0] == i" @click="deleteShape" icon="mdi-delete"></v-icon>
+            </v-col>
           </v-row></v-container></v-list-item-title>
         </v-list-item>
       </v-list>
       <v-card-actions><v-spacer></v-spacer>
-        <v-btn v-if="shapes.length>1" @click="deleteShape">Delete</v-btn>
         <v-btn @click="addShape">New</v-btn>
       </v-card-actions>
     </v-card>
