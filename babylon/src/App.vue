@@ -112,7 +112,6 @@ export default {
     },
     setReadOnly(b) {
       this.readOnly = b
-      console.log(b)
     },
     loadPuzzle(p) {
       this.puzzle = p
