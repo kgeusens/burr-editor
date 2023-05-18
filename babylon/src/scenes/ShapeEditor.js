@@ -140,7 +140,7 @@ class Grid {
         this.parent=parent
         this._voxel=voxel
         this._controls = new GridControls(this)
-        this._ghost = new Ghost(this, 0.01, 0.01)
+        this._ghost = new Ghost(this, 0.01, 0)
     }
     set voxel(voxel) {
         this._voxel=voxel
@@ -244,7 +244,6 @@ class Ghost {
     }
 
     render() {
-        console.log("render Ghost", this._voxel.stateString)
         if (!this._voxel.stateString.includes('#')) { this.dispose(); return }
         this.dispose()
         let hole=null
@@ -282,6 +281,7 @@ class Ghost {
         ghostMaterial.emissiveColor=new Color3(0, 1, 0)
         this.mesh.material=ghostMaterial
         this.mesh.isPickable=false
+        this.renderOutline()
     }
     renderBevel(shapeCSG) {
         // create the nudge
@@ -333,8 +333,6 @@ class Ghost {
                                 }
                             }
                         }
-                        let options={}
-                        let lines=null
                         if (count == 1 || count == 3) {
                             if (count == 1) {
                                 bevel[d].position = basePosition.add(new Vector3(dx, dy, dz))
@@ -344,27 +342,12 @@ class Ghost {
                             switch(d) {
                                 case 'x':
                                     if (count == 1 ) node[dx+1][dy][dz] |= dimValue[d]
-                                    options = {
-                                    points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx+0.5, dy-0.5, dz-0.5)], //vec3 array,
-                                    updatable: true,
-                                    };
-                                    this.outlines.push(MeshBuilder.CreateLines("lines", options, scene)); //scene is optional
                                     break
                                 case 'y':
                                     if (count == 1 ) node[dx][dy+1][dz] |= dimValue[d]
-                                    options = {
-                                    points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx-0.5, dy+0.5, dz-0.5)], //vec3 array,
-                                    updatable: true,
-                                    };
-                                    this.outlines.push(MeshBuilder.CreateLines("lines", options, scene)); //scene is optional
                                     break
                                 case 'z':
                                     if (count == 1 ) node[dx][dy][dz+1] |= dimValue[d]
-                                    options = {
-                                    points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx-0.5, dy-0.5, dz+0.5)], //vec3 array,
-                                    updatable: true,
-                                    };
-                                    this.outlines.push(lines = MeshBuilder.CreateLines("lines", options, scene)); //scene is optional
                                     break
                             }
                         }
@@ -390,6 +373,56 @@ class Ghost {
             }
         }
         nudge.dispose()
+    }
+    renderOutline() {
+        for (let d of ['x', 'y', 'z']) {
+            for (let dx=0; dx <= this.x; dx++) {
+                for (let dy=0; dy <= this.y; dy++) {
+                    for (let dz=0; dz <= this.z; dz++) {
+                        let count = 0
+                        for (let i=0; i<2; i++) {
+                            for (let j=0; j<2; j++) {
+                                switch (d) {
+                                    case ('x'):
+                                        if (this._voxel.getVoxelState(dx,dy-i,dz-j)) count+=1
+                                        break
+                                    case ('y'):
+                                        if (this._voxel.getVoxelState(dx-i,dy,dz-j)) count+=1
+                                        break
+                                    case ('z'):
+                                        if (this._voxel.getVoxelState(dx-i,dy-j,dz)) count+=1
+                                        break
+                                }
+                            }
+                        }
+                        let options={}
+                        let lines=null
+                        if (count == 1 || count == 3) {
+                            switch(d) {
+                                case 'x':
+                                    options = {
+                                    points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx+0.5, dy-0.5, dz-0.5)], //vec3 array,
+                                    };
+                                    this.outlines.push(MeshBuilder.CreateLines("lines", options, scene)); //scene is optional
+                                    break
+                                case 'y':
+                                    options = {
+                                    points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx-0.5, dy+0.5, dz-0.5)], //vec3 array,
+                                    };
+                                    this.outlines.push(MeshBuilder.CreateLines("lines", options, scene)); //scene is optional
+                                    break
+                                case 'z':
+                                    options = {
+                                    points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx-0.5, dy-0.5, dz+0.5)], //vec3 array,
+                                    };
+                                    this.outlines.push(lines = MeshBuilder.CreateLines("lines", options, scene)); //scene is optional
+                                    break
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     dispose() {
         if (this.mesh.dispose) this.mesh.dispose()
@@ -630,7 +663,7 @@ export class sceneBuilder {
             HIDDEN: 
             [   
                 {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 0, 0)},
-                {material: new StandardMaterial("myMaterial", scene), alpha: 0.2, color: new Color3(0, 1, 0)},
+                {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(0, 1, 0)},
                 {material: new StandardMaterial("myMaterial", scene), alpha: 0, color: new Color3(1, 1, 0)},
             ]
         };
