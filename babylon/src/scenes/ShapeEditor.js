@@ -193,13 +193,17 @@ class Grid {
         let xmax=(layerName=="x")?layerNumber:this.x-1
         let ymax=(layerName=="y")?layerNumber:this.y-1
         let zmax=(layerName=="z")?layerNumber:this.z-1
-        for (let x=xmin;x<=xmax;x++) {
-            for (let y=ymin;y<=ymax;y++) {
-                for (let z=zmin;z<=zmax;z++) {
-                    this._boxes[x][y][z].highlight("highlightGrid", state)
-                } 
-            }
-        }
+        this._layerIsActive[layerName][layerNumber]=state
+        this.render()
+//        this._grid.render()
+
+//        for (let x=xmin;x<=xmax;x++) {
+//            for (let y=ymin;y<=ymax;y++) {
+//                for (let z=zmin;z<=zmax;z++) {
+//                    this._boxes[x][y][z].highlight("highlightGrid", state)
+//                } 
+//            }
+//        }
     }
     setLayerState(layerName, layerNumber=0, state=0) {
         // if layerName is not either "x" or "y" or "z" the state will apply to the full grid
@@ -470,26 +474,29 @@ class GridControls {
                     this._controls[axis][idx].position=new Vector3(-this._offsetControls, -this._offsetControls, -this._offsetControls)
                     this._controls[axis][idx].locallyTranslate(new Vector3(0, idx+this._offsetControls, 0))
                     this._controls[axis][idx].actionManager = new ActionManager(scene);
+                    var oldHighlight=false
                     this._controls[axis][idx].actionManager.registerAction(
                         new ExecuteCodeAction(
                             ActionManager.OnLeftPickTrigger, (evt) => {
-                                this._grid._layerIsActive[axis][idx]=!this._grid._layerIsActive[axis][idx]
+                                this._grid._layerIsActive[axis][idx]=!oldHighlight
+                                oldHighlight=this._grid._layerIsActive[axis][idx]
                                 this.render()
-                                this._grid.render()
+//                                this._grid.render()
                             }
                         )
                     )
                     this._controls[axis][idx].actionManager.registerAction(
                         new ExecuteCodeAction(
                             ActionManager.OnPointerOverTrigger, (evt) => {
-                                this._grid.highlight(axis,idx,true)
+                                oldHighlight=this._grid._layerIsActive[axis][idx]
+                                this._grid.highlight(axis,idx,!oldHighlight)
                             }
                         )
                     )
                     this._controls[axis][idx].actionManager.registerAction(
                         new ExecuteCodeAction(
                             ActionManager.OnPointerOutTrigger, (evt) => {
-                                this._grid.highlight(axis,idx,false)
+                                this._grid.highlight(axis,idx,oldHighlight)
                             }
                         )
                     )
