@@ -196,15 +196,6 @@ class Grid {
         let zmax=(layerName=="z")?layerNumber:this.z-1
         this._layerIsActive[layerName][layerNumber]=state
         this.render()
-//        this._grid.render()
-
-//        for (let x=xmin;x<=xmax;x++) {
-//            for (let y=ymin;y<=ymax;y++) {
-//                for (let z=zmin;z<=zmax;z++) {
-//                    this._boxes[x][y][z].highlight("highlightGrid", state)
-//                } 
-//            }
-//        }
     }
     setLayerState(layerName, layerNumber=0, state=0) {
         // if layerName is not either "x" or "y" or "z" the state will apply to the full grid
@@ -519,13 +510,8 @@ class GridControls {
             new ExecuteCodeAction(
                 ActionManager.OnLeftPickTrigger, (evt) => {
                     if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3(this.parent.position.x+(this.x-1)/2, this.parent.position.y+(this.y-1)/2, this.parent.position.z+(this.z-1)/2));
-                }
-            )
-        )
-        this._controls.origin.actionManager.registerAction(
-            new ExecuteCodeAction(
-                ActionManager.OnRightPickTrigger, (evt) => {
                     this.readOnly=!this.readOnly
+                    this._grid.render()
                 }
             )
         )
