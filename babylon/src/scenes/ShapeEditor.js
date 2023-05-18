@@ -131,7 +131,10 @@ class Grid {
     get parent() { return this._parent }
     set parent(p) { this._parent = p}
     get readOnly() { return this._readOnly }
-    set readOnly(b) { this._readOnly = b; this.render() }
+    set readOnly(b) { 
+        this._readOnly = b; 
+//        this.render() 
+    }
 
     constructor(voxel, parent=null) {
         this.parent=parent
@@ -142,9 +145,7 @@ class Grid {
     set voxel(voxel) {
         this._voxel=voxel
         this.setSize(voxel.x, voxel.y, voxel.z)
-//        this.render()
         this._controls.setSize(voxel.x, voxel.y, voxel.z)
-//        this._controls.render()
     }
     get voxel() { return this._voxel }
     setSize(x, y, z) {
@@ -223,6 +224,7 @@ class Ghost {
     _dimensions={x:0, y:0, z:0}
     _parent=null
     mesh={}
+    outlines=[]
     delta=0
     bevel=0
 
@@ -242,6 +244,7 @@ class Ghost {
     }
 
     render() {
+        console.log("render Ghost", this._voxel.stateString)
         if (!this._voxel.stateString.includes('#')) { this.dispose(); return }
         this.dispose()
         let hole=null
@@ -345,7 +348,7 @@ class Ghost {
                                     points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx+0.5, dy-0.5, dz-0.5)], //vec3 array,
                                     updatable: true,
                                     };
-                                    lines = MeshBuilder.CreateLines("lines", options, scene); //scene is optional
+                                    this.outlines.push(MeshBuilder.CreateLines("lines", options, scene)); //scene is optional
                                     break
                                 case 'y':
                                     if (count == 1 ) node[dx][dy+1][dz] |= dimValue[d]
@@ -353,7 +356,7 @@ class Ghost {
                                     points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx-0.5, dy+0.5, dz-0.5)], //vec3 array,
                                     updatable: true,
                                     };
-                                    lines = MeshBuilder.CreateLines("lines", options, scene); //scene is optional
+                                    this.outlines.push(MeshBuilder.CreateLines("lines", options, scene)); //scene is optional
                                     break
                                 case 'z':
                                     if (count == 1 ) node[dx][dy][dz+1] |= dimValue[d]
@@ -361,7 +364,7 @@ class Ghost {
                                     points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx-0.5, dy-0.5, dz+0.5)], //vec3 array,
                                     updatable: true,
                                     };
-                                    lines = MeshBuilder.CreateLines("lines", options, scene); //scene is optional
+                                    this.outlines.push(lines = MeshBuilder.CreateLines("lines", options, scene)); //scene is optional
                                     break
                             }
                         }
@@ -390,7 +393,9 @@ class Ghost {
     }
     dispose() {
         if (this.mesh.dispose) this.mesh.dispose()
+        for (let line of this.outlines) { line.dispose()}
         this.mesh={}
+        this.outlines=[]
     }
     attach() {
     }
@@ -412,7 +417,9 @@ class GridControls {
     get z() { return this.dimensions.z }
     get parent() { return this._grid.parent }
     get readOnly() { return this._grid.readOnly}
-    set readOnly(b) { this._grid.readOnly = b; this.render()}
+    set readOnly(b) { 
+        this._grid.readOnly = b; 
+    }
     reSize(axisName, newSize) { 
         this.dimensions[axisName]=newSize
         this._grid.setSize(this.x, this.y, this.z)
