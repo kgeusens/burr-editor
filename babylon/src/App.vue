@@ -121,7 +121,9 @@ export default {
     },
     updateShapeState(s) {
       if (this.shape) {
-        if ( this.shape.x !== s.x || this.shape.y !== s.y || this.shape.z !== s.z ) this.shape.setSize(s.x, s.y, s.z)
+        if ( this.shape.x !== s.x || this.shape.y !== s.y || this.shape.z !== s.z ) {
+          this.shape.setSize(s.x, s.y, s.z)
+        }
         this.shape.stateString = s.stateString
       }
     },

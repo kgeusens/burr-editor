@@ -26,7 +26,6 @@ class Box {
     _parentGrid={}
     _position={x:0, y:0, z:0}
     _isActive=true // is it pickable/editable?
-    _isHighlighted=false // is it highlighted?
     _isVisible=true // is it Visible?
     _mesh=null
     _readOnly=false
@@ -498,7 +497,6 @@ class GridControls {
     constructor(grid){
         this._grid=grid;
         // The layer selectors (created in setSize)
-//            this.setSize(grid.x, grid.y, grid.z)
         // The Origin
         this._controls.origin=MeshBuilder.CreateSphere("origin", {diameter:this._controlSize} , scene)
         this._controls.origin.parent=this.parent
