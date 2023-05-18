@@ -92,6 +92,7 @@ class Box {
             this._mesh.disableEdgesRendering()
         } else {
             if (this._isActive) {
+                this._mesh.edgesWidth=1.5
                 this._mesh.enableEdgesRendering()
             } else { 
                 this._mesh.material=this.materials["HIDDEN"][this.state].material
@@ -158,7 +159,7 @@ class Grid {
             this._layerIsActive.y[y]=false
                 if (this._boxes[x][y] == undefined) this._boxes[x][y]=[];
                 for (let z=0;z<=this.z-1;z++) {
-                    this._layerIsActive.z[z]=true
+                    this._layerIsActive.z[z]=false
                     if (this._boxes[x][y][z] == undefined) { 
                         this._boxes[x][y][z]=new Box(x,y,z,this, this.parent)
                     }
@@ -481,7 +482,6 @@ class GridControls {
                                 this._grid._layerIsActive[axis][idx]=!oldHighlight
                                 oldHighlight=this._grid._layerIsActive[axis][idx]
                                 this.render()
-//                                this._grid.render()
                             }
                         )
                     )
