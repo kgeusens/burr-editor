@@ -9,7 +9,9 @@ import {
   Matrix,
   PointerDragBehavior,
   PointerEventTypes,
-  HighlightLayer
+  HighlightLayer,
+  CSG,
+  VertexData,
 } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
 import { Voxel } from "@kgeusens/burr-data"
@@ -117,6 +119,7 @@ class Grid {
     _readOnly=true
     _parent=null
     _controls=null
+    _ghost=null
     get x() { return this._dimensions.x }
     set x(v) { this._dimensions.x = v}
     get y() { return this._dimensions.y }
@@ -134,6 +137,7 @@ class Grid {
         this.parent=parent
         this._voxel=voxel
         this._controls = new GridControls(this)
+        this._ghost = new Ghost(this, 0.01, 0.01)
     }
     set voxel(voxel) {
         this._voxel=voxel
@@ -178,6 +182,7 @@ class Grid {
             }
         }
         this._controls.render()
+        this._ghost.render()
     }
     highlight(layerName, layerNumber=0, state=false) {
         // if layerName is not either "x" or "y" or "z" the highlight will apply to the full grid
@@ -212,6 +217,185 @@ class Grid {
         }
     }
 } // end of class Grid
+
+class Ghost {
+    // dimension of grid
+    _dimensions={x:0, y:0, z:0}
+    _parent=null
+    mesh={}
+    delta=0
+    bevel=0
+
+    get x() { return this._parent._voxel.x }
+    get y() { return this._parent._voxel.y }
+    get z() { return this._parent._voxel.z }
+    get readOnly() { return this._parent._readOnly }
+    set readOnly(val) {
+        this._parent._readOnly=val
+    }
+    get _voxel() {return this._parent._voxel}
+
+    constructor(parent=null, deltaWidth=0, bevelWidth=0) {
+        this._parent=parent
+        this.delta=deltaWidth
+        this.bevel=bevelWidth
+    }
+
+    render() {
+        if (!this._voxel.stateString.includes('#')) { this.dispose(); return }
+        this.dispose()
+        let hole=null
+        let bevel = {}
+        // create the bounding box
+        this.mesh = MeshBuilder.CreateBox("voxel",{width:this.x - 2*this.delta, depth:this.z - 2*this.delta, height:this.y - 2*this.delta})
+        this.mesh.setPivotMatrix(Matrix.Translation(this.x/2 - 0.5, this.y/2 - 0.5, this.z/2 - 0.5), false);
+        const shapeCSG = CSG.FromMesh(this.mesh);
+
+        // punch holes
+        hole = MeshBuilder.CreateBox("box",{size:1 + 2*this.delta})
+        hole.isVisible = false
+        for (let dx=0; dx < this.x; dx++) {
+            for (let dy=0; dy < this.y; dy++) {
+                for (let dz=0; dz < this.z; dz++) {
+                    if (!this._voxel.getVoxelState(dx, dy, dz)) {
+                        hole.position=new Vector3(dx,dy,dz)
+                        shapeCSG.subtractInPlace(CSG.FromMesh(hole))
+                    }
+                }
+            }
+        }
+        hole.dispose
+        // create bevel if needed
+        if (this.bevel >0) this.renderBevel(shapeCSG)
+        // compute the normals
+        const tempMesh=shapeCSG.toMesh()
+        const vertexData = VertexData.ExtractFromMesh(tempMesh);
+         VertexData.ComputeNormals(vertexData.positions, vertexData.indices, vertexData.normals )
+         vertexData.applyToMesh(this.mesh)
+        tempMesh.dispose()
+        // apply material
+        const ghostMaterial = new StandardMaterial("myMaterial", scene)
+        ghostMaterial.alpha=0.2
+        ghostMaterial.emissiveColor=new Color3(0, 1, 0)
+        this.mesh.material=ghostMaterial
+        this.mesh.isPickable=false
+    }
+    renderBevel(shapeCSG) {
+        // create the nudge
+        const dimName = {x: "width", y: "height", z: "depth"}
+        const dimValue = {x: 1, y: 2, z: 4} 
+        let bevelOptions = { width: 2*this.bevel, depth: 2*this.bevel, height: 2*this.bevel }
+        let basePosition=null
+        let nudge=MeshBuilder.CreateBox("nudge")
+        let nudgeCSG=CSG.FromMesh(nudge)
+        let bevel=[]
+        for (let d of ['x', 'y', 'z']) {
+            bevelOptions = { width: 2*this.bevel, depth: 2*this.bevel, height: 2*this.bevel }
+            bevelOptions[dimName[d]] = 1+2*this.delta // compensate the bevel box for the delta of the holes
+            bevel[d] = MeshBuilder.CreateBox("bevel",bevelOptions)
+            bevel[d].rotation[d] = Math.PI / 4
+            nudgeCSG.intersectInPlace(CSG.FromMesh(bevel[d]))
+        }
+        let tempMesh=nudgeCSG.toMesh()
+        let vertexData = VertexData.ExtractFromMesh(tempMesh);
+        VertexData.ComputeNormals(vertexData.positions, vertexData.indices, vertexData.normals )
+        tempMesh.dispose()
+        vertexData.applyToMesh(nudge)
+        let nudgeBasePosition = new Vector3(-0.5,-0.5,-0.5)
+        // initialize 3 dimensional array for the nodes (vertices)
+        let node=[...Array(this.x + 1)].map(x => [...Array(this.y + 1)].map(y => [...Array(this.z + 1)].map(v=>0)))
+
+        // first bevel, and update the node matrix to keep track how many bevels join together at the node
+        for (let d of ['x', 'y', 'z']) {
+            bevelOptions = { width: 2*this.bevel, depth: 2*this.bevel, height: 2*this.bevel }
+            bevelOptions[dimName[d]] = 1+2*this.delta // compensate the bevel box for the delta of the holes
+            basePosition = new Vector3(-0.5,-0.5,-0.5)
+            basePosition[d]=0
+            for (let dx=0; dx <= this.x; dx++) {
+                for (let dy=0; dy <= this.y; dy++) {
+                    for (let dz=0; dz <= this.z; dz++) {
+                        let count = 0
+                        for (let i=0; i<2; i++) {
+                            for (let j=0; j<2; j++) {
+                                switch (d) {
+                                    case ('x'):
+                                        if (this._voxel.getVoxelState(dx,dy-i,dz-j)) count+=1
+                                        break
+                                    case ('y'):
+                                        if (this._voxel.getVoxelState(dx-i,dy,dz-j)) count+=1
+                                        break
+                                    case ('z'):
+                                        if (this._voxel.getVoxelState(dx-i,dy-j,dz)) count+=1
+                                        break
+                                }
+                            }
+                        }
+                        let options={}
+                        let lines=null
+                        if (count == 1 || count == 3) {
+                            if (count == 1) {
+                                bevel[d].position = basePosition.add(new Vector3(dx, dy, dz))
+                                shapeCSG.subtractInPlace(CSG.FromMesh(bevel[d]))
+                                node[dx][dy][dz] |= dimValue[d]
+                            }
+                            switch(d) {
+                                case 'x':
+                                    if (count == 1 ) node[dx+1][dy][dz] |= dimValue[d]
+                                    options = {
+                                    points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx+0.5, dy-0.5, dz-0.5)], //vec3 array,
+                                    updatable: true,
+                                    };
+                                    lines = MeshBuilder.CreateLines("lines", options, scene); //scene is optional
+                                    break
+                                case 'y':
+                                    if (count == 1 ) node[dx][dy+1][dz] |= dimValue[d]
+                                    options = {
+                                    points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx-0.5, dy+0.5, dz-0.5)], //vec3 array,
+                                    updatable: true,
+                                    };
+                                    lines = MeshBuilder.CreateLines("lines", options, scene); //scene is optional
+                                    break
+                                case 'z':
+                                    if (count == 1 ) node[dx][dy][dz+1] |= dimValue[d]
+                                    options = {
+                                    points: [new Vector3(dx-0.5, dy-0.5, dz-0.5),new Vector3(dx-0.5, dy-0.5, dz+0.5)], //vec3 array,
+                                    updatable: true,
+                                    };
+                                    lines = MeshBuilder.CreateLines("lines", options, scene); //scene is optional
+                                    break
+                            }
+                        }
+                    }
+                }
+            }
+            bevel[d].dispose()
+        }
+        // now clean up the joints where multiple bevels join
+        for (let dx=0; dx <= this.x; dx++) {
+            for (let dy=0; dy <= this.y; dy++) {
+                for (let dz=0; dz <= this.z; dz++) {
+                    switch(node[dx][dy][dz]) {
+                        case 3:
+                        case 5:
+                        case 6:
+                        case 7:
+                            nudge.position = nudgeBasePosition.add(new Vector3(dx,dy,dz))
+                            shapeCSG.subtractInPlace(CSG.FromMesh(nudge))
+
+                    }
+                }
+            }
+        }
+        nudge.dispose()
+    }
+    dispose() {
+        if (this.mesh.dispose) this.mesh.dispose()
+        this.mesh={}
+    }
+    attach() {
+    }
+} // end of class Ghost
+
 
 class GridControls {
     _grid=null
