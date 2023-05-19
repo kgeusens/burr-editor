@@ -4,6 +4,9 @@
       <v-toolbar-title>
         {{ props.puzzle.problems.problem.length }} Problems <v-spacer></v-spacer> 
       </v-toolbar-title>
+      <v-btn icon @click="addProblem">
+        <v-icon>mdi-playlist-plus</v-icon>
+      </v-btn>
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
       <v-list  mandatory v-model:selected="DATA.selectedProblem">
@@ -21,6 +24,7 @@
               readonly
             ></v-text-field></v-col>
             <v-col class = "pa-0" align="right">
+              <v-icon v-if="selectedProblemIndex == i && problems.length > 1" @click.stop="deleteProblem" icon="mdi-delete"></v-icon>
             </v-col>
           </v-row></v-container></v-list-item-title>
         </v-list-item>
@@ -112,7 +116,13 @@
 
   function setResult() {
     selectedProblem.value.result.id = selectedShapeIndex.value
-
+  }
+  function addProblem() {
+    let idx=props.puzzle.addProblem()
+    selectedProblemIndex.value = idx
+  }
+  function deleteProblem() {
+    props.puzzle.deleteProblem(selectedProblemIndex.value)
   }
 
   watch(selectedShape, (newval, oldval) => {
