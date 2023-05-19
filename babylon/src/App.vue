@@ -47,12 +47,15 @@
         class="pa-2"
         v-model="drawer"
         temporary
+        :scrim=false
         >
-        <PuzzleDrawer :puzzle="puzzle" @newShape="loadShape" @setReadOnly="setReadOnly"/>
+        <PuzzleDrawer :puzzle="puzzle" @newShape="loadShape" @setReadOnly="setReadOnly">
+        </PuzzleDrawer>
       </v-navigation-drawer>
-      <v-layout-item model-value position="top" class="text-start" size="0">
+      <v-layout-item position="top" class="text-start" size="0">
         <div class="ma-4">
-          <v-btn @click.stop="drawer = !drawer" icon="mdi-arrow-right" size="small" elevation="4" />
+          <span v-if=drawer style="display:inline-block;width:450px"></span>
+          <v-btn @click.stop="drawer = !drawer" icon="mdi-arrow-left-right" size="small" elevation="4" />
         </div>
       </v-layout-item>
       <v-card width="100%" height="100%">
@@ -68,6 +71,7 @@
         </BabylonEngine>
       </v-card>
     </v-main>
+
     <v-main v-show="tab == 'problems' && puzzle.shapes">
       <v-navigation-drawer
         id="problemDrawer"
@@ -76,12 +80,14 @@
         class="pa-2"
         v-model="drawer"
         temporary
+        :scrim=false
         >
         <ProblemDrawer :puzzle="puzzle" @newShape="loadShape" @setReadOnly="setReadOnly"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
-          <v-btn @click.stop="drawer = !drawer" icon="mdi-arrow-right" size="small" elevation="4" />
+          <span v-if=drawer style="display:inline-block;width:450px"></span>
+          <v-btn @click.stop="drawer = !drawer" icon="mdi-arrow-left-right" size="small" elevation="4" />
         </div>
       </v-layout-item>
       <v-card width="100%" height="100%">
