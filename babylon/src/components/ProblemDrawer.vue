@@ -4,13 +4,6 @@
       <v-toolbar-title>
         {{ props.puzzle.shapes.voxel.length }} Shapes <v-spacer></v-spacer> 
       </v-toolbar-title>
-      <v-btn icon @click="addShape">
-        <v-icon>mdi-playlist-plus</v-icon>
-      </v-btn>
-      <v-btn icon @click="DATA.readOnly = !DATA.readOnly">
-        <v-icon v-if="DATA.readOnly">mdi-lock-outline</v-icon>
-        <v-icon v-if="!DATA.readOnly">mdi-lock-open-variant-outline</v-icon>
-      </v-btn>
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
       <v-list mandatory v-model:selected="DATA.selectedItem">
@@ -19,24 +12,15 @@
             <v-col class="pa-0" align="center"><v-chip>
               {{ i }}
             </v-chip></v-col>
-            <v-col class="pa-0 v-col-3"><v-text-field
+            <v-col class="pa-0 v-col-9"><v-text-field
               v-model="item.name"
               hide-details
               label="name"
               density="compact"
               variant="outlined"
             ></v-text-field></v-col>
-            <v-col v-for="dim in ['x', 'y', 'z']" class="pa-0 v-col-2"><v-text-field
-              v-model="item[dim]"
-              hide-details
-              :label="dim"
-              type="number"
-              density="compact"
-              variant="outlined"
-            >
-            </v-text-field></v-col>
             <v-col class = "pa-0" align="right">
-              <v-icon v-if="DATA.selectedItem[0] == i && props.puzzle.shapes.voxel.length > 1" @click.stop="deleteShape" icon="mdi-delete"></v-icon>
+              <v-icon v-if="DATA.selectedItem[0] == i " icon="mdi-delete"></v-icon>
             </v-col>
           </v-row></v-container></v-list-item-title>
         </v-list-item>
@@ -56,18 +40,6 @@
     }
     );
   const DATA= reactive({ selectedItem: [], readOnly: true })
-
-  function addShape() {
-    let idx=props.puzzle.addShape()
-    DATA.selectedItem=[idx]
-  }
-  function deleteShape() {
-    if (shapes.value.length > 1) { 
-      let idx = selectedIndex.value
-      if (idx == (shapes.value.length - 1)) selectedIndex.value-=1
-      props.puzzle.deleteShape(idx) 
-    }
-  }
 
   const selectedShape = computed({
     get: () => shapes.value[selectedIndex.value]

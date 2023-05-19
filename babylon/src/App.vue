@@ -41,6 +41,8 @@
 
     <v-main v-show="tab == 'puzzle' && puzzle.shapes">
       <v-navigation-drawer
+        id="puzzleDrawer"
+        key="puzzleDrawer"
         width="450"
         class="pa-2"
         v-model="drawer"
@@ -66,11 +68,31 @@
         </BabylonEngine>
       </v-card>
     </v-main>
+    <v-main v-show="tab == 'problems' && puzzle.shapes">
+      <v-navigation-drawer
+        id="problemDrawer"
+        key="problemDrawer"
+        width="450"
+        class="pa-2"
+        v-model="drawer"
+        temporary
+        >
+        <ProblemDrawer :puzzle="puzzle" @newShape="loadShape" @setReadOnly="setReadOnly"/>
+      </v-navigation-drawer>
+      <v-layout-item model-value position="top" class="text-start" size="0">
+        <div class="ma-4">
+          <v-btn @click.stop="drawer = !drawer" icon="mdi-arrow-right" size="small" elevation="4" />
+        </div>
+      </v-layout-item>
+      <v-card width="100%" height="100%">
+      </v-card>
+    </v-main>
   </v-app>
 </template>
 
 <script>
 import PuzzleDrawer from "./components/PuzzleDrawer.vue"
+import ProblemDrawer from "./components/ProblemDrawer.vue"
 import LocalFileDialog from "./components/LocalFileDialog.vue"
 import PWBPDialog from './components/PWBPDialog.vue'
 import BabylonEngine from "./components/babylon/BabylonEngine.vue";
@@ -98,6 +120,7 @@ export default {
   },
   components: {
     PuzzleDrawer,
+    ProblemDrawer,
     LocalFileDialog,
     PWBPDialog,
     BabylonScene,
