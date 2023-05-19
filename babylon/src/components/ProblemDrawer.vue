@@ -6,12 +6,22 @@
       </v-toolbar-title>
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
-      <v-list>
+      <v-list  mandatory v-model:selected="DATA.selectedProblem">
         <v-list-item  v-for="(item, i) in problems" class="py-0 px-1" :key="i" :value="i">
           <v-list-item-title><v-container fluid><v-row align="center">
             <v-col class="pa-0" align="center"><v-chip>
               {{ i }}
             </v-chip></v-col>
+            <v-col class="pa-0 v-col-9"><v-text-field
+              v-model="item.solutions.solution.length"
+              hide-details
+              label="solutions"
+              density="compact"
+              variant="outlined"
+              readonly
+            ></v-text-field></v-col>
+            <v-col class = "pa-0" align="right">
+            </v-col>
           </v-row></v-container></v-list-item-title>
         </v-list-item>
       </v-list>
@@ -24,7 +34,7 @@
       </v-toolbar-title>
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
-      <v-list mandatory v-model:selected="DATA.selectedItem">
+      <v-list mandatory v-model:selected="DATA.selectedShape">
         <v-list-item  v-for="(item, i) in shapes" class="py-0 px-1" :key="i" :value="i">
           <v-list-item-title><v-container fluid><v-row align="center">
             <v-col class="pa-0" align="center"><v-chip>
@@ -37,7 +47,7 @@
               density="compact"
               variant="outlined"
             ></v-text-field></v-col>
-            <v-col class="pa-0 v-col-2"><v-text-field
+            <v-col class="pa-0 v-col-2"><v-text-field v-if="selectedProblem.result.id != i"
               v-model="shapesCount[i].count"
               hide-details
               label="count"
@@ -47,7 +57,8 @@
             >
             </v-text-field></v-col>
             <v-col class = "pa-0" align="right">
-              <v-icon v-if="problems[0].result.id == i" icon="mdi-puzzle-check"></v-icon>
+              <v-icon v-if="selectedProblem.result.id == i" icon="mdi-puzzle-check"></v-icon>
+              <v-icon v-if="selectedProblem.result.id != i && selectedShapeIndex == i" icon="mdi-puzzle-outline" @click="setResult"></v-icon>
             </v-col>
           </v-row></v-container></v-list-item-title>
         </v-list-item>
@@ -57,24 +68,32 @@
 </template>
 
 <script setup>
-  import { reactive, computed, watch, nextTick } from 'vue'
-//  import { Puzzle, Voxel } from "@kgeusens/burr-data"
+  import { reactive, computed, watch } from 'vue'
 
-  const emit = defineEmits(["newShape", "setReadOnly"])
+  const emit = defineEmits(["newShape"])
   const props = defineProps(
     { 
         puzzle: { type: Object, default: null }, 
     }
     );
-  const DATA= reactive({ selectedItem: [], readOnly: true })
+  const DATA= reactive({ selectedShape: [], selectedProblem: [] })
 
   const selectedShape = computed({
-    get: () => shapes.value[selectedIndex.value]
+    get: () => shapes.value[selectedShapeIndex.value]
   })
 
-  const selectedIndex = computed({
-    get: () => DATA.selectedItem[0],
-    set: (val) => DATA.selectedItem = [val]
+  const selectedShapeIndex = computed({
+    get: () => DATA.selectedShape[0],
+    set: (val) => DATA.selectedShape = [val]
+  })
+
+  const selectedProblem = computed({
+    get: () => problems.value[selectedProblemIndex.value]
+  })
+
+  const selectedProblemIndex = computed({
+    get: () => DATA.selectedProblem[0],
+    set: (val) => DATA.selectedProblem = [val]
   })
 
   const shapes = computed({
@@ -87,17 +106,21 @@
 
   const shapesCount = computed({
     get: () => {
-      console.log(props.puzzle.problems.problem[0].getShapeFromId(1))
-      return props.puzzle.shapes.voxel.map((vox, idx) => props.puzzle.problems.problem[0].getShapeFromId(idx))
+      return props.puzzle.shapes.voxel.map((vox, idx) => selectedProblem.value.getShapeFromId(idx))
     }
   })
+
+  function setResult() {
+    selectedProblem.value.result.id = selectedShapeIndex.value
+
+  }
 
   watch(selectedShape, (newval, oldval) => {
     emit("newShape", newval)
     })
-  watch(() => props.puzzle, (newval) => DATA.selectedItem=[0])
-  watch(() => DATA.readOnly, (newval) => {
-    emit("setReadOnly", newval)
-    })
-  watch(problems, (newval) => console.log(newval))
+  watch(() => props.puzzle, (newval) => { 
+    DATA.selectedShape=[0]
+    DATA.selectedProblem=[0]
+  })
+//  watch(selectedProblem, (newval) => console.log(newval))
 </script>

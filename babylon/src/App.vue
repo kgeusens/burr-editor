@@ -82,7 +82,7 @@
         temporary
         :scrim=false
         >
-        <ProblemDrawer :puzzle="puzzle" @newShape="loadShape" @setReadOnly="setReadOnly"/>
+        <ProblemDrawer :puzzle="puzzle"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
