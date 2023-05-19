@@ -1,5 +1,5 @@
 <template>
-  <v-card variant="outlined" v-if="props.puzzle.shapes">
+  <v-card class="my-2" variant="outlined" v-if="props.puzzle.shapes">
     <v-toolbar density="compact" color="primary">
       <v-toolbar-title>
         {{ props.puzzle.shapes.voxel.length }} Shapes <v-spacer></v-spacer> 
