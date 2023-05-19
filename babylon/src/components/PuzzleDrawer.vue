@@ -64,8 +64,8 @@
   function deleteShape() {
     if (shapes.value.length > 1) { 
       let idx = selectedIndex.value
-      if (idx == (shapes.value.length - 1)) selectedIndex.value-=1
       props.puzzle.deleteShape(idx) 
+      if (idx >= (shapes.value.length - 1)) selectedIndex.value=shapes.value.length - 1
     }
   }
 

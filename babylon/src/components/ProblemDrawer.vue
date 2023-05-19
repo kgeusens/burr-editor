@@ -44,7 +44,7 @@
             <v-col class="pa-0" align="center"><v-chip>
               {{ i }}
             </v-chip></v-col>
-            <v-col class="pa-0 v-col-7"><v-text-field
+            <v-col class="pa-0 v-col-5"><v-text-field
               v-model="item.name"
               hide-details
               label="name"
@@ -55,6 +55,15 @@
               v-model="shapesCount[i].count"
               hide-details
               label="count"
+              type="number"
+              density="compact"
+              variant="outlined"
+            >
+            </v-text-field></v-col>
+            <v-col class="pa-0 v-col-2"><v-text-field v-if="selectedProblem.result.id != i"
+              v-model="shapesCount[i].group"
+              hide-details
+              label="group"
               type="number"
               density="compact"
               variant="outlined"
@@ -122,7 +131,11 @@
     selectedProblemIndex.value = idx
   }
   function deleteProblem() {
-    props.puzzle.deleteProblem(selectedProblemIndex.value)
+    if (problems.value.length > 1) { 
+      let idx = selectedProblemIndex.value
+      props.puzzle.deleteProblem(selectedProblemIndex.value)
+      if (idx >= (problems.value.length - 1)) selectedProblemIndex.value=problems.value.length - 1
+    }
   }
 
   watch(selectedShape, (newval, oldval) => {
