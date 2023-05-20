@@ -110,13 +110,6 @@
     set: (val) => DATA.selectedProblem = [val]
   })
 
-  const selectedProblemResult = computed({
-    get: () => {
-      return shapes.value[selectedProblem.value.result.id]
-    }
-  })
-
-
   const shapes = computed({
     get: () => props.puzzle.shapes ? props.puzzle.shapes.voxel : []
   })
@@ -149,12 +142,9 @@
   watch(selectedShape, (newval, oldval) => {
 //    emit("newShape", newval)
     })
-  watch(selectedProblemResult, (newval, oldval) => {
-    emit("newShape", newval)
-  })
   watch(() => props.puzzle, (newval) => { 
     DATA.selectedShape=[0]
     DATA.selectedProblem=[0]
   })
-//  watch(selectedProblem, (newval) => console.log(newval))
+  watch(selectedProblem, (newval) => emit("newShape", newval))
 </script>

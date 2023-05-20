@@ -82,7 +82,7 @@
         temporary
         :scrim=false
         >
-        <ProblemDrawer :puzzle="puzzle" @newShape="loadProblemShape"/>
+        <ProblemDrawer :puzzle="puzzle" @newShape="loadProblem"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -93,7 +93,7 @@
       <v-card width="100%" height="100%">
         <BabylonEngine>
           <BabylonScene>
-            <BabylonSceneModel :model=BodyViewer :detail=problemShapeDetail>
+            <BabylonSceneModel :model=BodyViewer :detail=problemDetail>
             </BabylonSceneModel>
             <BabylonCamera id="1">
               <BabylonView width="parent" height="parent">
@@ -118,7 +118,7 @@ import BabylonCamera from "./components/babylon/BabylonCamera.vue";
 import BabylonView from "./components/babylon/BabylonView.vue";
 import { sceneBuilder } from "./scenes/ShapeEditor.js";
 import { sceneBuilder as bodyBuilder } from "./scenes/ShapeBody.js";
-import { Puzzle } from "@kgeusens/burr-data";
+import { Problem, Puzzle } from "@kgeusens/burr-data";
 
 export default {
   name: "App",
@@ -126,7 +126,7 @@ export default {
     return { 
       puzzle: new Puzzle(), 
       shape: null,
-      problemShape: null,
+      problem: new Problem(),
       fileName: "", 
       VoxelEditor: sceneBuilder,
       BodyViewer: bodyBuilder,
@@ -153,8 +153,8 @@ export default {
     loadShape(s) {
       this.shape = s
     },
-    loadProblemShape(s) {
-      this.problemShape = s
+    loadProblem(p) {
+      this.problem = p
     },
     setReadOnly(b) {
       this.readOnly = b
@@ -196,8 +196,8 @@ export default {
     shapeDetail() {
       return { shape: this.shape, size: this.shapeSize, readOnly: this.readOnly }
     },
-    problemShapeDetail() {
-      return { shape: this.problemShape, delta: 0, bevel: 0.05, alpha: 1, outline: false }
+    problemDetail() {
+      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], delta: 0, bevel: 0.05, alpha: 1, outline: false }
     }
   },
   watch:{
