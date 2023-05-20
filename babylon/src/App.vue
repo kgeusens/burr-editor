@@ -118,12 +118,13 @@ import BabylonCamera from "./components/babylon/BabylonCamera.vue";
 import BabylonView from "./components/babylon/BabylonView.vue";
 import { sceneBuilder } from "./scenes/ShapeEditor.js";
 import { sceneBuilder as bodyBuilder } from "./scenes/ShapeBody.js";
+import { Puzzle } from "@kgeusens/burr-data";
 
 export default {
   name: "App",
   data() {
     return { 
-      puzzle: {}, 
+      puzzle: new Puzzle(), 
       shape: null,
       problemShape: null,
       fileName: "", 

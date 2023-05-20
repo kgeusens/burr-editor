@@ -81,15 +81,16 @@
 </template>
 
 <script setup>
+  import { Puzzle } from '@kgeusens/burr-data';
   import { reactive, computed, watch } from 'vue'
 
   const emit = defineEmits(["newShape"])
   const props = defineProps(
     { 
-        puzzle: { type: Object, default: null }, 
+        puzzle: { type: Object, default: new Puzzle() }, 
     }
     );
-  const DATA= reactive({ selectedShape: [], selectedProblem: [] })
+  const DATA= reactive({ selectedShape: [0], selectedProblem: [0] })
 
   const selectedShape = computed({
     get: () => shapes.value[selectedShapeIndex.value]
@@ -108,6 +109,13 @@
     get: () => DATA.selectedProblem[0],
     set: (val) => DATA.selectedProblem = [val]
   })
+
+  const selectedProblemResult = computed({
+    get: () => {
+      return shapes.value[selectedProblem.value.result.id]
+    }
+  })
+
 
   const shapes = computed({
     get: () => props.puzzle.shapes ? props.puzzle.shapes.voxel : []
@@ -139,8 +147,11 @@
   }
 
   watch(selectedShape, (newval, oldval) => {
-    emit("newShape", newval)
+//    emit("newShape", newval)
     })
+  watch(selectedProblemResult, (newval, oldval) => {
+    emit("newShape", newval)
+  })
   watch(() => props.puzzle, (newval) => { 
     DATA.selectedShape=[0]
     DATA.selectedProblem=[0]
