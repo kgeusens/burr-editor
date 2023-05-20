@@ -77,7 +77,7 @@ class Ghost {
         // apply material
         const ghostMaterial = new StandardMaterial("myMaterial", scene)
         ghostMaterial.alpha=this.alpha
-        ghostMaterial.emissiveColor=new Color3(0, 1, 0)
+        ghostMaterial.diffuseColor=new Color3(0, 1, 0)
         this.mesh.material=ghostMaterial
         this.mesh.isPickable=false
         if (this.outline) this.renderOutline()
@@ -105,8 +105,7 @@ class Ghost {
         vertexData.applyToMesh(nudge)
         let nudgeBasePosition = new Vector3(-0.5,-0.5,-0.5)
         // initialize 3 dimensional array for the nodes (vertices)
-        let node=[...Array(this.x + 1)].map(x => [...Array(this.y + 1)].map(y => [...Array(this.z + 1)].map(v=>0)))
-
+        let node=[...Array(1*this.x + 1)].map(x => [...Array(1*this.y + 1)].map(y => [...Array(1*this.z + 1)].map(v=>0)))
         // first bevel, and update the node matrix to keep track how many bevels join together at the node
         for (let d of ['x', 'y', 'z']) {
             bevelOptions = { width: 2*this.bevel, depth: 2*this.bevel, height: 2*this.bevel }
