@@ -26,6 +26,8 @@ class Ghost {
     outlines=[]
     delta=0
     bevel=0
+    outline=true
+    alpha=1
 
     get x() { return this.voxel.x }
     get y() { return this.voxel.y }
@@ -74,11 +76,11 @@ class Ghost {
         tempMesh.dispose()
         // apply material
         const ghostMaterial = new StandardMaterial("myMaterial", scene)
-        ghostMaterial.alpha=0.2
+        ghostMaterial.alpha=this.alpha
         ghostMaterial.emissiveColor=new Color3(0, 1, 0)
         this.mesh.material=ghostMaterial
         this.mesh.isPickable=false
-        this.renderOutline()
+        if (this.outline) this.renderOutline()
     }
     renderBevel(shapeCSG) {
         // create the nudge
@@ -265,9 +267,14 @@ export class sceneBuilder {
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
-        let vox=new Voxel(options.shape)
+        var { shape, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        let vox=new Voxel(shape)
         vox.callback = this.stateCallback
         this.piece.voxel = new Proxy(vox,handler)
+        this.piece.delta=delta
+        this.piece.bevel=bevel
+        this.piece.alpha=alpha
+        this.piece.outline=outline
         this.piece.render()
     }
 }

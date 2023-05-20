@@ -196,7 +196,7 @@ export default {
       return { shape: this.shape, size: this.shapeSize, readOnly: this.readOnly }
     },
     problemShapeDetail() {
-      return { shape: this.problemShape }
+      return { shape: this.problemShape, delta: 0, bevel: 0.05, alpha: 1, outline: true }
     }
   },
   watch:{
