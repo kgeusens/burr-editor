@@ -81,6 +81,7 @@ class Ghost {
         this.mesh.material=ghostMaterial
         this.mesh.isPickable=false
         if (this.outline) this.renderOutline()
+        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((this.x-1)/2, (this.y-1)/2, (this.z-1)/2));
     }
     renderBevel(shapeCSG) {
         // create the nudge
