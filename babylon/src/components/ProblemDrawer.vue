@@ -87,7 +87,7 @@
   const emit = defineEmits(["newShape"])
   const props = defineProps(
     { 
-        puzzle: { type: Object, default: new Puzzle() }, 
+        puzzle: { type: Object, default: null }, 
     }
     );
   const DATA= reactive({ selectedShape: [0], selectedProblem: [0] })
@@ -146,5 +146,5 @@
     DATA.selectedShape=[0]
     DATA.selectedProblem=[0]
   })
-  watch(selectedProblem, (newval) => emit("newShape", newval))
+  watch(selectedProblemIndex, (newval) => emit("newShape", newval))
 </script>

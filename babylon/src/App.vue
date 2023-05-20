@@ -125,8 +125,9 @@ export default {
   data() {
     return { 
       puzzle: new Puzzle(), 
-      shape: null,
-      problem: new Problem(),
+      shapeIndex: 0,
+      problemIndex: 0,
+      problemTrigger:0,
       fileName: "", 
       VoxelEditor: sceneBuilder,
       BodyViewer: bodyBuilder,
@@ -153,8 +154,8 @@ export default {
     loadShape(s) {
       this.shape = s
     },
-    loadProblem(p) {
-      this.problem = p
+    loadProblem(i) {
+      this.problemIndex = i
     },
     setReadOnly(b) {
       this.readOnly = b
@@ -171,10 +172,10 @@ export default {
           this.shape.setSize(s.x, s.y, s.z)
         }
         this.shape.stateString = s.stateString
+        this.problemTrigger++
       }
     },
     async saveLocal() {
-      console.log("saving")
       let a = document.createElement("a")
       let blob = new Blob([this.puzzle.saveToXML()], { type: 'text/plain' });
       const cs = new CompressionStream("gzip")
@@ -193,11 +194,17 @@ export default {
       if (this.shape) return { x: this.shape.x, y: this.shape.y, z: this.shape.z }
       else return { x:0, y:0, z:0 }
     },
+    shape() {
+      return this.puzzle.shapes.voxel[this.shapeIndex]
+    },
+    problem() { 
+      return this.puzzle.problems.problem[this.problemIndex]
+    },
     shapeDetail() {
       return { shape: this.shape, size: this.shapeSize, readOnly: this.readOnly }
     },
     problemDetail() {
-      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], delta: 0, bevel: 0.05, alpha: 1, outline: false }
+      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], delta: 0, bevel: 0.05, alpha: 1, outline: false, trigger: this.problemTrigger }
     }
   },
   watch:{

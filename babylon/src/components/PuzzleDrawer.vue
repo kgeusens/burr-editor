@@ -55,7 +55,7 @@
         puzzle: { type: Object, default: null }, 
     }
     );
-  const DATA= reactive({ selectedItem: [], readOnly: true })
+  const DATA= reactive({ selectedItem: [0], readOnly: true })
 
   function addShape() {
     let idx=props.puzzle.addShape()
