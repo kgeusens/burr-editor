@@ -151,8 +151,8 @@ export default {
     BabylonView,
   },
   methods: {
-    loadShape(s) {
-      this.shape = s
+    loadShape(i) {
+      this.shapeIndex = i
     },
     loadProblem(i) {
       this.problemIndex = i

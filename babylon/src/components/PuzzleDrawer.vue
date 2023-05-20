@@ -82,7 +82,7 @@
     get: () => props.puzzle.shapes ? props.puzzle.shapes.voxel : []
   })
 
-  watch(selectedShape, (newval, oldval) => {
+  watch(selectedIndex, (newval, oldval) => {
     emit("newShape", newval)
     })
   watch(() => props.puzzle, (newval) => DATA.selectedItem=[0])
