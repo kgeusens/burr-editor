@@ -203,8 +203,16 @@ export default {
     shapeDetail() {
       return { shape: this.shape, size: this.shapeSize, readOnly: this.readOnly }
     },
+    problemPieces() {
+      let arr=[]
+      if (this.problem.shapes.shape.length == 0) return []
+      for (let shape of this.problem.shapes.shape) {
+        if (shape.count >0 && shape.id != this.problem.result.id) arr.push(this.puzzle.shapes.voxel[shape.id])
+      }
+      return arr
+    },
     problemDetail() {
-      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], delta: 0, bevel: 0.05, alpha: 1, outline: false, trigger: this.problemTrigger }
+      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.problemPieces, delta: 0, bevel: 0.05, alpha: 1, outline: false, trigger: this.problemTrigger }
     }
   },
   watch:{
