@@ -91,6 +91,16 @@
         </div>
       </v-layout-item>
       <v-card width="100%" height="100%">
+        <BabylonEngine>
+          <BabylonScene>
+            <BabylonSceneModel :model=BodyViewer :detail=shapeDetail>
+            </BabylonSceneModel>
+            <BabylonCamera id="1">
+              <BabylonView width="parent" height="parent">
+              </BabylonView>
+            </BabylonCamera>
+          </BabylonScene>
+        </BabylonEngine>
       </v-card>
     </v-main>
   </v-app>
@@ -107,6 +117,7 @@ import BabylonSceneModel from "./components/babylon/BabylonSceneModel.vue";
 import BabylonCamera from "./components/babylon/BabylonCamera.vue";
 import BabylonView from "./components/babylon/BabylonView.vue";
 import { sceneBuilder } from "./scenes/ShapeEditor.js";
+import { sceneBuilder as bodyBuilder } from "./scenes/ShapeBody.js";
 
 export default {
   name: "App",
@@ -115,7 +126,8 @@ export default {
       puzzle: {}, 
       shape: null,
       fileName: "", 
-      VoxelEditor: sceneBuilder, 
+      VoxelEditor: sceneBuilder,
+      BodyViewer: bodyBuilder,
       drawer: false, 
       tab: "",
       showLoadLocalFile: 0,

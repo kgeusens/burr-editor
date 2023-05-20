@@ -244,12 +244,12 @@ class Ghost {
         let hole=null
         let bevel = {}
         // create the bounding box
-        this.mesh = MeshBuilder.CreateBox("voxel",{width:this.x - 2*this.delta, depth:this.z - 2*this.delta, height:this.y - 2*this.delta}, scene)
+        this.mesh = MeshBuilder.CreateBox("voxel",{width:this.x - 2*this.delta, depth:this.z - 2*this.delta, height:this.y - 2*this.delta})
         this.mesh.setPivotMatrix(Matrix.Translation(this.x/2 - 0.5, this.y/2 - 0.5, this.z/2 - 0.5), false);
         const shapeCSG = CSG.FromMesh(this.mesh);
 
         // punch holes
-        hole = MeshBuilder.CreateBox("box",{size:1 + 2*this.delta}, scene)
+        hole = MeshBuilder.CreateBox("box",{size:1 + 2*this.delta})
         hole.isVisible = false
         for (let dx=0; dx < this.x; dx++) {
             for (let dy=0; dy < this.y; dy++) {
@@ -284,13 +284,13 @@ class Ghost {
         const dimValue = {x: 1, y: 2, z: 4} 
         let bevelOptions = { width: 2*this.bevel, depth: 2*this.bevel, height: 2*this.bevel }
         let basePosition=null
-        let nudge=MeshBuilder.CreateBox("nudge", {size:1}, scene)
+        let nudge=MeshBuilder.CreateBox("nudge")
         let nudgeCSG=CSG.FromMesh(nudge)
         let bevel=[]
         for (let d of ['x', 'y', 'z']) {
             bevelOptions = { width: 2*this.bevel, depth: 2*this.bevel, height: 2*this.bevel }
             bevelOptions[dimName[d]] = 1+2*this.delta // compensate the bevel box for the delta of the holes
-            bevel[d] = MeshBuilder.CreateBox("bevel",bevelOptions, scene)
+            bevel[d] = MeshBuilder.CreateBox("bevel",bevelOptions)
             bevel[d].rotation[d] = Math.PI / 4
             nudgeCSG.intersectInPlace(CSG.FromMesh(bevel[d]))
         }
