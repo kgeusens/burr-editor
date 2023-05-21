@@ -93,7 +93,7 @@
       <v-card width="100%" height="100%">
         <BabylonEngine>
           <BabylonScene>
-            <BabylonSceneModel :model=BodyViewer :detail=problemDetail>
+            <BabylonSceneModel :model=ProblemViewer :detail=problemDetail>
             </BabylonSceneModel>
             <BabylonCamera id="1">
               <BabylonView width="parent" height="parent">
@@ -117,7 +117,8 @@ import BabylonSceneModel from "./components/babylon/BabylonSceneModel.vue";
 import BabylonCamera from "./components/babylon/BabylonCamera.vue";
 import BabylonView from "./components/babylon/BabylonView.vue";
 import { sceneBuilder } from "./scenes/ShapeEditor.js";
-import { sceneBuilder as bodyBuilder } from "./scenes/ShapeBody.js";
+// import { sceneBuilder as bodyBuilder } from "./scenes/ShapeBody.js";
+import { sceneBuilder as problemBuilder } from "./scenes/ProblemSummary.js";
 import { Problem, Puzzle } from "@kgeusens/burr-data";
 
 export default {
@@ -130,7 +131,8 @@ export default {
       problemTrigger:0,
       fileName: "", 
       VoxelEditor: sceneBuilder,
-      BodyViewer: bodyBuilder,
+      ProblemViewer: problemBuilder,
+//      BodyViewer: bodyBuilder,
       drawer: false, 
       tab: "",
       showLoadLocalFile: 0,
