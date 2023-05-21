@@ -263,14 +263,15 @@ const handler = {
 }
 
 export class sceneBuilder {
-    piece
+    result
+    pieces=[]
     stateCallback
     constructor(sc, callbackFunction, options = {}) {
         scene = sc
         this.stateCallback=callbackFunction
         const rootNode = new TransformNode("root");
         rootNode.position=new Vector3(0,0,0)
-        this.piece=new Ghost(new Voxel({}), 0, 0, rootNode)
+        this.result=new Ghost(new Voxel({}), 0, 0, rootNode)
         this.setOptions(options)
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
@@ -279,14 +280,14 @@ export class sceneBuilder {
 
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
-        this.piece.voxel = new Proxy(vox,handler)
-        this.piece.delta=delta
-        this.piece.bevel=bevel
-        this.piece.alpha=alpha
-        this.piece.outline=outline
+        this.result.voxel = new Proxy(vox,handler)
+        this.result.delta=delta
+        this.result.bevel=bevel
+        this.result.alpha=alpha
+        this.result.outline=outline
         let r = rotationVector(rotationIndex)
-        this.piece.parent.rotation = new Vector3(r[0], r[1], r[2])
-        this.piece.parent.position = new Vector3(position.x, position.y, position.z)
-        this.piece.render()
+        this.result.parent.rotation = new Vector3(r[0], r[1], r[2])
+        this.result.parent.position = new Vector3(position.x, position.y, position.z)
+        this.result.render()
     }
 }
