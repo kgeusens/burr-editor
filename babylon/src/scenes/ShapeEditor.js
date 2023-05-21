@@ -682,9 +682,10 @@ export class sceneBuilder {
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
-        let vox=new Voxel(options.shape)
+        var { shape, readOnly, size} = options
+        let vox=new Voxel(shape)
         vox.callback = this.stateCallback
-        this.grid.readOnly = options.readOnly
+        this.grid.readOnly = readOnly
         this.grid.voxel = new Proxy(vox,handler)
         this.grid.render()
     }
