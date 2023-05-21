@@ -276,7 +276,7 @@ export class sceneBuilder {
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
-        var { shape, pieces, position = {x:0, y:0, z:0} , rotationIndex = 0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        var { shape, pieces = [], position = {x:0, y:0, z:0} , rotationIndex = 0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
 
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
@@ -289,5 +289,19 @@ export class sceneBuilder {
         this.result.parent.rotation = new Vector3(r[0], r[1], r[2])
         this.result.parent.position = new Vector3(position.x, position.y, position.z)
         this.result.render()
+
+        for (let piece of this.pieces) piece.dispose()
+        this.pieces=[]
+        for (let idx in pieces) {
+            let radius = 5
+            let angle = (idx*Math.PI*2)/pieces.length
+            let p = new Ghost(pieces[idx], delta, bevel, this.result.parent)
+            p.alpha = alpha
+            p.outline = outline
+            this.pieces.push(p)
+            p.render()
+            p.mesh.position.x=Math.cos(angle)*radius*Math.sqrt(2)
+            p.mesh.position.y=Math.sin(angle)*radius*Math.sqrt(2)
+        }
     }
 }
