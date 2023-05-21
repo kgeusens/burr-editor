@@ -275,7 +275,7 @@ export class sceneBuilder {
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
-        var { shape, pieces, position = {x:0, y:0, z:-10} , rotationIndex = 0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        var { shape, pieces, position = {x:0, y:0, z:0} , rotationIndex = 0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
 
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
