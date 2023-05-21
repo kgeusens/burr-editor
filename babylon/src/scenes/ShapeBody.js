@@ -1,26 +1,26 @@
 import {
-  Vector3,
-  MeshBuilder,
-  StandardMaterial,
-  Color3,
-  TransformNode,
-  ActionManager,
-  ExecuteCodeAction,
-  Matrix,
-  PointerDragBehavior,
-  PointerEventTypes,
-  HighlightLayer,
-  CSG,
-  VertexData,
-} from "@babylonjs/core";
-
+    Vector3,
+    MeshBuilder,
+    StandardMaterial,
+    Color3,
+    TransformNode,
+    ActionManager,
+    ExecuteCodeAction,
+    Matrix,
+    PointerDragBehavior,
+    PointerEventTypes,
+    HighlightLayer,
+    CSG,
+    VertexData,
+  } from "@babylonjs/core";
 import { Voxel } from "@kgeusens/burr-data"
-
+import { rotationVector } from '../utils/rotation'
+  
 var scene
 
 class Ghost {
     // dimension of grid
-    _parent=null
+    _parent
     _voxel=null
     mesh={}
     outlines=[]
@@ -34,8 +34,9 @@ class Ghost {
     get z() { return this.voxel.z }
     get voxel() {return this._voxel}
     set voxel(v) { this._voxel = v }
+    get parent() { return this._parent }
 
-    constructor(voxel = new Voxel(), deltaWidth=0, bevelWidth=0, parent) {
+    constructor(voxel = new Voxel(), deltaWidth=0, bevelWidth=0, parent = null) {
         this._parent=parent
         this._voxel=voxel
         this.delta=deltaWidth
@@ -49,11 +50,13 @@ class Ghost {
         let bevel = {}
         // create the bounding box
         this.mesh = MeshBuilder.CreateBox("voxel",{width:this.x - 2*this.delta, depth:this.z - 2*this.delta, height:this.y - 2*this.delta}, scene)
+        this.mesh.parent = this.parent
         this.mesh.setPivotMatrix(Matrix.Translation(this.x/2 - 0.5, this.y/2 - 0.5, this.z/2 - 0.5), false);
         const shapeCSG = CSG.FromMesh(this.mesh);
 
         // punch holes
         hole = MeshBuilder.CreateBox("box",{size:1 + 2*this.delta}, scene)
+        hole.parent = this.parent
         hole.isVisible = false
         for (let dx=0; dx < this.x; dx++) {
             for (let dy=0; dy < this.y; dy++) {
@@ -70,9 +73,10 @@ class Ghost {
         if (this.bevel >0) this.renderBevel(shapeCSG)
         // compute the normals
         const tempMesh=shapeCSG.toMesh()
+        tempMesh.parent = this.parent
         const vertexData = VertexData.ExtractFromMesh(tempMesh);
-         VertexData.ComputeNormals(vertexData.positions, vertexData.indices, vertexData.normals )
-         vertexData.applyToMesh(this.mesh)
+        VertexData.ComputeNormals(vertexData.positions, vertexData.indices, vertexData.normals )
+        vertexData.applyToMesh(this.mesh)
         tempMesh.dispose()
         // apply material
         const ghostMaterial = new StandardMaterial("myMaterial", scene)
@@ -90,16 +94,19 @@ class Ghost {
         let bevelOptions = { width: 2*this.bevel, depth: 2*this.bevel, height: 2*this.bevel }
         let basePosition=null
         let nudge=MeshBuilder.CreateBox("nudge", { size: 1}, scene)
+        nudge.parent=this.parent
         let nudgeCSG=CSG.FromMesh(nudge)
         let bevel=[]
         for (let d of ['x', 'y', 'z']) {
             bevelOptions = { width: 2*this.bevel, depth: 2*this.bevel, height: 2*this.bevel }
             bevelOptions[dimName[d]] = 1+2*this.delta // compensate the bevel box for the delta of the holes
             bevel[d] = MeshBuilder.CreateBox("bevel",bevelOptions)
+            bevel[d].parent = this.parent
             bevel[d].rotation[d] = Math.PI / 4
             nudgeCSG.intersectInPlace(CSG.FromMesh(bevel[d]))
         }
         let tempMesh=nudgeCSG.toMesh()
+        tempMesh.parent=this.parent
         let vertexData = VertexData.ExtractFromMesh(tempMesh);
         VertexData.ComputeNormals(vertexData.positions, vertexData.indices, vertexData.normals )
         tempMesh.dispose()
@@ -222,6 +229,7 @@ class Ghost {
                 }
             }
         }
+        for (let out of this.outlines) out.parent=this.parent
     }
     dispose() {
         if (this.mesh.dispose) this.mesh.dispose()
@@ -267,7 +275,8 @@ export class sceneBuilder {
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
-        var { shape, pieces, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        var { shape, position, rotationIndex = 0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
         this.piece.voxel = new Proxy(vox,handler)
@@ -275,6 +284,8 @@ export class sceneBuilder {
         this.piece.bevel=bevel
         this.piece.alpha=alpha
         this.piece.outline=outline
+        let r = rotationVector(rotationIndex)
+        this.piece.parent.rotation = new Vector3(r[0], r[1], r[2])
         this.piece.render()
     }
 }
