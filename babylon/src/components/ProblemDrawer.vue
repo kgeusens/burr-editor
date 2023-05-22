@@ -91,7 +91,7 @@
         problemIndex: { type: Array, default: [0] },
     }
     );
-  const DATA= reactive({ selectedShape: [0], selectedProblem: [0] })
+  const DATA= reactive({ selectedShape: [0] })
 
   const selectedShape = computed({
     get: () => shapes.value[selectedShapeIndex.value]

@@ -98,7 +98,7 @@
         problemIndex: { type: Array, default: [0] },
     }
     );
-  const DATA= reactive({ selectedShape: [0], selectedProblem: [0], selectedSolution: [0] })
+  const DATA= reactive({ selectedShape: [0], selectedSolution: [0] })
 
   const selectedShape = computed({
     get: () => shapes.value[selectedShapeIndex.value]
@@ -152,7 +152,7 @@
       let j = 0
       for (let idx=0; idx < tempShapes.length; idx++) {
         for (let i=0; i<tempShapes[idx]; i++) {
-          shapeList.push( { shape: shapes.value[idx] , id: j, rotationIndex: assembly[j*4+3], position: [Number(assembly[j*4]), Number(assembly[j*4+1]), Number(assembly[j*4+2]) ]} )
+          shapeList.push( { shape: shapes.value[idx] , id: j, name: idx + "." + i + " " + shapes.value[idx].name} )
           j++
         }
       }
@@ -179,7 +179,6 @@
     })
   watch(() => props.puzzle, (newval) => { 
 //    DATA.selectedShape=[0]
-//    DATA.selectedProblem=[0]
   })
 //  watch(selectedProblemIndex, (newval) => emit("update:problemIndex", newval))
   watch(selectedSolutionIndex, (newval) => emit("newSolution", newval))
