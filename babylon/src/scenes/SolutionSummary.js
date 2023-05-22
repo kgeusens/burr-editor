@@ -280,22 +280,22 @@ export class sceneBuilder {
 
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
-//        let r = rotationVector(rotationIndex)
-//        this.result.parent.rotation = new Vector3(r[0], r[1], r[2])
-//        this.result.parent.position = new Vector3(position.x, position.y, position.z)
-//        this.result.render()
 
-        for (let piece of this.pieces) piece.dispose()
+        for (let piece of this.pieces) { 
+            let p = piece.parent
+            piece.dispose()
+            p.dispose()
+        }
         this.pieces=[]
         for (let idx in pieces) {
             let angle = (idx*Math.PI*2)/pieces.length
-            let p = new Ghost(pieces[idx].shape, delta, bevel, this.result.parent)
+            let p = new Ghost(pieces[idx].shape, delta, bevel,new TransformNode("root"))
             p.alpha = alpha
             p.outline = outline
             this.pieces.push(p)
             p.render()
-            p.mesh.rotation = rotationVector(pieces[idx].rotationIndex)
-            p.mesh.position = new Vector3(pieces[idx].position[0], pieces[idx].position[1], pieces[idx].position[2])
+            p.parent.rotation = rotationVector(pieces[idx].rotationIndex)
+            p.parent.position = new Vector3(pieces[idx].position[0], pieces[idx].position[1], pieces[idx].position[2])
         }
     }
 }
