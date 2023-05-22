@@ -92,11 +92,12 @@
   import { Puzzle } from '@kgeusens/burr-data';
   import { reactive, computed, watch } from 'vue'
 
-  const emit = defineEmits(["update:problemIndex", "newSolution"])
+  const emit = defineEmits(["update:problemIndex", "update:solutionIndex"])
   const props = defineProps(
     { 
         puzzle: { type: Object, default: null },
         problemIndex: { type: Array, default: [0] },
+        solutionIndex: { type: Array, default: [0] },
     }
     );
   const DATA= reactive({ selectedShape: [0], selectedSolution: [0] })
@@ -124,13 +125,18 @@
     set: (val) => emit("update:problemIndex", val)
   })
 
+  const solutionIndex = computed({
+    get: () => props.solutionIndex,
+    set: (val) => emit("update:solutionIndex", val)
+  })
+
   const selectedSolution = computed({
     get: () => solutions.value[selectedSolutionIndex.value]
   })
 
   const selectedSolutionIndex = computed({
-    get: () => DATA.selectedSolution[0],
-    set: (val) => DATA.selectedSolution = [val]
+    get: () => props.solutionIndex[0],
+    set: (val) => solutionIndex.value = [val]
   })
 
   const shapes = computed({

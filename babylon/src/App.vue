@@ -114,7 +114,7 @@
         temporary
         :scrim=false
         >
-        <SolutionDrawer :puzzle="puzzle" v-model:problemIndex="problemIndex" @newSolution="loadSolution"/>
+        <SolutionDrawer :puzzle="puzzle" v-model:problemIndex="problemIndex" v-model:solutionIndex="solutionIndex"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -163,7 +163,7 @@ export default {
       puzzle: new Puzzle(), 
       shapeIndex: 0,
       problemIndex: [0],
-      solutionIndex: 0,
+      solutionIndex: [0],
       problemTrigger:0,
       fileName: "", 
       VoxelEditor: sceneBuilder,
@@ -193,12 +193,6 @@ export default {
   methods: {
     loadShape(i) {
       this.shapeIndex = i
-    },
-    loadProblem(i) {
-      this.problemIndex = i
-    },
-    loadSolution(i) {
-      this.solutionIndex = i
     },
     setReadOnly(b) {
       this.readOnly = b
@@ -241,10 +235,10 @@ export default {
       return this.puzzle.shapes.voxel[this.shapeIndex]
     },
     problem() { 
-      return this.puzzle.problems.problem[this.problemIndex]
+      return this.puzzle.problems.problem[this.problemIndex[0]]
     },
     solution() {
-      return this.problem.solutions.solution[this.solutionIndex]
+      return this.problem.solutions.solution[this.solutionIndex[0]]
     },
     shapeDetail() {
       return { shape: this.shape, size: this.shapeSize, readOnly: this.readOnly }
@@ -279,7 +273,7 @@ export default {
       return shapeList
     },
     problemDetail() {
-      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.problemPieces, delta: 0, bevel: 0, alpha: 1, outline: false, trigger: this.problemTrigger }
+      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.problemPieces, delta: 0, bevel: 0, alpha: 1, outline: true, trigger: this.problemTrigger }
     },
     solutionDetail() {
       return { pieces: this.solutionPieces, delta: 0.01, bevel: 0, alpha: 1, outline: true, trigger: this.problemTrigger }
