@@ -273,7 +273,7 @@ export default {
       return shapeList
     },
     problemDetail() {
-      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.problemPieces, delta: 0, bevel: 0, alpha: 1, outline: true, trigger: this.problemTrigger }
+      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.problemPieces, delta: 0, bevel: 0, alpha: 1, outline: false, trigger: this.problemTrigger }
     },
     solutionDetail() {
       return { pieces: this.solutionPieces, delta: 0.01, bevel: 0, alpha: 1, outline: true, trigger: this.problemTrigger }
