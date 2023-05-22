@@ -77,6 +77,7 @@
               label="name"
               density="compact"
               variant="outlined"
+              readonly
             ></v-text-field></v-col>
             <v-col class = "pa-0" align="right">
             </v-col>
