@@ -285,23 +285,24 @@ export class sceneBuilder {
         this.result.bevel=bevel
         this.result.alpha=alpha
         this.result.outline=outline
-        let r = rotationVector(rotationIndex)
-        this.result.parent.rotation = new Vector3(r[0], r[1], r[2])
-        this.result.parent.position = new Vector3(position.x, position.y, position.z)
         this.result.render()
 
-        for (let piece of this.pieces) piece.dispose()
+        for (let piece of this.pieces) { 
+            let p = piece.parent
+            piece.dispose()
+            p.dispose()
+         }
         this.pieces=[]
         let radius = shape?Math.max(shape.x, shape.y):1
         for (let idx in pieces) {
             let angle = (idx*Math.PI*2)/pieces.length
-            let p = new Ghost(pieces[idx], delta, bevel, this.result.parent)
+            let p = new Ghost(pieces[idx], delta, bevel, new TransformNode("subRoot"))
             p.alpha = alpha
             p.outline = outline
             this.pieces.push(p)
             p.render()
-            p.mesh.position.x=Math.cos(angle)*radius*Math.sqrt(2)
-            p.mesh.position.y=Math.sin(angle)*radius*Math.sqrt(2)
+            p.parent.position.x=Math.cos(angle)*radius*Math.sqrt(2)
+            p.parent.position.y=Math.sin(angle)*radius*Math.sqrt(2)
         }
     }
 }
