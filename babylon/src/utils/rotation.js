@@ -1,3 +1,7 @@
+import {
+  Vector3,
+} from "@babylonjs/core";
+
 export const rotationMatrix = [ 
 [0,0,0],
 [1,0,0], // OK
@@ -28,14 +32,8 @@ export const rotationMatrix = [
 export const KG = "Koen Geusens"
 
 export function rotationVector(idx) {
-    var result = new Array();
     const pie = Math.PI/2;
-
-    for(let i = 0;i<3;i++) {
-      result.push(rotationMatrix[idx][i]*pie)
-    }
-
-    return result;
+    return new Vector3(rotationMatrix[idx][0]*pie, rotationMatrix[idx][1]*pie, rotationMatrix[idx][2]*pie);
 };
 
 export function rotate(idx) { return rotationVector(idx); }

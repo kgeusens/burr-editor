@@ -114,7 +114,7 @@
         temporary
         :scrim=false
         >
-        <SolutionDrawer :puzzle="puzzle" @newShape="loadSolution"/>
+        <SolutionDrawer :puzzle="puzzle" @newProblem="loadProblem" @newSolution="loadSolution"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -125,7 +125,7 @@
       <v-card width="100%" height="100%">
         <BabylonEngine>
           <BabylonScene>
-            <BabylonSceneModel :model=SolutionViewer :detail=problemDetail>
+            <BabylonSceneModel :model=SolutionViewer :detail=solutionDetail>
             </BabylonSceneModel>
             <BabylonCamera id="1">
               <BabylonView width="parent" height="parent">
@@ -163,6 +163,7 @@ export default {
       puzzle: new Puzzle(), 
       shapeIndex: 0,
       problemIndex: 0,
+      solutionIndex: 0,
       problemTrigger:0,
       fileName: "", 
       VoxelEditor: sceneBuilder,
@@ -196,8 +197,8 @@ export default {
     loadProblem(i) {
       this.problemIndex = i
     },
-    loadSolution(e) {
-      console.log(e)
+    loadSolution(i) {
+      this.solutionIndex = i
     },
     setReadOnly(b) {
       this.readOnly = b
@@ -242,6 +243,9 @@ export default {
     problem() { 
       return this.puzzle.problems.problem[this.problemIndex]
     },
+    solution() {
+      return this.problem.solutions.solution[this.solutionIndex]
+    },
     shapeDetail() {
       return { shape: this.shape, size: this.shapeSize, readOnly: this.readOnly }
     },
@@ -253,8 +257,32 @@ export default {
       }
       return arr
     },
+    solutionPieces() {
+      // returns an array that maps to the id of the unique entities. 
+      // A shape with id=2 and count=3 means entity 2 is used three times. 
+      // It will occur as ... 2, 2, 2 ... in the array
+      // We return an array of entities, together with its position, and the rotation
+      if (!this.solution) return []
+      let shapeList = []
+      let tempShapes = []
+      let assembly = this.solution.assembly.text.split(" ")
+      for (let shape of this.problem.shapes.shape) {
+          tempShapes[shape.id] = shape.count
+      }
+      let j = 0
+      for (let idx=0; idx < tempShapes.length; idx++) {
+        for (let i=0; i<tempShapes[idx]; i++) {
+          shapeList.push( { shape: this.puzzle.shapes.voxel[idx] , id: j, rotationIndex: assembly[j*4+3], position: [Number(assembly[j*4]), Number(assembly[j*4+1]), Number(assembly[j*4+2]) ]} )
+          j++
+        }
+      }
+      return shapeList
+    },
     problemDetail() {
       return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.problemPieces, delta: 0, bevel: 0, alpha: 1, outline: false, trigger: this.problemTrigger }
+    },
+    solutionDetail() {
+      return { pieces: this.solutionPieces, delta: 0, bevel: 0, alpha: 1, outline: false, trigger: this.problemTrigger }
     }
   },
   watch:{

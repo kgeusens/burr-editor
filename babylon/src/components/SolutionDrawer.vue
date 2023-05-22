@@ -91,7 +91,7 @@
   import { Puzzle } from '@kgeusens/burr-data';
   import { reactive, computed, watch } from 'vue'
 
-  const emit = defineEmits(["newShape"])
+  const emit = defineEmits(["newProblem", "newSolution"])
   const props = defineProps(
     { 
         puzzle: { type: Object, default: null }, 
@@ -150,7 +150,6 @@
           j++
         }
       }
-      console.log(shapeList)
       return shapeList
     }
   })
@@ -176,5 +175,6 @@
     DATA.selectedShape=[0]
     DATA.selectedProblem=[0]
   })
-  watch(selectedProblemIndex, (newval) => emit("newShape", newval))
+  watch(selectedProblemIndex, (newval) => emit("newProblem", newval))
+  watch(selectedSolutionIndex, (newval) => emit("newSolution", newval))
 </script>
