@@ -83,7 +83,7 @@ class Ghost {
         ghostMaterial.alpha=this.alpha
         ghostMaterial.diffuseColor=new Color3(0, 1, 0)
         this.mesh.material=ghostMaterial
-        this.mesh.isPickable=false
+        this.mesh.isPickable=true
         if (this.outline) this.renderOutline()
 //        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((this.x-1)/2, (this.y-1)/2, (this.z-1)/2));
     }
@@ -280,6 +280,8 @@ export class sceneBuilder {
 
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
+
+        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((shape.x-1)/2, (shape.y-1)/2, (shape.z-1)/2));
 
         for (let piece of this.pieces) { 
             let p = piece.parent

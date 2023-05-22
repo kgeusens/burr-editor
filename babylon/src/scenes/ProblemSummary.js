@@ -52,7 +52,7 @@ class Ghost {
         for (let dx=0; dx < this.x; dx++) {
             for (let dy=0; dy < this.y; dy++) {
                 for (let dz=0; dz < this.z; dz++) {
-                    if (this.voxel.getVoxelState(dx, dy, dz) == 1 ) {
+                    if (this.voxel.getVoxelState(dx, dy, dz) !=0 ) {
                         let m = MeshBuilder.CreateBox("voxel",{size:1-2*this.delta}, scene)
                         m.parent = this.parent
                         m.position=new Vector3(dx,dy,dz)
@@ -74,7 +74,6 @@ class Ghost {
             this.mesh.edgesColor = new Color4(1,1,1,1)
             this.mesh.enableEdgesRendering() 
         }
-//        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((this.x-1)/2, (this.y-1)/2, (this.z-1)/2));
     }
     dispose() {
         if (this.mesh.dispose) this.mesh.dispose()
@@ -121,7 +120,7 @@ export class sceneBuilder {
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
-        var { shape, pieces = [], position = {x:0, y:0, z:0} , rotationIndex = 0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        var { shape, pieces = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
 
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
@@ -131,6 +130,8 @@ export class sceneBuilder {
         this.result.alpha=alpha
         this.result.outline=outline
         this.result.render()
+
+        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((shape.x-1)/2, (shape.y-1)/2, (shape.z-1)/2));
 
         for (let piece of this.pieces) { 
             let p = piece.parent
