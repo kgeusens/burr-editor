@@ -88,7 +88,7 @@
   const props = defineProps(
     { 
         puzzle: { type: Object, default: null }, 
-        problemIndex: { type: Array },
+        problemIndex: { type: Array, default: [0] },
     }
     );
   const DATA= reactive({ selectedShape: [0], selectedProblem: [0] })
@@ -107,8 +107,8 @@
   })
 
   const selectedProblemIndex = computed({
-    get: () => DATA.selectedProblem[0],
-    set: (val) => DATA.selectedProblem = [val]
+    get: () =>  props.problemIndex[0] ,
+    set: (val) => problemIndex.value = [val]
   })
 
   const problemIndex = computed({
@@ -149,8 +149,8 @@
 //    emit("newShape", newval)
     })
   watch(() => props.puzzle, (newval) => { 
-    DATA.selectedShape=[0]
-    DATA.selectedProblem=[0]
+//    DATA.selectedShape=[0]
+//    DATA.selectedProblem=[0]
   })
-  watch(selectedProblemIndex, (newval) => emit("newShape", newval))
+//  watch(selectedProblemIndex, (newval) => emit("newShape", newval))
 </script>
