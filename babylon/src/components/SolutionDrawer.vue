@@ -9,7 +9,7 @@
       </v-toolbar-title>
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
-      <v-list  mandatory v-model:selected="DATA.selectedProblem">
+      <v-list  mandatory v-model:selected="problemIndex">
         <v-list-item  v-for="(item, i) in problems" class="py-0 px-1" :key="i" :value="i">
           <v-list-item-title><v-container fluid><v-row align="center">
             <v-col class="pa-0" align="center"><v-chip>
@@ -91,10 +91,11 @@
   import { Puzzle } from '@kgeusens/burr-data';
   import { reactive, computed, watch } from 'vue'
 
-  const emit = defineEmits(["newProblem", "newSolution"])
+  const emit = defineEmits(["update:problemIndex", "newSolution"])
   const props = defineProps(
     { 
-        puzzle: { type: Object, default: null }, 
+        puzzle: { type: Object, default: null },
+        problemIndex: { type: Array },
     }
     );
   const DATA= reactive({ selectedShape: [0], selectedProblem: [0], selectedSolution: [0] })
@@ -115,6 +116,11 @@
   const selectedProblemIndex = computed({
     get: () => DATA.selectedProblem[0],
     set: (val) => DATA.selectedProblem = [val]
+  })
+
+  const problemIndex = computed({
+    get: () => props.problemIndex,
+    set: (val) => emit("update:problemIndex", val)
   })
 
   const selectedSolution = computed({
@@ -175,6 +181,6 @@
     DATA.selectedShape=[0]
     DATA.selectedProblem=[0]
   })
-  watch(selectedProblemIndex, (newval) => emit("newProblem", newval))
+//  watch(selectedProblemIndex, (newval) => emit("update:problemIndex", newval))
   watch(selectedSolutionIndex, (newval) => emit("newSolution", newval))
 </script>

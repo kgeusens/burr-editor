@@ -82,7 +82,7 @@
         temporary
         :scrim=false
         >
-        <ProblemDrawer :puzzle="puzzle" @newShape="loadProblem"/>
+        <ProblemDrawer :puzzle="puzzle" v-model:problemIndex="problemIndex"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -114,7 +114,7 @@
         temporary
         :scrim=false
         >
-        <SolutionDrawer :puzzle="puzzle" @newProblem="loadProblem" @newSolution="loadSolution"/>
+        <SolutionDrawer :puzzle="puzzle" v-model:problemIndex="problemIndex" @newSolution="loadSolution"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -162,7 +162,7 @@ export default {
     return { 
       puzzle: new Puzzle(), 
       shapeIndex: 0,
-      problemIndex: 0,
+      problemIndex: [0],
       solutionIndex: 0,
       problemTrigger:0,
       fileName: "", 
