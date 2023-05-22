@@ -103,12 +103,46 @@
         </BabylonEngine>
       </v-card>
     </v-main>
-  </v-app>
+
+    <v-main v-show="tab == 'solutions' && puzzle.shapes">
+      <v-navigation-drawer
+        id="solutionDrawer"
+        key="solutionDrawer"
+        width="450"
+        class="pa-2"
+        v-model="drawer"
+        temporary
+        :scrim=false
+        >
+        <SolutionDrawer :puzzle="puzzle" @newShape="loadSolution"/>
+      </v-navigation-drawer>
+      <v-layout-item model-value position="top" class="text-start" size="0">
+        <div class="ma-4">
+          <span v-if=drawer style="display:inline-block;width:450px"></span>
+          <v-btn @click.stop="drawer = !drawer" icon="mdi-arrow-left-right" size="small" elevation="4" />
+        </div>
+      </v-layout-item>
+      <v-card width="100%" height="100%">
+        <BabylonEngine>
+          <BabylonScene>
+            <BabylonSceneModel :model=SolutionViewer :detail=problemDetail>
+            </BabylonSceneModel>
+            <BabylonCamera id="1">
+              <BabylonView width="parent" height="parent">
+              </BabylonView>
+            </BabylonCamera>
+          </BabylonScene>
+        </BabylonEngine>
+      </v-card>
+    </v-main>
+
+</v-app>
 </template>
 
 <script>
 import PuzzleDrawer from "./components/PuzzleDrawer.vue"
 import ProblemDrawer from "./components/ProblemDrawer.vue"
+import SolutionDrawer from "./components/SolutionDrawer.vue"
 import LocalFileDialog from "./components/LocalFileDialog.vue"
 import PWBPDialog from './components/PWBPDialog.vue'
 import BabylonEngine from "./components/babylon/BabylonEngine.vue";
@@ -119,6 +153,7 @@ import BabylonView from "./components/babylon/BabylonView.vue";
 import { sceneBuilder } from "./scenes/ShapeEditor.js";
 // import { sceneBuilder as bodyBuilder } from "./scenes/ShapeBody.js";
 import { sceneBuilder as problemBuilder } from "./scenes/ProblemSummary.js";
+import { sceneBuilder as solutionBuilder } from "./scenes/SolutionSummary.js";
 import { Problem, Puzzle } from "@kgeusens/burr-data";
 
 export default {
@@ -132,6 +167,7 @@ export default {
       fileName: "", 
       VoxelEditor: sceneBuilder,
       ProblemViewer: problemBuilder,
+      SolutionViewer: solutionBuilder,
 //      BodyViewer: bodyBuilder,
       drawer: false, 
       tab: "",
@@ -144,6 +180,7 @@ export default {
   components: {
     PuzzleDrawer,
     ProblemDrawer,
+    SolutionDrawer,
     LocalFileDialog,
     PWBPDialog,
     BabylonScene,
@@ -158,6 +195,9 @@ export default {
     },
     loadProblem(i) {
       this.problemIndex = i
+    },
+    loadSolution(e) {
+      console.log(e)
     },
     setReadOnly(b) {
       this.readOnly = b
@@ -214,7 +254,7 @@ export default {
       return arr
     },
     problemDetail() {
-      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.problemPieces, delta: 0, bevel: 0.05, alpha: 1, outline: false, trigger: this.problemTrigger }
+      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.problemPieces, delta: 0, bevel: 0, alpha: 1, outline: false, trigger: this.problemTrigger }
     }
   },
   watch:{
