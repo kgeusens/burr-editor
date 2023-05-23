@@ -117,13 +117,11 @@ export class sceneBuilder {
         const rootNode = new TransformNode("root");
         rootNode.position=new Vector3(0,0,0)
         this.result=new Ghost(new Voxel({}), 0, 0, rootNode)
-//        this.setOptions(options)
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
         var { shape, pieces = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
 
-        console.log("setOptions", options)
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
         this.result.voxel = new Proxy(vox,handler)
@@ -140,9 +138,6 @@ export class sceneBuilder {
          }
         this.pieces=[]
         let radius = shape?Math.max(shape.x, shape.y):1
-        let allMeshes = [this.result.mesh]
-        let min = allMeshes[0].getBoundingInfo().boundingBox.minimumWorld;
-        let max = allMeshes[0].getBoundingInfo().boundingBox.maximumWorld;
         for (let idx in pieces) {
             let angle = (idx*Math.PI*2)/pieces.length
             let p = new Ghost(pieces[idx], delta, bevel, new TransformNode("subRoot"))
@@ -154,18 +149,12 @@ export class sceneBuilder {
             p.render()
             p.parent.computeWorldMatrix(true)
             p.mesh.computeWorldMatrix(true)
-
-            allMeshes.push(p.mesh)
-            let bbi = p.mesh.getBoundingInfo()
-            let meshMin = bbi.boundingBox.minimumWorld;
-            let meshMax = bbi.boundingBox.maximumWorld;
-            min = Vector3.Minimize(min, meshMin);
-            max = Vector3.Maximize(max, meshMax);
         }
 
         if (scene.activeCamera) { 
-//            scene.activeCamera.useFramingBehavior = true
-            scene.activeCamera.setTarget(allMeshes[0], true);
+            scene.activeCamera.useFramingBehavior = true
+            scene.activeCamera.framingBehavior.radiusScale = 3
+            scene.activeCamera.setTarget(this.result.mesh);
 }
     }
 }

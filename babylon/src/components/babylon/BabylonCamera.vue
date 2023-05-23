@@ -12,7 +12,7 @@
 
   const theScene = inject("scene")
 
-  const myCamera = new ArcRotateCamera(props.id, 0, 0, 15, new Vector3(0,0,0), theScene);
+  const myCamera = new ArcRotateCamera(props.id, 1.3, 0.7, 30, new Vector3(0,0,0), theScene);
   provide("camera", myCamera)
 
   myCamera.layerMask=1
