@@ -6,6 +6,8 @@ import {
     Color4,
     TransformNode,
     Mesh,
+    AbstractMesh,
+    Space,
     ActionManager,
     ExecuteCodeAction,
     Matrix,
@@ -24,7 +26,7 @@ class Ghost {
     // dimension of grid
     _parent
     _voxel=null
-    mesh={}
+    mesh=new AbstractMesh("mesh", scene)
     outlines=[]
     delta=0
     bevel=0
@@ -54,7 +56,6 @@ class Ghost {
                 for (let dz=0; dz < this.z; dz++) {
                     if (this.voxel.getVoxelState(dx, dy, dz) !=0 ) {
                         let m = MeshBuilder.CreateBox("voxel",{size:1-2*this.delta}, scene)
-                        m.parent = this.parent
                         m.position=new Vector3(dx,dy,dz)
                         meshArray.push(m)
                     }
@@ -68,7 +69,7 @@ class Ghost {
         ghostMaterial.alpha=this.alpha
         ghostMaterial.diffuseColor=new Color3(0, 1, 0)
         this.mesh.material=ghostMaterial
-//        this.mesh.isPickable=false
+        this.mesh.isPickable=true
         if (this.outline) { 
             this.mesh.edgesWidth=3
             this.mesh.edgesColor = new Color4(1,1,1,1)
@@ -78,7 +79,7 @@ class Ghost {
     dispose() {
         if (this.mesh.dispose) this.mesh.dispose()
         for (let line of this.outlines) { line.dispose()}
-        this.mesh={}
+        this.mesh=new AbstractMesh("mesh", scene)
         this.outlines=[]
     }
     attach() {
@@ -116,12 +117,13 @@ export class sceneBuilder {
         const rootNode = new TransformNode("root");
         rootNode.position=new Vector3(0,0,0)
         this.result=new Ghost(new Voxel({}), 0, 0, rootNode)
-        this.setOptions(options)
+//        this.setOptions(options)
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
         var { shape, pieces = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
 
+        console.log("setOptions", options)
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
         this.result.voxel = new Proxy(vox,handler)
@@ -131,8 +133,6 @@ export class sceneBuilder {
         this.result.outline=outline
         this.result.render()
 
-        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((shape.x-1)/2, (shape.y-1)/2, (shape.z-1)/2));
-
         for (let piece of this.pieces) { 
             let p = piece.parent
             piece.dispose()
@@ -140,15 +140,32 @@ export class sceneBuilder {
          }
         this.pieces=[]
         let radius = shape?Math.max(shape.x, shape.y):1
+        let allMeshes = [this.result.mesh]
+        let min = allMeshes[0].getBoundingInfo().boundingBox.minimumWorld;
+        let max = allMeshes[0].getBoundingInfo().boundingBox.maximumWorld;
         for (let idx in pieces) {
             let angle = (idx*Math.PI*2)/pieces.length
             let p = new Ghost(pieces[idx], delta, bevel, new TransformNode("subRoot"))
             p.alpha = alpha
             p.outline = outline
             this.pieces.push(p)
-            p.render()
             p.parent.position.x=Math.cos(angle)*radius*Math.sqrt(2)
             p.parent.position.y=Math.sin(angle)*radius*Math.sqrt(2)
+            p.render()
+            p.parent.computeWorldMatrix(true)
+            p.mesh.computeWorldMatrix(true)
+
+            allMeshes.push(p.mesh)
+            let bbi = p.mesh.getBoundingInfo()
+            let meshMin = bbi.boundingBox.minimumWorld;
+            let meshMax = bbi.boundingBox.maximumWorld;
+            min = Vector3.Minimize(min, meshMin);
+            max = Vector3.Maximize(max, meshMax);
         }
+
+        if (scene.activeCamera) { 
+//            scene.activeCamera.useFramingBehavior = true
+            scene.activeCamera.setTarget(allMeshes[0], true);
+}
     }
 }

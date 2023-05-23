@@ -245,7 +245,6 @@ export default {
     },
     problemPieces() {
       let arr=[]
-      if (this.problem.shapes.shape.length == 0) return []
       for (let shape of this.problem.shapes.shape) {
         if (shape.count >0 && shape.id != this.problem.result.id) arr.push(this.puzzle.shapes.voxel[shape.id])
       }
@@ -286,6 +285,20 @@ export default {
     },
     shapeSize(newv) {
     },
+    problemIndex(newv) {
+    },
+    problemPieces(newv, oldv) {
+//      console.log("problemPieces triggered", newv.length)
+    },
+    problem(newv, oldv) {
+//      console.log("problem triggered")
+    },
+    problemDetail(newv) {
+//      console.log("problemDetail triggered")
+    },
+    puzzle(newv) {
+//      console.log("puzzle triggered", newv)
+    }
   },
   mounted() { 
   }

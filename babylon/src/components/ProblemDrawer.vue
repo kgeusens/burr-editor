@@ -1,4 +1,7 @@
 <template>
+<!--
+  Problems
+ -->
   <v-card class="my-2" variant="outlined" v-if="props.puzzle.problems">
     <v-toolbar density="compact" color="primary">
       <v-toolbar-title>
@@ -31,6 +34,9 @@
       </v-list>
     </v-card>
   </v-card>
+<!--
+  Shapes
+ -->
   <v-card class="my-4" variant="outlined" v-if="props.puzzle.shapes">
     <v-toolbar density="compact" color="primary">
       <v-toolbar-title>
@@ -51,7 +57,7 @@
               density="compact"
               variant="outlined"
             ></v-text-field></v-col>
-            <v-col class="pa-0 v-col-2"><v-text-field v-if="selectedProblem.result.id != i"
+            <v-col class="pa-0 v-col-2"><v-text-field v-if="selectedProblem.result.id != i" @change="updateCount($event.target.value, i)"
               v-model="shapesCount[i].count"
               hide-details
               label="count"
@@ -130,6 +136,10 @@
     }
   })
 
+  function updateCount(val, idx) {
+    selectedProblem.value.setShape(shapesCount.value[idx])
+  }
+
   function setResult() {
     selectedProblem.value.result.id = selectedShapeIndex.value
   }
@@ -144,13 +154,4 @@
       if (idx >= (problems.value.length - 1)) selectedProblemIndex.value=problems.value.length - 1
     }
   }
-
-  watch(selectedShape, (newval, oldval) => {
-//    emit("newShape", newval)
-    })
-  watch(() => props.puzzle, (newval) => { 
-//    DATA.selectedShape=[0]
-//    DATA.selectedProblem=[0]
-  })
-//  watch(selectedProblemIndex, (newval) => emit("newShape", newval))
 </script>

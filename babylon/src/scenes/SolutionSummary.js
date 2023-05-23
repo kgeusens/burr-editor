@@ -281,7 +281,7 @@ export class sceneBuilder {
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
 
-        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((shape.x-1)/2, (shape.y-1)/2, (shape.z-1)/2));
+//        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((shape.x-1)/2, (shape.y-1)/2, (shape.z-1)/2));
 
         for (let piece of this.pieces) { 
             let p = piece.parent
