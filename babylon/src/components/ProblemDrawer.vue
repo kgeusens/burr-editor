@@ -136,10 +136,13 @@
     }
   })
 
+  function clearSolution() {
+    selectedProblem.value.solutions.solution = []
+  }
   function updateCount(val, idx) {
+    clearSolution()
     selectedProblem.value.setShape(shapesCount.value[idx])
   }
-
   function setResult() {
     selectedProblem.value.result.id = selectedShapeIndex.value
   }
