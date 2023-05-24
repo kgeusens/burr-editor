@@ -323,7 +323,7 @@ export class sceneBuilder {
         this.pieces.length = pieces.length
 
         // at this point, this.pieces has been intitialized
-        // Position the pieces
+        // Hide or Show(Position) the pieces
 
         for (let idx in this.pieces) {
             let p = this.pieces[idx]

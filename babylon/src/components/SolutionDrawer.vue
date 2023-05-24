@@ -229,7 +229,7 @@
   const statePositions = computed({
     get: () => {
 //      console.log(selectedSolution.value.separation[0])
-      return selectedSolution.value.separation[0].statePositionsAll
+      return selectedSolution.value.separation[0].movePositionsAll
     }
   })
 

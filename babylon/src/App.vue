@@ -276,7 +276,7 @@ export default {
       return shapeList
     },
     solutionPositions() {
-      return this.solution?this.solution.separation[0].statePositionsAll:[]
+      return this.solution?this.solution.separation[0].movePositionsAll:[]
     },
     problemDetail() {
       return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.problemPieces, delta: 0, bevel: 0, alpha: 1, outline: true, trigger: this.problemTrigger }
