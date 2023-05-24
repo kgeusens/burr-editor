@@ -5,7 +5,8 @@ import {
     Color3,
     TransformNode,
     ActionManager,
-    ExecuteCodeAction,
+    InterpolateValueAction,
+    SetValueAction,
     Matrix,
     PointerDragBehavior,
     PointerEventTypes,
@@ -37,6 +38,9 @@ class Ghost {
     get parent() { return this._parent }
     set isVisible(v) { 
         this.mesh.isVisible = v
+        for (let l of this.outlines) l.isVisible=v
+    }
+    set outlineIsVisible(v) { 
         for (let l of this.outlines) l.isVisible=v
     }
 
@@ -89,8 +93,45 @@ class Ghost {
         this.mesh.material=ghostMaterial
         this.mesh.isPickable=true
         if (this.outline) this.renderOutline()
-//        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((this.x-1)/2, (this.y-1)/2, (this.z-1)/2));
+        this.mesh.actionManager = new ActionManager(scene);
+        this.mesh.actionManager
+            .registerAction(
+                new InterpolateValueAction(
+                    ActionManager.OnPickTrigger,
+                    this.mesh.material,
+                    "alpha", 
+                    0.4,
+                    500
+                )
+            )
+            .then(
+                new InterpolateValueAction(
+                    ActionManager.OnPickTrigger,
+                    this.mesh.material,
+                    "alpha", 
+                    1,
+                    500
+                )
+            )
+        this.mesh.actionManager
+            .registerAction(
+                new SetValueAction(
+                    ActionManager.OnPickTrigger,
+                    this,
+                    "outlineIsVisible", 
+                    false
+                )
+            )
+            .then(
+                new SetValueAction(
+                    ActionManager.OnPickTrigger,
+                    this,
+                    "outlineIsVisible", 
+                    true
+                )
+            )
     }
+
     renderBevel(shapeCSG) {
         // create the nudge
         const dimName = {x: "width", y: "height", z: "depth"}

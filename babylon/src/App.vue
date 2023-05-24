@@ -288,9 +288,9 @@ export default {
         movePositions: this.solutionPositions,
         move: this.solutionMove,
         delta: 0.01, 
-        bevel: 0, 
+        bevel: 0.025, 
         alpha: 1, 
-        outline: true}
+        outline: false}
     }
   },
   watch:{
