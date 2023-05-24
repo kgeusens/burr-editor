@@ -292,9 +292,13 @@ export class sceneBuilder {
             p.alpha = alpha
             p.outline = outline
             this.pieces.push(p)
-            p.render()
             p.parent.rotation = rotationVector(pieces[idx].rotationIndex)
-            p.parent.position = new Vector3(movePositions[move][idx].x, movePositions[move][idx].y, movePositions[move][idx].z)
+            if (!movePositions[move][idx]) p.mesh.isVisible=false
+            else {
+                p.render()
+                p.mesh.isVisible=true
+                p.parent.position = new Vector3(movePositions[move][idx].x, movePositions[move][idx].y, movePositions[move][idx].z)
+            }
         }
     }
 }
