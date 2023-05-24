@@ -114,7 +114,7 @@
         temporary
         :scrim=false
         >
-        <SolutionDrawer :puzzle="puzzle" v-model:problemIndex="problemIndex" v-model:solutionIndex="solutionIndex"/>
+        <SolutionDrawer :puzzle="puzzle" v-model:problemIndex="problemIndex" v-model:solutionIndex="solutionIndex" v-model:playerMove="solutionMove"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -164,6 +164,7 @@ export default {
       shapeIndex: 0,
       problemIndex: [0],
       solutionIndex: [0],
+      solutionMove: 0,
       problemTrigger:0,
       fileName: "", 
       VoxelEditor: sceneBuilder,
@@ -271,11 +272,22 @@ export default {
       }
       return shapeList
     },
+    solutionPositions() {
+      return this.solution?this.solution.separation[0].statePositionsAll:[]
+    },
     problemDetail() {
       return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.problemPieces, delta: 0, bevel: 0, alpha: 1, outline: true, trigger: this.problemTrigger }
     },
     solutionDetail() {
-      return { shape: this.puzzle.shapes.voxel[this.problem.result.id], pieces: this.solutionPieces, delta: 0.01, bevel: 0, alpha: 1, outline: true, trigger: this.problemTrigger }
+      return { 
+        shape: this.puzzle.shapes.voxel[this.problem.result.id], 
+        pieces: this.solutionPieces, 
+        movePositions: this.solutionPositions,
+        move: this.solutionMove,
+        delta: 0.01, 
+        bevel: 0, 
+        alpha: 1, 
+        outline: true}
     }
   },
   watch:{

@@ -276,12 +276,10 @@ export class sceneBuilder {
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
-        var { shape, pieces = [], position = {x:0, y:0, z:0} , rotationIndex = 0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        var { shape, pieces = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
 
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
-
-//        if (scene.activeCamera) scene.activeCamera.setTarget(new Vector3((shape.x-1)/2, (shape.y-1)/2, (shape.z-1)/2));
 
         for (let piece of this.pieces) { 
             let p = piece.parent
@@ -290,14 +288,13 @@ export class sceneBuilder {
         }
         this.pieces=[]
         for (let idx in pieces) {
-            let angle = (idx*Math.PI*2)/pieces.length
             let p = new Ghost(pieces[idx].shape, delta, bevel,new TransformNode("root"))
             p.alpha = alpha
             p.outline = outline
             this.pieces.push(p)
             p.render()
             p.parent.rotation = rotationVector(pieces[idx].rotationIndex)
-            p.parent.position = new Vector3(pieces[idx].position[0], pieces[idx].position[1], pieces[idx].position[2])
+            p.parent.position = new Vector3(movePositions[move][idx].x, movePositions[move][idx].y, movePositions[move][idx].z)
         }
     }
 }

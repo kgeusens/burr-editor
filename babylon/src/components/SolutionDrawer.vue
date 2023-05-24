@@ -103,7 +103,7 @@
               1
             </v-chip></v-col>
             <v-col class="pa-0 v-col-9"><v-slider
-              v-model="DATA.playerMove"
+              v-model="playerMove"
               type="number"
               hide-details
               label="move"
@@ -114,7 +114,7 @@
             >
               <template v-slot:append>
                 <v-text-field
-                  v-model="DATA.playerMove"
+                  v-model="playerMove"
                   type="number"
                   hide-details
                   label="move"
@@ -139,15 +139,16 @@
   import { Puzzle } from '@kgeusens/burr-data';
   import { reactive, computed, watch } from 'vue'
 
-  const emit = defineEmits(["update:problemIndex", "update:solutionIndex"])
+  const emit = defineEmits(["update:problemIndex", "update:solutionIndex", "update:playerMove"])
   const props = defineProps(
     { 
         puzzle: { type: Object, default: null },
         problemIndex: { type: Array, default: [0] },
         solutionIndex: { type: Array, default: [0] },
+        playerMove: { type: Number, default: 0 }
     }
     );
-  const DATA= reactive({ selectedShape: [0], selectedSolution: [0], playerMove: 0 })
+  const DATA= reactive({ selectedShape: [0], selectedSolution: [0] })
 
   const selectedShape = computed({
     get: () => shapes.value[selectedShapeIndex.value]
@@ -171,10 +172,13 @@
     get: () => props.problemIndex,
     set: (val) => emit("update:problemIndex", val)
   })
-
   const solutionIndex = computed({
     get: () => props.solutionIndex,
     set: (val) => emit("update:solutionIndex", val)
+  })
+  const playerMove = computed({
+    get: () => props.playerMove,
+    set: (val) => emit("update:playerMove", Number(val))
   })
 
   const selectedSolution = computed({
