@@ -265,6 +265,12 @@ const handler = {
 export class sceneBuilder {
     result
     pieces=[]
+    movePositions=[]
+    move
+    delta
+    bevel
+    alpha
+    outline
     stateCallback
     constructor(sc, callbackFunction, options = {}) {
         scene = sc
@@ -272,30 +278,54 @@ export class sceneBuilder {
         const rootNode = new TransformNode("root");
         rootNode.position=new Vector3(0,0,0)
         this.result=new Ghost(new Voxel({}), 0, 0, rootNode)
-        this.setOptions(options)
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
-        var { shape, pieces = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        // Performance : only process changes
+        var { pieces = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
 
-        let vox=new Voxel(shape)
-        vox.callback = this.stateCallback
-
-        for (let piece of this.pieces) { 
-            let p = piece.parent
-            piece.dispose()
+        for (let idx in pieces) {
+            if (!this.pieces[idx]) {
+                // new piece, need to create
+                let g = new Ghost(pieces[idx].shape, delta, bevel,new TransformNode("root"))
+                g.alpha = alpha
+                g.outline = outline
+                this.pieces.push(g)
+                g.render()
+            }
+            else if (pieces[idx].shape.stateString != this.pieces[idx].voxel.stateString) {
+                // different shape, delete
+                let p = this.pieces[idx].parent
+                this.pieces[idx].dispose()
+                // and replace
+                let g = new Ghost(pieces[idx].shape, delta, bevel, p)
+                g.alpha = alpha
+                g.outline = outline
+                this.pieces[idx] = g
+                g.render()
+            }
+            else {
+                // do nothing I think
+            }
+        }
+        // now delete extra pieces in old situation
+        console.log()
+        for (let i = this.pieces.length; i<pieces.length; i++) {
+            let p = this.pieces[i].parent
+            this.pieces[i].dispose()
             p.dispose()
         }
-        this.pieces=[]
-        for (let idx in pieces) {
-            let p = new Ghost(pieces[idx].shape, delta, bevel,new TransformNode("root"))
-            p.alpha = alpha
-            p.outline = outline
-            this.pieces.push(p)
+        // and trim the cache to the correct length
+        this.pieces.length = pieces.length
+
+        // at this point, this.pieces has been intitialized
+        // positions the pieces
+
+        for (let idx in this.pieces) {
+            let p = this.pieces[idx]
             p.parent.rotation = rotationVector(pieces[idx].rotationIndex)
             if (!movePositions[move][idx]) p.mesh.isVisible=false
             else {
-                p.render()
                 p.mesh.isVisible=true
                 p.parent.position = new Vector3(movePositions[move][idx].x, movePositions[move][idx].y, movePositions[move][idx].z)
             }
