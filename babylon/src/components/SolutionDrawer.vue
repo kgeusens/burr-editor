@@ -86,6 +86,53 @@
       </v-list>
     </v-card>
   </v-card>
+<!--
+  Player
+ -->
+ <v-card class="my-4" variant="outlined" v-if="selectedProblem.solutions.solution.length > 0">
+    <v-toolbar density="compact" color="primary">
+      <v-toolbar-title>
+        Player <v-spacer></v-spacer> 
+      </v-toolbar-title>
+    </v-toolbar>
+    <v-card class="overflow-y-auto" max-height="400"  >
+      <v-list>
+        <v-list-item class="py-0 px-1">
+          <v-list-item-title><v-container fluid><v-row align="center">
+            <v-col class="pa-0" align="center"><v-chip>
+              1
+            </v-chip></v-col>
+            <v-col class="pa-0 v-col-9"><v-slider
+              v-model="DATA.playerMove"
+              type="number"
+              hide-details
+              label="move"
+              density="compact"
+              min="0"
+              :max="statePositions.length - 1"
+              step="1"
+            >
+              <template v-slot:append>
+                <v-text-field
+                  v-model="DATA.playerMove"
+                  type="number"
+                  hide-details
+                  label="move"
+                  density="compact"
+                  variant="outlined"
+                  style="width: 70px"
+                  min="0"
+                  :max="statePositions.length - 1"
+                ></v-text-field>                
+              </template>
+            </v-slider></v-col>
+            <v-col class = "pa-0" align="right">
+            </v-col>
+          </v-row></v-container></v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-card>
+  </v-card>
 </template>
 
 <script setup>
@@ -100,7 +147,7 @@
         solutionIndex: { type: Array, default: [0] },
     }
     );
-  const DATA= reactive({ selectedShape: [0], selectedSolution: [0] })
+  const DATA= reactive({ selectedShape: [0], selectedSolution: [0], playerMove: 0 })
 
   const selectedShape = computed({
     get: () => shapes.value[selectedShapeIndex.value]
@@ -175,9 +222,10 @@
     get: () => selectedProblem.value.solutions.solution
   })
 
-  const shapesCount = computed({
+  const statePositions = computed({
     get: () => {
-      return props.puzzle.shapes.voxel.map((vox, idx) => selectedProblem.value.getShapeFromId(idx))
+//      console.log(selectedSolution.value.separation[0])
+      return selectedSolution.value.separation[0].statePositionsAll
     }
   })
 
