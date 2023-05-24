@@ -200,6 +200,9 @@ export default {
     },
     loadPuzzle(p) {
       this.puzzle = p
+      this.problemIndex = [0]
+      this.solutionIndex= [0]
+      this.solutionMove = 0
     },
     setFilename(f) {
       this.fileName = f

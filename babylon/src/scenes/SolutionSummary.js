@@ -35,6 +35,10 @@ class Ghost {
     get voxel() {return this._voxel}
     set voxel(v) { this._voxel = v }
     get parent() { return this._parent }
+    set isVisible(v) { 
+        this.mesh.isVisible = v
+        for (let l of this.outlines) l.isVisible=v
+    }
 
     constructor(voxel = new Voxel(), deltaWidth=0, bevelWidth=0, parent = null) {
         this._parent=parent
@@ -319,14 +323,16 @@ export class sceneBuilder {
         this.pieces.length = pieces.length
 
         // at this point, this.pieces has been intitialized
-        // positions the pieces
+        // Position the pieces
 
         for (let idx in this.pieces) {
             let p = this.pieces[idx]
             p.parent.rotation = rotationVector(pieces[idx].rotationIndex)
-            if (!movePositions[move][idx]) p.mesh.isVisible=false
+            if (!movePositions[move][idx]) {
+                p.isVisible=false
+            }
             else {
-                p.mesh.isVisible=true
+                p.isVisible=true
                 p.parent.position = new Vector3(movePositions[move][idx].x, movePositions[move][idx].y, movePositions[move][idx].z)
             }
         }
