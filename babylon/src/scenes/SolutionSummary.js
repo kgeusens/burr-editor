@@ -322,7 +322,7 @@ export class sceneBuilder {
     outline
     stateCallback
     animationGroup
-    _framerate=30 // frames per second
+    _framerate=25 // frames per second
     _moveTime=1.5 // time in seconds to make a move
     _movePause=0.5 // pause time between moves in seconds
     constructor(sc, callbackFunction, options = {}) {
@@ -383,8 +383,9 @@ export class sceneBuilder {
                 let g = new Ghost(pieces[idx].shape, delta, bevel,new TransformNode("root"))
                 g.alpha = alpha
                 g.outline = outline
-                this.pieces.push(g)
+                g.parent.rotation=rotationVector(pieces[idx].rotationIndex)
                 g.render()
+                this.pieces.push(g)
             }
             else if (pieces[idx].shape.stateString != this.pieces[idx].voxel.stateString) {
                 // different shape, delete
@@ -394,15 +395,15 @@ export class sceneBuilder {
                 let g = new Ghost(pieces[idx].shape, delta, bevel, p)
                 g.alpha = alpha
                 g.outline = outline
-                this.pieces[idx] = g
+                g.parent.rotation=rotationVector(pieces[idx].rotationIndex)
                 g.render()
+                this.pieces[idx] = g
             }
             else {
                 // do nothing I think
             }
         }
         // now delete extra pieces in old situation
-        console.log()
         for (let i = this.pieces.length; i<pieces.length; i++) {
             let p = this.pieces[i].parent
             this.pieces[i].dispose()
@@ -414,22 +415,13 @@ export class sceneBuilder {
         // at this point, this.pieces has been intitialized
 
         // This would be a good place to process movePositions and build the player animation
+        // for performance, we need a way to check if the positions have changed or not.
+        // only update/cleanup when there is a change
         this.movePositions = movePositions
 
-        // Hide or Show(Position) the pieces
-        for (let idx in this.pieces) {
-            let p = this.pieces[idx]
-            p.parent.rotation = rotationVector(pieces[idx].rotationIndex)
-            if (!this.movePositions[move][idx]) {
-                p.isVisible=false
-            }
-            else {
-                p.isVisible=true
-                p.parent.position = new Vector3(Number(this.movePositions[move][idx].x), Number(this.movePositions[move][idx].y), Number(this.movePositions[move][idx].z))
-            }
-        }
-
-        // start the animation
-        this.animationGroup.start(true)
+        // position the animation at frame of "move"
+        this.animationGroup.play(true)
+        this.animationGroup.goToFrame(move*this.frameLength)
+        this.animationGroup.pause()
     }
 }
