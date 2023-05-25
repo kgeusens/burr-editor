@@ -16,6 +16,7 @@ import {
     HighlightLayer,
     CSG,
     VertexData,
+    AnimationGroup,
   } from "@babylonjs/core";
 import { Voxel } from "@kgeusens/burr-data"
 import { rotationVector } from '../utils/rotation'
@@ -320,6 +321,7 @@ export class sceneBuilder {
     alpha
     outline
     stateCallback
+    animationGroup
     _framerate=30 // frames per second
     _moveTime=1.5 // time in seconds to make a move
     _movePause=0.5 // pause time between moves in seconds
@@ -338,6 +340,7 @@ export class sceneBuilder {
         let positionKeyList= Array.from(Array(this.pieces.length), () => [])
         let animationList=Array.from(Array(this.pieces.length), () => new Animation("pieceAnimation", "position", 30, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CYCLE))
         let easingFunction = new QuadraticEase()
+        let solutionAnimationGroup = new AnimationGroup("solutionPlayer")
         easingFunction.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT)
         // build animations
         // build the keyframe list for every piece
@@ -348,14 +351,23 @@ export class sceneBuilder {
                 if (mp[moveIdx][pieceIdx]) {
                     positionKeyList[pieceIdx].push({
                         frame: moveIdx * this.frameLength, 
-                        value: new Vector3(mp[moveIdx][pieceIdx].x, mp[moveIdx][pieceIdx].y, mp[moveIdx][pieceIdx].z)
+                        value: new Vector3(Number(mp[moveIdx][pieceIdx].x), Number(mp[moveIdx][pieceIdx].y), Number(mp[moveIdx][pieceIdx].z))
                     })
+                } else {
+                    // repeat the position of the previous keyFrame
+                    positionKeyList[pieceIdx].push({
+                        frame: moveIdx * this.frameLength, 
+                        value: positionKeyList[pieceIdx][moveIdx - 1].value
+                    })
+
                 }
             }
             animationList[pieceIdx].setKeys(positionKeyList[pieceIdx])
             animationList[pieceIdx].setEasingFunction(easingFunction)
+            solutionAnimationGroup.addTargetedAnimation(animationList[pieceIdx], this.pieces[pieceIdx].parent)
+            this.animationGroup = solutionAnimationGroup
+            
         }
-        // animations are now prepared in an array, 1 animation for eache piece
     }
 
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
@@ -405,7 +417,6 @@ export class sceneBuilder {
         this.movePositions = movePositions
 
         // Hide or Show(Position) the pieces
-
         for (let idx in this.pieces) {
             let p = this.pieces[idx]
             p.parent.rotation = rotationVector(pieces[idx].rotationIndex)
@@ -414,10 +425,11 @@ export class sceneBuilder {
             }
             else {
                 p.isVisible=true
-                p.parent.position = new Vector3(this.movePositions[move][idx].x, this.movePositions[move][idx].y, this.movePositions[move][idx].z)
+                p.parent.position = new Vector3(Number(this.movePositions[move][idx].x), Number(this.movePositions[move][idx].y), Number(this.movePositions[move][idx].z))
             }
         }
 
-        // process movePositions
+        // start the animation
+        this.animationGroup.start(true)
     }
 }
