@@ -8,6 +8,9 @@ import {
     InterpolateValueAction,
     SetValueAction,
     Matrix,
+    Animation,
+    QuadraticEase,
+    EasingFunction,
     PointerDragBehavior,
     PointerEventTypes,
     HighlightLayer,
@@ -309,14 +312,17 @@ const handler = {
 
 export class sceneBuilder {
     result
-    pieces=[]
-    movePositions=[]
+    pieces=[] // these are Ghosts
+    _movePositions=[]
     move
     delta
     bevel
     alpha
     outline
     stateCallback
+    _framerate=30 // frames per second
+    _moveTime=1.5 // time in seconds to make a move
+    _movePause=0.5 // pause time between moves in seconds
     constructor(sc, callbackFunction, options = {}) {
         scene = sc
         this.stateCallback=callbackFunction
@@ -324,11 +330,41 @@ export class sceneBuilder {
         rootNode.position=new Vector3(0,0,0)
         this.result=new Ghost(new Voxel({}), 0, 0, rootNode)
     }
+
+    get frameLength() { return this._framerate * (this._moveTime + this._movePause) }
+    get movePositions() { return this._movePositions }
+    set movePositions(mp) {
+        this._movePositions=mp
+        let positionKeyList= Array.from(Array(this.pieces.length), () => [])
+        let animationList=Array.from(Array(this.pieces.length), () => new Animation("pieceAnimation", "position", 30, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CYCLE))
+        let easingFunction = new QuadraticEase()
+        easingFunction.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT)
+        // build animations
+        // build the keyframe list for every piece
+        for (let pieceIdx in this.pieces) {
+            // for every piece
+            for (let moveIdx in mp) {
+                // for every move and every piece, add a frame to the piece for that move
+                if (mp[moveIdx][pieceIdx]) {
+                    positionKeyList[pieceIdx].push({
+                        frame: moveIdx * this.frameLength, 
+                        value: new Vector3(mp[moveIdx][pieceIdx].x, mp[moveIdx][pieceIdx].y, mp[moveIdx][pieceIdx].z)
+                    })
+                }
+            }
+            animationList[pieceIdx].setKeys(positionKeyList[pieceIdx])
+            animationList[pieceIdx].setEasingFunction(easingFunction)
+        }
+        // animations are now prepared in an array, 1 animation for eache piece
+    }
+
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
+
     setOptions(options) {
         // Performance : only process changes
         var { pieces = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
 
+        // turn the pieces (voxel data) into ghosts (3D representations)
         for (let idx in pieces) {
             if (!this.pieces[idx]) {
                 // new piece, need to create
@@ -364,18 +400,24 @@ export class sceneBuilder {
         this.pieces.length = pieces.length
 
         // at this point, this.pieces has been intitialized
+
+        // This would be a good place to process movePositions and build the player animation
+        this.movePositions = movePositions
+
         // Hide or Show(Position) the pieces
 
         for (let idx in this.pieces) {
             let p = this.pieces[idx]
             p.parent.rotation = rotationVector(pieces[idx].rotationIndex)
-            if (!movePositions[move][idx]) {
+            if (!this.movePositions[move][idx]) {
                 p.isVisible=false
             }
             else {
                 p.isVisible=true
-                p.parent.position = new Vector3(movePositions[move][idx].x, movePositions[move][idx].y, movePositions[move][idx].z)
+                p.parent.position = new Vector3(this.movePositions[move][idx].x, this.movePositions[move][idx].y, this.movePositions[move][idx].z)
             }
         }
+
+        // process movePositions
     }
 }
