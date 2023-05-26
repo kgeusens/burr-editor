@@ -17,6 +17,7 @@ import {
     CSG,
     VertexData,
     AnimationGroup,
+    BoundingInfo,
   } from "@babylonjs/core";
 import { Voxel } from "@kgeusens/burr-data"
 import { rotationVector } from '../utils/rotation'
@@ -355,6 +356,20 @@ export class sceneBuilder {
         this._animationGroup.dispose()
         this._animationGroup = ag 
     }
+    get boundingInfo() {
+        this.pieces[0].mesh.computeWorldMatrix(true)
+        let min = this.pieces[0].mesh.getBoundingInfo().boundingBox.minimumWorld;
+        let max = this.pieces[0].mesh.getBoundingInfo().boundingBox.maximumWorld;
+        for(let i=0; i<this.pieces.length; i++){
+            this.pieces[i].mesh.computeWorldMatrix(true)
+            let meshMin = this.pieces[i].mesh.getBoundingInfo().boundingBox.minimumWorld;
+            let meshMax = this.pieces[i].mesh.getBoundingInfo().boundingBox.maximumWorld;
+            min = Vector3.Minimize(min, meshMin);
+            max = Vector3.Maximize(max, meshMax);
+        }
+        console.log(min,max)
+        return new BoundingInfo(min,max)
+    }
     buildAnimationGroup() {
         let mp = this.movePositions
         let solutionAnimationGroup = this.animationGroup.clone()
@@ -454,6 +469,8 @@ export class sceneBuilder {
         this.movePositions = movePositions
         // Build the animation
         this.animationGroup = this.buildAnimationGroup()
+        // Calculate bouding box of solution
+
 
         // position the animation at frame of "move"
         this.animationGroup.play(true)
@@ -461,7 +478,8 @@ export class sceneBuilder {
         this.animationGroup.pause()
 
         // Focus the camera
-        if (scene.activeCamera) { 
+        if (scene.activeCamera) {
+            scene.activeCamera.setTarget(this.boundingInfo.boundingBox.center);
         }
     }
 }
