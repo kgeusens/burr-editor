@@ -343,36 +343,41 @@ export class sceneBuilder {
     get frameLength() { return this._framerate * (this._moveTime + this._movePause) }
     get movePositions() { return this._movePositions }
     set movePositions(mp) {
-        this._movePositions=mp
-        let positionKeyList= Array.from(Array(this.pieces.length), () => [])
-        let animationList=Array.from(Array(this.pieces.length), () => new Animation("pieceAnimation", "position", 30, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CYCLE))
-        let easingFunction = new QuadraticEase()
-        let solutionAnimationGroup = new AnimationGroup("solutionPlayer")
-        easingFunction.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT)
-        // build animations
-        // build the keyframe list for every piece
-        for (let pieceIdx in this.pieces) {
-            // for every piece
-            for (let moveIdx in mp) {
-                // for every move and every piece, add a frame to the piece for that move
-                if (mp[moveIdx][pieceIdx]) {
-                    positionKeyList[pieceIdx].push({
-                        frame: moveIdx * this.frameLength, 
-                        value: new Vector3(Number(mp[moveIdx][pieceIdx].x), Number(mp[moveIdx][pieceIdx].y), Number(mp[moveIdx][pieceIdx].z))
-                    })
-                } else {
-                    // repeat the position of the previous keyFrame
-                    positionKeyList[pieceIdx].push({
-                        frame: moveIdx * this.frameLength, 
-                        value: positionKeyList[pieceIdx][moveIdx - 1].value
-                    })
+        let oldState=JSON.stringify(this._movePositions)
+        let newState=JSON.stringify(mp)
+        if (oldState != newState) {
+            this.isDirty = true
+            this._movePositions=mp
+            let positionKeyList= Array.from(Array(this.pieces.length), () => [])
+            let animationList=Array.from(Array(this.pieces.length), () => new Animation("pieceAnimation", "position", 30, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CYCLE))
+            let easingFunction = new QuadraticEase()
+            let solutionAnimationGroup = new AnimationGroup("solutionPlayer")
+            easingFunction.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT)
+            // build animations
+            // build the keyframe list for every piece
+            for (let pieceIdx in this.pieces) {
+                // for every piece
+                for (let moveIdx in mp) {
+                    // for every move and every piece, add a frame to the piece for that move
+                    if (mp[moveIdx][pieceIdx]) {
+                        positionKeyList[pieceIdx].push({
+                            frame: moveIdx * this.frameLength, 
+                            value: new Vector3(Number(mp[moveIdx][pieceIdx].x), Number(mp[moveIdx][pieceIdx].y), Number(mp[moveIdx][pieceIdx].z))
+                        })
+                    } else {
+                        // repeat the position of the previous keyFrame
+                        positionKeyList[pieceIdx].push({
+                            frame: moveIdx * this.frameLength, 
+                            value: positionKeyList[pieceIdx][moveIdx - 1].value
+                        })
 
+                    }
                 }
+                animationList[pieceIdx].setKeys(positionKeyList[pieceIdx])
+                animationList[pieceIdx].setEasingFunction(easingFunction)
+                solutionAnimationGroup.addTargetedAnimation(animationList[pieceIdx], this.pieces[pieceIdx].parent)
+                this.animationGroup = solutionAnimationGroup
             }
-            animationList[pieceIdx].setKeys(positionKeyList[pieceIdx])
-            animationList[pieceIdx].setEasingFunction(easingFunction)
-            solutionAnimationGroup.addTargetedAnimation(animationList[pieceIdx], this.pieces[pieceIdx].parent)
-            this.animationGroup = solutionAnimationGroup
         }
     }
     get isDirty() { return this._isDirty }
@@ -411,7 +416,6 @@ export class sceneBuilder {
                 // same shape, same index. check and set rotation
                 let g=this.pieces[idx]
                 if (g.rotationIndex != pieces[idx].rotationIndex) {
-                    console.log("check")
                     this.isDirty=true
                     g.rotationIndex = pieces[idx].rotationIndex
                 }
@@ -436,8 +440,6 @@ export class sceneBuilder {
         // at this point, this.pieces has been intitialized. this.isDirty indicates if this is the same assembly as before, or not.
 
         // This would be a good place to process movePositions and build the player animation
-        // for performance, we need a way to check if the positions have changed or not.
-        // only update/cleanup when there is a change
         this.movePositions = movePositions
 
         // position the animation at frame of "move"
