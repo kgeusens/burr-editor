@@ -46,8 +46,14 @@
             <v-col class="pa-0" align="center"><v-chip>
               {{ i }}
             </v-chip></v-col>
-            <v-col class="pa-0 v-col-9">
-            </v-col>
+            <v-col class="pa-0 v-col-9"><v-text-field
+              v-model="solutions[i].complexity"
+              hide-details
+              label="complexity"
+              density="compact"
+              variant="outlined"
+              readonly
+            ></v-text-field></v-col>
             <v-col class = "pa-0" align="right">
             </v-col>
           </v-row></v-container></v-list-item-title>
