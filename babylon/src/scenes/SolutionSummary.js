@@ -400,7 +400,9 @@ export class sceneBuilder {
                 this.pieces[idx] = g
             }
             else {
-                // do nothing I think
+                // same shape, same index: rotation
+                let g=this.pieces[idx]
+                g.parent.rotation=rotationVector(pieces[idx].rotationIndex)
             }
         }
         // now delete extra pieces in old situation
@@ -423,5 +425,7 @@ export class sceneBuilder {
         this.animationGroup.play(true)
         this.animationGroup.goToFrame(move*this.frameLength)
         this.animationGroup.pause()
+        //
+        console.log(movePositions)
     }
 }

@@ -40,7 +40,7 @@
       </v-toolbar-title>
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
-      <v-list mandatory v-model:selected="DATA.selectedSolution">
+      <v-list mandatory v-model:selected="solutionIndex">
         <v-list-item  v-for="(item, i) in solutions" class="py-0 px-1" :key="i" :value="i">
           <v-list-item-title><v-container fluid><v-row align="center">
             <v-col class="pa-0" align="center"><v-chip>
@@ -99,10 +99,7 @@
       <v-list>
         <v-list-item class="py-0 px-1">
           <v-list-item-title><v-container fluid><v-row align="center">
-            <v-col class="pa-0" align="center"><v-chip>
-              1
-            </v-chip></v-col>
-            <v-col class="pa-0 v-col-9"><v-slider
+            <v-col class="pa-0" ><v-slider
               v-model="playerMove"
               type="number"
               hide-details
@@ -110,7 +107,7 @@
               density="compact"
               min="0"
               :max="statePositions.length - 1"
-              step="1"
+              step="0.04"
             >
               <template v-slot:append>
                 <v-text-field
@@ -120,14 +117,12 @@
                   label="move"
                   density="compact"
                   variant="outlined"
-                  style="width: 70px"
+                  style="width: 90px"
                   min="0"
                   :max="statePositions.length - 1"
                 ></v-text-field>                
               </template>
             </v-slider></v-col>
-            <v-col class = "pa-0" align="right">
-            </v-col>
           </v-row></v-container></v-list-item-title>
         </v-list-item>
       </v-list>
@@ -148,7 +143,7 @@
         playerMove: { type: Number, default: 0 }
     }
     );
-  const DATA= reactive({ selectedShape: [0], selectedSolution: [0] })
+  const DATA= reactive({ selectedShape: [0] })
 
   const selectedShape = computed({
     get: () => shapes.value[selectedShapeIndex.value]
@@ -240,5 +235,6 @@
 //    DATA.selectedShape=[0]
   })
 //  watch(selectedProblemIndex, (newval) => emit("update:problemIndex", newval))
-  watch(selectedSolutionIndex, (newval) => emit("newSolution", newval))
+  watch(selectedSolutionIndex, (newval) => { 
+  })
 </script>
