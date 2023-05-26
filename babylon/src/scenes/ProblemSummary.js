@@ -155,6 +155,6 @@ export class sceneBuilder {
             scene.activeCamera.useFramingBehavior = true
             scene.activeCamera.framingBehavior.radiusScale = 3
             scene.activeCamera.setTarget(this.result.mesh);
-}
+        }
     }
 }

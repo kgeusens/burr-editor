@@ -33,7 +33,6 @@ class Ghost {
     bevel=0
     outline=true
     alpha=1
-    _rotationIndex = 0
 
     get x() { return this.voxel.x }
     get y() { return this.voxel.y }
@@ -47,11 +46,6 @@ class Ghost {
     }
     set outlineIsVisible(v) { 
         for (let l of this.outlines) l.isVisible=v
-    }
-    get rotationIndex() { return this._rotationIndex}
-    set rotationIndex(idx) { 
-        this.parent.rotation=rotationVector(idx)
-        this._rotationIndex = idx; 
     }
 
     constructor(voxel = new Voxel(), deltaWidth=0, bevelWidth=0, parent = null) {
@@ -321,7 +315,6 @@ export class sceneBuilder {
     result
     pieces=[] // these are Ghosts
     _movePositions=[]
-    _isDirty=true // means there is a change to the base solution sequence (pieces of positions changed)
     move
     delta
     bevel
@@ -373,12 +366,11 @@ export class sceneBuilder {
             animationList[pieceIdx].setEasingFunction(easingFunction)
             solutionAnimationGroup.addTargetedAnimation(animationList[pieceIdx], this.pieces[pieceIdx].parent)
             this.animationGroup = solutionAnimationGroup
+            
         }
     }
-    get isDirty() { return this._isDirty }
-    set isDirty(b) { this._isDirty = b}
-    get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
 
+    get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     buildGhosts(options) {
         var { pieces = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
         // turn the pieces (voxel data) into ghosts (3D representations)
@@ -386,7 +378,6 @@ export class sceneBuilder {
         for (let idx in pieces) {
             if (!this.pieces[idx]) {
                 // new piece, need to create
-                this.isDirty=true
                 let g = new Ghost(pieces[idx].shape, delta, bevel,new TransformNode("root"))
                 g.alpha = alpha
                 g.outline = outline
@@ -395,7 +386,6 @@ export class sceneBuilder {
                 this.pieces.push(g)
             }
             else if (pieces[idx].shape.stateString != this.pieces[idx].voxel.stateString) {
-                this.isDirty=true
                 // different shape, delete
                 let p = this.pieces[idx].parent
                 this.pieces[idx].dispose()
@@ -408,13 +398,9 @@ export class sceneBuilder {
                 this.pieces[idx] = g
             }
             else {
-                // same shape, same index. check and set rotation
+                // same shape, same index: rotation
                 let g=this.pieces[idx]
-                if (g.rotationIndex != pieces[idx].rotationIndex) {
-                    console.log("check")
-                    this.isDirty=true
-                    g.rotationIndex = pieces[idx].rotationIndex
-                }
+                g.parent.rotation=rotationVector(pieces[idx].rotationIndex)
             }
         }
         // now delete extra pieces in old situation
@@ -431,9 +417,9 @@ export class sceneBuilder {
     setOptions(options) {
         // Performance : only process changes
         var { pieces = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
-        this.isDirty=false
+
         this.buildGhosts(options)
-        // at this point, this.pieces has been intitialized. this.isDirty indicates if this is the same assembly as before, or not.
+        // at this point, this.pieces has been intitialized
 
         // This would be a good place to process movePositions and build the player animation
         // for performance, we need a way to check if the positions have changed or not.
@@ -447,6 +433,7 @@ export class sceneBuilder {
 
         // Focus the camera
         if (scene.activeCamera) { 
+            scene.activeCamera.setTarget(this.pieces[0].mesh);
         }
     }
 }
