@@ -426,6 +426,5 @@ export class sceneBuilder {
         this.animationGroup.goToFrame(move*this.frameLength)
         this.animationGroup.pause()
         //
-        console.log(movePositions)
     }
 }

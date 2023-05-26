@@ -301,7 +301,7 @@ export default {
     shapeSize(newv) {
     },
     problemIndex(newv) {
-      console.log("problemIndex triggered", newv)
+//      console.log("problemIndex triggered", newv)
     },
     problemPieces(newv, oldv) {
 //      console.log("problemPieces triggered", newv.length)
@@ -316,7 +316,7 @@ export default {
 //      console.log("puzzle triggered", newv)
     },
     solutionIndex(newv) {
-      console.log("solutionIndex triggered", newv)
+//      console.log("solutionIndex triggered", newv)
     }
   },
   mounted() { 
