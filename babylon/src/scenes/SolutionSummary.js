@@ -367,7 +367,6 @@ export class sceneBuilder {
             min = Vector3.Minimize(min, meshMin);
             max = Vector3.Maximize(max, meshMax);
         }
-        console.log(min,max)
         return new BoundingInfo(min,max)
     }
     buildAnimationGroup() {
@@ -448,7 +447,6 @@ export class sceneBuilder {
             }
         }
         // now delete extra pieces in old situation
-        console.log(this.pieces.length, pieces.length)
         for (let i = pieces.length; i<this.pieces.length; i++) {
             this.isDirty=true
             let p = this.pieces[i].parent
@@ -478,7 +476,7 @@ export class sceneBuilder {
         this.animationGroup.pause()
 
         // Focus the camera
-        if (scene.activeCamera) {
+        if (scene.activeCamera && this.isDirty) {
             scene.activeCamera.setTarget(this.boundingInfo.boundingBox.center);
         }
     }
