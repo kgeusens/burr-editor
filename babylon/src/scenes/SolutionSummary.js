@@ -433,7 +433,8 @@ export class sceneBuilder {
             }
         }
         // now delete extra pieces in old situation
-        for (let i = this.pieces.length; i<pieces.length; i++) {
+        console.log(this.pieces.length, pieces.length)
+        for (let i = pieces.length; i<this.pieces.length; i++) {
             this.isDirty=true
             let p = this.pieces[i].parent
             this.pieces[i].dispose()
