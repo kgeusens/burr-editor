@@ -328,7 +328,7 @@ export class sceneBuilder {
     alpha
     outline
     stateCallback
-    animationGroup
+    _animationGroup = new AnimationGroup("solutionPlayer")
     _framerate=25 // frames per second
     _moveTime=1.5 // time in seconds to make a move
     _movePause=0.5 // pause time between moves in seconds
@@ -348,10 +348,21 @@ export class sceneBuilder {
         if (oldState != newState) {
             this.isDirty = true
             this._movePositions=mp
+        }
+    }
+    get animationGroup() { return this._animationGroup }
+    set animationGroup(ag) { 
+        this._animationGroup.dispose()
+        this._animationGroup = ag 
+    }
+    buildAnimationGroup() {
+        let mp = this.movePositions
+        let solutionAnimationGroup = this.animationGroup.clone()
+        if (this.isDirty) {
             let positionKeyList= Array.from(Array(this.pieces.length), () => [])
             let animationList=Array.from(Array(this.pieces.length), () => new Animation("pieceAnimation", "position", 30, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CYCLE))
             let easingFunction = new QuadraticEase()
-            let solutionAnimationGroup = new AnimationGroup("solutionPlayer")
+            solutionAnimationGroup = new AnimationGroup("solutionPlayer")
             easingFunction.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT)
             // build animations
             // build the keyframe list for every piece
@@ -376,9 +387,9 @@ export class sceneBuilder {
                 animationList[pieceIdx].setKeys(positionKeyList[pieceIdx])
                 animationList[pieceIdx].setEasingFunction(easingFunction)
                 solutionAnimationGroup.addTargetedAnimation(animationList[pieceIdx], this.pieces[pieceIdx].parent)
-                this.animationGroup = solutionAnimationGroup
             }
-        }
+        } 
+        return solutionAnimationGroup
     }
     get isDirty() { return this._isDirty }
     set isDirty(b) { this._isDirty = b}
@@ -423,24 +434,25 @@ export class sceneBuilder {
         }
         // now delete extra pieces in old situation
         for (let i = this.pieces.length; i<pieces.length; i++) {
+            this.isDirty=true
             let p = this.pieces[i].parent
             this.pieces[i].dispose()
             p.dispose()
         }
         // and trim the cache to the correct length
         this.pieces.length = pieces.length
-
     }
 
     setOptions(options) {
         // Performance : only process changes
         var { pieces = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
         this.isDirty=false
+        // Build the ghosts in this.pieces
         this.buildGhosts(options)
-        // at this point, this.pieces has been intitialized. this.isDirty indicates if this is the same assembly as before, or not.
-
-        // This would be a good place to process movePositions and build the player animation
+        // Process movePositions and build the player animation
         this.movePositions = movePositions
+        // Build the animation
+        this.animationGroup = this.buildAnimationGroup()
 
         // position the animation at frame of "move"
         this.animationGroup.play(true)

@@ -317,6 +317,7 @@ export default {
     },
     solutionIndex(newv) {
 //      console.log("solutionIndex triggered", newv)
+        this.solutionMove=0;
     }
   },
   mounted() { 
