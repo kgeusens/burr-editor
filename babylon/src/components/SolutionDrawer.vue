@@ -36,7 +36,7 @@
  <v-card class="my-4" variant="outlined" v-if="selectedProblem.solutions.solution.length > 0">
     <v-toolbar density="compact" color="primary">
       <v-toolbar-title>
-        Solutions <v-spacer></v-spacer> 
+        {{ solutions.length }} Solutions for problem<v-spacer></v-spacer> 
       </v-toolbar-title>
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
@@ -67,7 +67,7 @@
   <v-card class="my-4" variant="outlined" v-if="props.puzzle.shapes">
     <v-toolbar density="compact" color="primary">
       <v-toolbar-title>
-        {{ props.puzzle.shapes.voxel.length }} Pieces <v-spacer></v-spacer> 
+        {{ pieces.length }} Pieces in solution<v-spacer></v-spacer> 
       </v-toolbar-title>
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >

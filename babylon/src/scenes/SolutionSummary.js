@@ -21,6 +21,7 @@ import {
   } from "@babylonjs/core";
 import { Voxel } from "@kgeusens/burr-data"
 import { rotationVector } from '../utils/rotation'
+import { pieceColor } from '../utils/colors'
   
 var scene
 
@@ -467,8 +468,10 @@ export class sceneBuilder {
         this.movePositions = movePositions
         // Build the animation
         this.animationGroup = this.buildAnimationGroup()
-        // Calculate bouding box of solution
-
+        // Patch the colors
+        for (let idx in this.pieces) {
+            this.pieces[idx].mesh.material.diffuseColor=pieceColor(idx)
+        }
 
         // position the animation at frame of "move"
         this.animationGroup.play(true)
