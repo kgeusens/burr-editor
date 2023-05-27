@@ -155,6 +155,7 @@ import { sceneBuilder } from "./scenes/ShapeEditor.js";
 import { sceneBuilder as problemBuilder } from "./scenes/ProblemSummary.js";
 import { sceneBuilder as solutionBuilder } from "./scenes/SolutionSummary.js";
 import { Problem, Puzzle } from "@kgeusens/burr-data";
+import { pieceColor } from "./utils/colors"
 
 export default {
   name: "App",
@@ -269,7 +270,13 @@ export default {
       let j = 0
       for (let idx=0; idx < tempShapes.length; idx++) {
         for (let i=0; i<tempShapes[idx]; i++) {
-          shapeList.push( { shape: this.puzzle.shapes.voxel[idx] , id: j, rotationIndex: assembly[j*4+3], position: [Number(assembly[j*4]), Number(assembly[j*4+1]), Number(assembly[j*4+2]) ]} )
+          shapeList.push( { 
+            shape: this.puzzle.shapes.voxel[idx] , 
+            id: j, 
+            rotationIndex: assembly[j*4+3],
+            color: pieceColor(idx, i)
+//            position: [Number(assembly[j*4]), Number(assembly[j*4+1]), Number(assembly[j*4+2]) ]
+          } )
           j++
         }
       }
