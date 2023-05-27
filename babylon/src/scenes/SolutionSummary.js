@@ -312,7 +312,7 @@ const handler = {
     set(target, property, value) {
         target[property] = value
         if (property == "state") {
-            console.log("intercepted", property, value)
+//            console.log("intercepted", property, value)
         }
         return true
     }
@@ -469,7 +469,6 @@ export class sceneBuilder {
         this.animationGroup = this.buildAnimationGroup()
         // Patch the colors
         for (let idx in this.pieces) {
-            console.log("updating colors")
             this.pieces[idx].mesh.material.diffuseColor=Color3.FromHexString(pieceColors[idx])
         }
 

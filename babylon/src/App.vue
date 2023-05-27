@@ -114,7 +114,7 @@
         temporary
         :scrim=false
         >
-        <SolutionDrawer :puzzle="puzzle" @update:pieceColors="updatePieceColors" v-model:problemIndex="problemIndex" v-model:solutionIndex="solutionIndex" v-model:playerMove="solutionMove"/>
+        <SolutionDrawer :puzzle="puzzle" @playerAction="playerAction" @update:pieceColors="updatePieceColors" v-model:problemIndex="problemIndex" v-model:solutionIndex="solutionIndex" v-model:playerMove="solutionMove"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -205,6 +205,9 @@ export default {
       this.problemIndex = [0]
       this.solutionIndex= [0]
       this.solutionMove = 0
+    },
+    playerAction(val) {
+      console.log("playerAction", val)
     },
     setFilename(f) {
       this.fileName = f
@@ -311,22 +314,16 @@ export default {
     shapeSize(newv) {
     },
     problemIndex(newv) {
-//      console.log("problemIndex triggered", newv)
     },
     problemPieces(newv, oldv) {
-//      console.log("problemPieces triggered", newv.length)
     },
     problem(newv, oldv) {
-//      console.log("problem triggered")
     },
     problemDetail(newv) {
-//      console.log("problemDetail triggered")
     },
     puzzle(newv) {
-//      console.log("puzzle triggered", newv)
     },
     solutionIndex(newv) {
-//      console.log("solutionIndex triggered", newv)
         this.solutionMove=0;
     },
   },
