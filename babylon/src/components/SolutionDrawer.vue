@@ -77,13 +77,21 @@
             <v-col class="pa-0" align="center"><v-chip>
               {{ i }}
             </v-chip></v-col>
-            <v-col class="pa-0 v-col-9"><v-text-field
+            <v-col class="pa-0 v-col-5"><v-text-field
               v-model="item.name"
               hide-details
               label="name"
               density="compact"
               variant="outlined"
               readonly
+            ></v-text-field></v-col>
+            <v-col class="pa-0 v-col-4"><v-text-field
+              v-model="item.colorString"
+              hide-details
+              label="color"
+              density="compact"
+              variant="outlined"
+              @change="changeColor($event, item)"
             ></v-text-field></v-col>
             <v-col class = "pa-0" align="right">
             </v-col>
@@ -139,8 +147,9 @@
 <script setup>
   import { Puzzle } from '@kgeusens/burr-data';
   import { reactive, computed, watch } from 'vue'
+  import { pieceColor } from '../utils/colors';
 
-  const emit = defineEmits(["update:problemIndex", "update:solutionIndex", "update:playerMove"])
+  const emit = defineEmits(["update:problemIndex", "update:solutionIndex", "update:playerMove", "update:pieceColors"])
   const props = defineProps(
     { 
         puzzle: { type: Object, default: null },
@@ -211,7 +220,7 @@
       let j = 0
       for (let idx=0; idx < tempShapes.length; idx++) {
         for (let i=0; i<tempShapes[idx]; i++) {
-          shapeList.push( { shape: shapes.value[idx] , id: j, name: idx + "." + i + " " + shapes.value[idx].name} )
+          shapeList.push( { shape: shapes.value[idx] , id: j, name: idx + "." + i + " " + shapes.value[idx].name, colorString: pieceColor(idx, i).toHexString()} )
           j++
         }
       }
@@ -229,10 +238,13 @@
 
   const statePositions = computed({
     get: () => {
-//      console.log(selectedSolution.value.separation[0])
       return selectedSolution.value.separation[0].movePositionsAll
     }
   })
+
+  const changeColor = function(event, piece) {
+    console.log(event.target.value, piece)
+  }
 
   watch(selectedShape, (newval, oldval) => {
 //    emit("newShape", newval)

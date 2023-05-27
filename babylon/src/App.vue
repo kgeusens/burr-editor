@@ -275,7 +275,6 @@ export default {
             id: j, 
             rotationIndex: assembly[j*4+3],
             color: pieceColor(idx, i)
-//            position: [Number(assembly[j*4]), Number(assembly[j*4+1]), Number(assembly[j*4+2]) ]
           } )
           j++
         }
