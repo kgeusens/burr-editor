@@ -73,62 +73,51 @@
     <v-card class="overflow-y-auto" max-height="400"  >
       <v-list mandatory v-model:selected="DATA.selectedShape">
         <v-list-item  v-for="(item, i) in pieces" class="py-1 px-1" :key="i" :value="i">
-<!--
-          <v-card class="py-1"><v-row align="center">
-            <v-col align="center"><v-chip> {{ i }}</v-chip></v-col>
-            <v-col class="v-col-9"><v-text-field
-              v-model="solutions[i].complexity"
-              hide-details
-              label="complexity"
-              density="compact"
-              variant="outlined"
-              readonly
-            ></v-text-field></v-col>
-            <v-col></v-col>
+           <v-card>
+            <v-list-item-title><v-container fluid><v-row align="center">
+              <v-col class="pa-0" align="center"><v-chip>
+                {{ i }}
+              </v-chip></v-col>
+              <v-col class="pa-0 v-col-5"><v-text-field
+                v-model="item.name"
+                hide-details
+                label="name"
+                density="compact"
+                variant="outlined"
+                readonly
+              ></v-text-field></v-col>
+              <v-col class="pa-0 v-col-4"><v-text-field
+                v-model="colors[i]"
+                hide-details
+                label="color"
+                density="compact"
+                variant="outlined"
+                @click="colorClicked(i)"
+                readonly
+              ></v-text-field></v-col>
+              <v-col class = "pa-0" align="right">
+              </v-col>
+            </v-row></v-container></v-list-item-title>
             <v-expand-transition>
-              <div v-show="show">
-                <v-divider></v-divider>
-                <v-card-text>
-                  I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.
-                </v-card-text>
-              </div>
-            </v-expand-transition>            
-          </v-row></v-card>
- -->
- <v-card>
-          <v-list-item-title><v-container fluid><v-row align="center">
-            <v-col class="pa-0" align="center"><v-chip>
-              {{ i }}
-            </v-chip></v-col>
-            <v-col class="pa-0 v-col-5"><v-text-field
-              v-model="item.name"
-              hide-details
-              label="name"
-              density="compact"
-              variant="outlined"
-              readonly
-            ></v-text-field></v-col>
-            <v-col class="pa-0 v-col-4"><v-text-field
-              v-model="item.colorString"
-              hide-details
-              label="color"
-              density="compact"
-              variant="outlined"
-              @change="changeColor($event, item)"
-              @click="colorClicked(i)"
-            ></v-text-field></v-col>
-            <v-col class = "pa-0" align="right">
-            </v-col>
-          </v-row></v-container></v-list-item-title>
-          <v-expand-transition>
-              <div v-show="DATA.showColorPicker == i">
-                <v-divider></v-divider>
-                <v-card-text>
-                  I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.
-                </v-card-text>
-              </div>
-            </v-expand-transition>            
-</v-card>
+                <div v-show="DATA.showColorPicker == i">
+                  <v-divider></v-divider>
+                  <v-card-text>
+                    <v-color-picker
+                      mode="rgb"
+                      v-model="colors[i]"
+                      class="ma-0"
+                      hide-canvas
+                      hide-inputs
+                      show-swatches
+                      swatches-max-height="100px"
+                      width="100%"
+                      @update:modelValue="changeColor"
+                      >
+                    </v-color-picker>
+                  </v-card-text>
+                </div>
+             </v-expand-transition>            
+          </v-card>
         </v-list-item>
       </v-list>
     </v-card>
@@ -253,7 +242,30 @@
       let j = 0
       for (let idx=0; idx < tempShapes.length; idx++) {
         for (let i=0; i<tempShapes[idx]; i++) {
-          shapeList.push( { shape: shapes.value[idx] , id: j, name: idx + "." + i + " " + shapes.value[idx].name, colorString: pieceColor(idx, i).toHexString()} )
+          shapeList.push( { 
+            shape: shapes.value[idx] , 
+            id: j, 
+            name: idx + "." + i + " " + shapes.value[idx].name
+          } )
+          j++
+        }
+      }
+      return shapeList
+    }
+  })
+
+  const colors = computed({
+    get: () => { 
+      if (!selectedSolution.value) return []
+      let shapeList = []
+      let tempShapes = []
+      for (let shape of selectedProblem.value.shapes.shape) {
+          tempShapes[shape.id] = shape.count
+      }
+      let j = 0
+      for (let idx=0; idx < tempShapes.length; idx++) {
+        for (let i=0; i<tempShapes[idx]; i++) {
+          shapeList.push(pieceColor(idx, i).toHexString())
           j++
         }
       }
@@ -275,8 +287,8 @@
     }
   })
 
-  const changeColor = function(event, piece) {
-    console.log(event.target.value, piece)
+  const changeColor = function(val) {
+    emit("update:pieceColors", colors.value)
   }
   const colorClicked = function(val) {
     if (DATA.showColorPicker == val) DATA.showColorPicker=-1
@@ -292,4 +304,5 @@
 //  watch(selectedProblemIndex, (newval) => emit("update:problemIndex", newval))
   watch(selectedSolutionIndex, (newval) => { 
   })
+  watch(colors, (val) => emit("update:pieceColors", colors.value))
 </script>

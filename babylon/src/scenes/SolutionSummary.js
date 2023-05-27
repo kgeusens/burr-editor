@@ -459,7 +459,7 @@ export class sceneBuilder {
 
     setOptions(options) {
         // Performance : only process changes
-        var { pieces = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        var { pieces = [], pieceColors = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
         this.isDirty=false
         // Build the ghosts in this.pieces
         this.buildGhosts(options)
@@ -469,7 +469,8 @@ export class sceneBuilder {
         this.animationGroup = this.buildAnimationGroup()
         // Patch the colors
         for (let idx in this.pieces) {
-            this.pieces[idx].mesh.material.diffuseColor=pieces[idx].color
+            console.log("updating colors")
+            this.pieces[idx].mesh.material.diffuseColor=Color3.FromHexString(pieceColors[idx])
         }
 
         // position the animation at frame of "move"

@@ -114,7 +114,7 @@
         temporary
         :scrim=false
         >
-        <SolutionDrawer :puzzle="puzzle" v-model:problemIndex="problemIndex" v-model:solutionIndex="solutionIndex" v-model:playerMove="solutionMove"/>
+        <SolutionDrawer :puzzle="puzzle" @update:pieceColors="updatePieceColors" v-model:problemIndex="problemIndex" v-model:solutionIndex="solutionIndex" v-model:playerMove="solutionMove"/>
       </v-navigation-drawer>
       <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
@@ -166,6 +166,7 @@ export default {
       problemIndex: [0],
       solutionIndex: [0],
       solutionMove: 0,
+      pieceColors:[],
       problemTrigger:0,
       fileName: "", 
       VoxelEditor: sceneBuilder,
@@ -207,6 +208,9 @@ export default {
     },
     setFilename(f) {
       this.fileName = f
+    },
+    updatePieceColors(c) {
+      this.pieceColors=[...c]
     },
     updateShapeState(s) {
       if (this.shape) {
@@ -273,8 +277,7 @@ export default {
           shapeList.push( { 
             shape: this.puzzle.shapes.voxel[idx] , 
             id: j, 
-            rotationIndex: assembly[j*4+3],
-            color: pieceColor(idx, i)
+            rotationIndex: assembly[j*4+3]
           } )
           j++
         }
@@ -290,7 +293,8 @@ export default {
     solutionDetail() {
       return { 
         shape: this.puzzle.shapes.voxel[this.problem.result.id], 
-        pieces: this.solutionPieces, 
+        pieces: this.solutionPieces,
+        pieceColors: this.pieceColors,
         movePositions: this.solutionPositions,
         move: this.solutionMove,
         delta: 0.01, 
@@ -324,7 +328,7 @@ export default {
     solutionIndex(newv) {
 //      console.log("solutionIndex triggered", newv)
         this.solutionMove=0;
-    }
+    },
   },
   mounted() { 
   }
