@@ -10,7 +10,7 @@
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
       <v-list  mandatory v-model:selected="problemIndex">
-        <v-list-item  v-for="(item, i) in problems" class="py-0 px-1" :key="i" :value="i">
+        <v-list-item  v-for="(item, i) in problems" class="py-1 px-1" :key="i" :value="i">
           <v-list-item-title><v-container fluid><v-row align="center">
             <v-col class="pa-0" align="center"><v-chip>
               {{ i }}
@@ -41,7 +41,7 @@
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
       <v-list mandatory v-model:selected="solutionIndex">
-        <v-list-item  v-for="(item, i) in solutions" class="py-0 px-1" :key="i" :value="i">
+        <v-list-item  v-for="(item, i) in solutions" class="py-y px-1" :key="i" :value="i">
           <v-list-item-title><v-container fluid><v-row align="center">
             <v-col class="pa-0" align="center"><v-chip>
               {{ i }}
@@ -72,7 +72,30 @@
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
       <v-list mandatory v-model:selected="DATA.selectedShape">
-        <v-list-item  v-for="(item, i) in pieces" class="py-0 px-1" :key="i" :value="i">
+        <v-list-item  v-for="(item, i) in pieces" class="py-1 px-1" :key="i" :value="i">
+<!--
+          <v-card class="py-1"><v-row align="center">
+            <v-col align="center"><v-chip> {{ i }}</v-chip></v-col>
+            <v-col class="v-col-9"><v-text-field
+              v-model="solutions[i].complexity"
+              hide-details
+              label="complexity"
+              density="compact"
+              variant="outlined"
+              readonly
+            ></v-text-field></v-col>
+            <v-col></v-col>
+            <v-expand-transition>
+              <div v-show="show">
+                <v-divider></v-divider>
+                <v-card-text>
+                  I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.
+                </v-card-text>
+              </div>
+            </v-expand-transition>            
+          </v-row></v-card>
+ -->
+ <v-card>
           <v-list-item-title><v-container fluid><v-row align="center">
             <v-col class="pa-0" align="center"><v-chip>
               {{ i }}
@@ -92,10 +115,20 @@
               density="compact"
               variant="outlined"
               @change="changeColor($event, item)"
+              @click="colorClicked(i)"
             ></v-text-field></v-col>
             <v-col class = "pa-0" align="right">
             </v-col>
           </v-row></v-container></v-list-item-title>
+          <v-expand-transition>
+              <div v-show="DATA.showColorPicker == i">
+                <v-divider></v-divider>
+                <v-card-text>
+                  I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.
+                </v-card-text>
+              </div>
+            </v-expand-transition>            
+</v-card>
         </v-list-item>
       </v-list>
     </v-card>
@@ -158,7 +191,7 @@
         playerMove: { type: Number, default: 0 }
     }
     );
-  const DATA= reactive({ selectedShape: [0] })
+  const DATA= reactive({ selectedShape: [0], showColorPicker: -1 })
 
   const selectedShape = computed({
     get: () => shapes.value[selectedShapeIndex.value]
@@ -244,6 +277,10 @@
 
   const changeColor = function(event, piece) {
     console.log(event.target.value, piece)
+  }
+  const colorClicked = function(val) {
+    if (DATA.showColorPicker == val) DATA.showColorPicker=-1
+    else DATA.showColorPicker=val
   }
 
   watch(selectedShape, (newval, oldval) => {
