@@ -323,7 +323,8 @@ export class sceneBuilder {
     pieces=[] // these are Ghosts
     _movePositions=[]
     _isDirty=true // means there is a change to the base solution sequence (pieces of positions changed)
-    move
+    _move
+    _frame
     delta
     bevel
     alpha
@@ -333,14 +334,21 @@ export class sceneBuilder {
     _framerate=25 // frames per second
     _moveTime=1.5 // time in seconds to make a move
     _movePause=0.5 // pause time between moves in seconds
+
     constructor(sc, callbackFunction, options = {}) {
         scene = sc
         this.stateCallback=callbackFunction
         const rootNode = new TransformNode("root");
         rootNode.position=new Vector3(0,0,0)
         this.result=new Ghost(new Voxel({}), 0, 0, rootNode)
+        scene.registerBeforeRender( () => { if (this.updatedFrame()) console.log(this.frame) })
     }
-
+    updatedFrame() { 
+        if (this._frame == this.frame) return false
+        this._frame = this.frame
+        return true
+    }
+    get frame() { return this.animationGroup.animatables[0]?.masterFrame }
     get frameLength() { return this._framerate * (this._moveTime + this._movePause) }
     get movePositions() { return this._movePositions }
     set movePositions(mp) {
