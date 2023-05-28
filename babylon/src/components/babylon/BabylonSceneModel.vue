@@ -20,6 +20,10 @@ import { reactive, inject, watch, onMounted } from "@vue/runtime-core";
 
     const myModel = new props.model(theScene, stateCallback)
 
+    const execute = function(action, options = {}) {
+        myModel.execute(action, options)
+    }
+
     onMounted(() => {
     });
 
@@ -28,5 +32,6 @@ import { reactive, inject, watch, onMounted } from "@vue/runtime-core";
         (newval,oldval) => myModel.setOptions(newval)
     )
 
+    defineExpose({execute})
 
 </script>

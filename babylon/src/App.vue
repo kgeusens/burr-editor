@@ -125,7 +125,7 @@
       <v-card width="100%" height="100%">
         <BabylonEngine>
           <BabylonScene>
-            <BabylonSceneModel :model=SolutionViewer :detail=solutionDetail>
+            <BabylonSceneModel ref="player" :model=SolutionViewer :detail=solutionDetail>
             </BabylonSceneModel>
             <BabylonCamera id="1">
               <BabylonView width="parent" height="parent">
@@ -179,6 +179,7 @@ export default {
       showPWBPDialog: 0,
       showServerDialog: 0,
       readOnly: true,
+      player: null,
     }
   },
   components: {
@@ -206,8 +207,8 @@ export default {
       this.solutionIndex= [0]
       this.solutionMove = 0
     },
-    playerAction(val) {
-      console.log("playerAction", val)
+    playerAction(action, options) {
+      if (this.player) this.player.execute(action, options)
     },
     setFilename(f) {
       this.fileName = f
@@ -299,7 +300,6 @@ export default {
         pieces: this.solutionPieces,
         pieceColors: this.pieceColors,
         movePositions: this.solutionPositions,
-        move: this.solutionMove,
         delta: 0.01, 
         bevel: 0.025, 
         alpha: 1, 
@@ -328,6 +328,8 @@ export default {
     },
   },
   mounted() { 
+    this.player = this.$refs.player
+    console.log(this.player)
   }
 };
 </script>

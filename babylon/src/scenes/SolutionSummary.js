@@ -457,9 +457,33 @@ export class sceneBuilder {
         this.pieces.length = pieces.length
     }
 
+    execute(action, options) {
+        switch (action) {
+            case "pause":
+                this.animationGroup.pause()
+                break
+            case "play":
+                this.animationGroup.play(false)
+                break
+            case "stop":
+                this.animationGroup.stop()
+                break
+            case "reset":
+                this.animationGroup.reset()
+                break
+            case "move":
+                this.animationGroup.play(true)
+                this.animationGroup.goToFrame(options.move*this.frameLength)
+                this.animationGroup.pause()
+                break
+            default:
+                console.log("SolutionSummary: unknown action", action)
+        }
+    }
+
     setOptions(options) {
         // Performance : only process changes
-        var { pieces = [], pieceColors = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        var { pieces = [], pieceColors = [], movePositions = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
         this.isDirty=false
         // Build the ghosts in this.pieces
         this.buildGhosts(options)
@@ -473,9 +497,7 @@ export class sceneBuilder {
         }
 
         // position the animation at frame of "move"
-        this.animationGroup.play(true)
-        this.animationGroup.goToFrame(move*this.frameLength)
-        this.animationGroup.pause()
+        if (this.isDirty) this.execute("move", { move: 0 })
 
         // Focus the camera
         if (scene.activeCamera && this.isDirty) {

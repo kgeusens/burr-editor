@@ -164,7 +164,7 @@
         <v-list-item class="py-0 px-1">
           <v-list-item-title><v-container fluid><v-row align="center">
             <v-col>
-              <v-btn class="mx-2" icon="mdi-restart" @click="playerAction('restart')"></v-btn>
+              <v-btn class="mx-2" icon="mdi-restart" @click="playerAction('reset')"></v-btn>
               <v-btn class="mx-2" icon="mdi-play" @click="playerAction('play')"></v-btn>
             </v-col>
             <v-col>
@@ -222,7 +222,11 @@
   })
   const playerMove = computed({
     get: () => props.playerMove,
-    set: (val) => emit("update:playerMove", Number(val))
+    set: (val) =>  { 
+      emit("update:playerMove", Number(val)) 
+      emit("playerAction", "move", { move: Number(val) })
+    }
+//    set: (val) => emit("update:playerMove", Number(val))
   })
 
   const selectedSolution = computed({
@@ -306,8 +310,8 @@
     if (DATA.showColorPicker == val) DATA.showColorPicker=-1
     else DATA.showColorPicker=val
   }
-  const playerAction = function(action) {
-    emit("playerAction", action)
+  const playerAction = function(action, options) {
+    emit("playerAction", action, options)
   }
 
   watch(selectedShape, (newval, oldval) => {
