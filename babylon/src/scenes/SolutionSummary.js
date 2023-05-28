@@ -343,12 +343,16 @@ export class sceneBuilder {
         this.result=new Ghost(new Voxel({}), 0, 0, rootNode)
         scene.registerBeforeRender( () => { if (this.updatedFrame()) console.log(this.frame) })
     }
-    updatedFrame() { 
+    updatedFrame() {
         if (this._frame == this.frame) return false
         this._frame = this.frame
         return true
     }
-    get frame() { return this.animationGroup.animatables[0]?.masterFrame }
+    get frame() { 
+        let f = this.animationGroup.animatables[0]?.masterFrame
+        if (!isNaN(f)) console.log(Math.floor(f + 0.1))
+        return f
+    }
     get frameLength() { return this._framerate * (this._moveTime + this._movePause) }
     get movePositions() { return this._movePositions }
     set movePositions(mp) {

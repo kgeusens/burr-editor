@@ -329,7 +329,6 @@ export default {
   },
   mounted() { 
     this.player = this.$refs.player
-    console.log(this.player)
   }
 };
 </script>
