@@ -374,7 +374,8 @@ export class sceneBuilder {
         }
     }
     get animationGroup() { return this._animationGroup }
-    set animationGroup(ag) { 
+    set animationGroup(ag) {
+        this._animationGroup.stop()
         this._animationGroup.dispose()
         this._animationGroup = ag 
     }
@@ -393,7 +394,7 @@ export class sceneBuilder {
     }
     buildAnimationGroup() {
         let mp = this.movePositions
-        let solutionAnimationGroup = this.animationGroup.clone()
+        let solutionAnimationGroup = new AnimationGroup("solutionPlayer")
         if (this.isDirty) {
             let positionKeyList= Array.from(Array(this.pieces.length), () => [])
             let animationList=Array.from(Array(this.pieces.length), () => new Animation("pieceAnimation", "position", 30, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CYCLE))
@@ -509,7 +510,6 @@ export class sceneBuilder {
             case "previous":
                 let pl = this.animationGroup.isPlaying
                 let targetMove = Math.floor( (this.frame-1 - this._framerate*0.5)/this.frameLength)
-                console.log(this.frame)
                 if (targetMove < 0 ) targetMove=0
                 if (!pl) this.animationGroup.play(true)
                 this.animationGroup.goToFrame(targetMove*this.frameLength)
