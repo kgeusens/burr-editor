@@ -301,7 +301,7 @@ export default {
         pieceColors: this.pieceColors,
         movePositions: this.solutionPositions,
         delta: 0.01, 
-        bevel: 0.025, 
+        bevel: 0.04, 
         alpha: 1, 
         outline: false}
     }
