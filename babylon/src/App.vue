@@ -281,7 +281,7 @@ export default {
           shapeList.push( { 
             shape: this.puzzle.shapes.voxel[idx] , 
             id: j, 
-            rotationIndex: assembly[j*4+3]
+            rotationIndex: Number(assembly[j*4+3])
           } )
           j++
         }

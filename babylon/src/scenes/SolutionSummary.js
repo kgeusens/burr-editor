@@ -51,8 +51,8 @@ class Ghost {
     }
     get rotationIndex() { return this._rotationIndex}
     set rotationIndex(idx) { 
-        this.parent.rotation=rotationVector(idx)
-        this._rotationIndex = idx; 
+        this._rotationIndex = Number(idx); 
+        this.parent.rotation=rotationVector(this._rotationIndex)
     }
 
     constructor(voxel = new Voxel(), deltaWidth=0, bevelWidth=0, parent = null) {
@@ -341,7 +341,11 @@ export class sceneBuilder {
         const rootNode = new TransformNode("root");
         rootNode.position=new Vector3(0,0,0)
         this.result=new Ghost(new Voxel({}), 0, 0, rootNode)
-        scene.registerBeforeRender( () => { if (this.updatedFrame()) console.log(this.frame) })
+        scene.registerBeforeRender( () => { 
+            if (this.updatedFrame()) {
+//                console.log(this._frame)
+            } 
+        })
     }
     updatedFrame() {
         if (this._frame == this.frame) return false
@@ -350,7 +354,7 @@ export class sceneBuilder {
     }
     get frame() { 
         let f = this.animationGroup.animatables[0]?.masterFrame
-        if (!isNaN(f)) console.log(Math.floor(f + 0.1))
+        if (!isNaN(f)) f = Math.floor(f + 0.1)
         return f
     }
     get frameLength() { return this._framerate * (this._moveTime + this._movePause) }
@@ -432,7 +436,7 @@ export class sceneBuilder {
                 let g = new Ghost(pieces[idx].shape, delta, bevel,new TransformNode("root"))
                 g.alpha = alpha
                 g.outline = outline
-                g.parent.rotation=rotationVector(pieces[idx].rotationIndex)
+                g.rotationIndex = pieces[idx].rotationIndex
                 g.render()
                 this.pieces.push(g)
             }
@@ -445,7 +449,7 @@ export class sceneBuilder {
                 let g = new Ghost(pieces[idx].shape, delta, bevel, p)
                 g.alpha = alpha
                 g.outline = outline
-                g.parent.rotation=rotationVector(pieces[idx].rotationIndex)
+                g.rotationIndex = pieces[idx].rotationIndex
                 g.render()
                 this.pieces[idx] = g
             }
