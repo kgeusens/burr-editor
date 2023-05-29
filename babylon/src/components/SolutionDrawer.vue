@@ -165,9 +165,9 @@
           <v-list-item-title><v-container fluid><v-row align="center">
             <v-col>
               <v-btn size="small" class="mx-1" icon="mdi-skip-backward" @click="playerAction('reset')"></v-btn>
-              <v-btn size="small" class="mx-1" icon="mdi-skip-previous"></v-btn>
+              <v-btn size="small" class="mx-1" icon="mdi-skip-previous" @click="playerAction('previous')"></v-btn>
               <v-btn class="mx-1" icon="mdi-play" @click="playerAction('play')"></v-btn>
-              <v-btn size="small" class="mx-1" icon="mdi-skip-next"></v-btn>
+              <v-btn size="small" class="mx-1" icon="mdi-skip-next" @click="playerAction('next')"></v-btn>
             </v-col>
             <v-col>
               <v-btn class="mx-1" icon="mdi-pause" @click="playerAction('pause')"></v-btn>

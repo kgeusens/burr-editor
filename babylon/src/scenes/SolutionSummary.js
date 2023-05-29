@@ -323,13 +323,12 @@ export class sceneBuilder {
     pieces=[] // these are Ghosts
     _movePositions=[]
     _isDirty=true // means there is a change to the base solution sequence (pieces of positions changed)
-    _move
-    _frame
     delta
     bevel
     alpha
     outline
     stateCallback
+    _frame
     _animationGroup = new AnimationGroup("solutionPlayer")
     _framerate=25 // frames per second
     _moveTime=1.5 // time in seconds to make a move
@@ -341,21 +340,28 @@ export class sceneBuilder {
         const rootNode = new TransformNode("root");
         rootNode.position=new Vector3(0,0,0)
         this.result=new Ghost(new Voxel({}), 0, 0, rootNode)
-        scene.registerBeforeRender( () => { 
-            if (this.updatedFrame()) {
-//                console.log(this._frame)
-            } 
+        scene.registerBeforeRender( () => {
+            let gf = this.getFrame()
+            if (gf >=0) {
+                if (this.frame != gf) {
+                    this.frame = gf
+                }
+            }
         })
     }
-    updatedFrame() {
-        if (this._frame == this.frame) return false
-        this._frame = this.frame
-        return true
+    get frame() {
+        return this._frame
     }
-    get frame() { 
+    set frame(val) {
+        this._frame=val
+    }
+    getFrame() { 
         let f = this.animationGroup.animatables[0]?.masterFrame
-        if (!isNaN(f)) f = Math.floor(f + 0.1)
+        if (!isNaN(f)) f = Math.floor(f + 0.001)
         return f
+    }
+    get move() {
+        return this._frame?Math.floor(this._frame/this.frameLength):0
     }
     get frameLength() { return this._framerate * (this._moveTime + this._movePause) }
     get movePositions() { return this._movePositions }
@@ -479,18 +485,35 @@ export class sceneBuilder {
                 this.animationGroup.pause()
                 break
             case "play":
-                this.animationGroup.play(false)
+                this.animationGroup.play(true)
                 break
             case "stop":
                 this.animationGroup.stop()
                 break
             case "reset":
-                this.animationGroup.reset()
+                this.animationGroup.play(true)
+                this.animationGroup.goToFrame(0)
+                this.animationGroup.pause()
                 break
             case "move":
                 this.animationGroup.play(true)
                 this.animationGroup.goToFrame(options.move*this.frameLength)
                 this.animationGroup.pause()
+                break
+            case "next":
+                let p = this.animationGroup.isPlaying
+                if (!p) this.animationGroup.play(true)
+                if (this.move >= 0) this.animationGroup.goToFrame((this.move+1)*this.frameLength)
+                if (!p) this.animationGroup.pause()
+                break
+            case "previous":
+                let pl = this.animationGroup.isPlaying
+                let targetMove = Math.floor( (this.frame-1 - this._framerate*0.5)/this.frameLength)
+                console.log(this.frame)
+                if (targetMove < 0 ) targetMove=0
+                if (!pl) this.animationGroup.play(true)
+                this.animationGroup.goToFrame(targetMove*this.frameLength)
+                if (!pl) this.animationGroup.pause()
                 break
             default:
                 console.log("SolutionSummary: unknown action", action)
