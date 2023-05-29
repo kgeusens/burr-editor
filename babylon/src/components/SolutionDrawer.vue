@@ -96,6 +96,7 @@
                 readonly
               ></v-text-field></v-col>
               <v-col class = "pa-0" align="right">
+                <v-icon icon="mdi-square" :color="colors[i]" @click="colorClicked(i)"></v-icon>
               </v-col>
             </v-row></v-container></v-list-item-title>
             <v-expand-transition>

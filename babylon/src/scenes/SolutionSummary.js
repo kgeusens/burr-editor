@@ -375,9 +375,11 @@ export class sceneBuilder {
     }
     get animationGroup() { return this._animationGroup }
     set animationGroup(ag) {
-        this._animationGroup.stop()
-        this._animationGroup.dispose()
-        this._animationGroup = ag 
+        if (this.animationGroup.uniqueId != ag.uniqueId) {
+            this._animationGroup.stop()
+            this._animationGroup.dispose()
+            this._animationGroup = ag 
+        }
     }
     get boundingInfo() {
         this.pieces[0].mesh.computeWorldMatrix(true)
@@ -393,13 +395,12 @@ export class sceneBuilder {
         return new BoundingInfo(min,max)
     }
     buildAnimationGroup() {
-        let mp = this.movePositions
-        let solutionAnimationGroup = new AnimationGroup("solutionPlayer")
         if (this.isDirty) {
+            let mp = this.movePositions
+            let solutionAnimationGroup = new AnimationGroup("solutionPlayer")
             let positionKeyList= Array.from(Array(this.pieces.length), () => [])
             let animationList=Array.from(Array(this.pieces.length), () => new Animation("pieceAnimation", "position", 30, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CYCLE))
             let easingFunction = new QuadraticEase()
-            solutionAnimationGroup = new AnimationGroup("solutionPlayer")
             easingFunction.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT)
             // build animations
             // build the keyframe list for every piece
@@ -425,8 +426,9 @@ export class sceneBuilder {
                 animationList[pieceIdx].setEasingFunction(easingFunction)
                 solutionAnimationGroup.addTargetedAnimation(animationList[pieceIdx], this.pieces[pieceIdx].parent)
             }
+            return solutionAnimationGroup
         } 
-        return solutionAnimationGroup
+        else return this._animationGroup
     }
     get isDirty() { return this._isDirty }
     set isDirty(b) { this._isDirty = b}
