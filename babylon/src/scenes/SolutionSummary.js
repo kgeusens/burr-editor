@@ -435,52 +435,57 @@ export class sceneBuilder {
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
 
     buildGhosts(options) {
-        var { pieces = [], movePositions = [], move=0, delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        var { puzzle, solution, problem, delta = 0, bevel = 0, alpha = 1, outline = true } = options
         // turn the pieces (voxel data) into ghosts (3D representations)
         // rotate to the correct position
-        for (let idx in pieces) {
+        let pieceMap = solution.pieceMap
+        for (let idx of solution.pieceNumbers) {
+            let shapeID=problem.shapeMap[idx]
+            let shape=puzzle.shapes.voxel[shapeID]
             if (!this.pieces[idx]) {
                 // new piece, need to create
                 this.isDirty=true
-                let g = new Ghost(pieces[idx].shape, delta, bevel,new TransformNode("root"))
+                let g = new Ghost(shape, delta, bevel,new TransformNode("root"))
                 g.alpha = alpha
                 g.outline = outline
-                g.rotationIndex = pieces[idx].rotationIndex
+                g.rotationIndex = pieceMap[idx].rotation
                 g.render()
                 this.pieces.push(g)
             }
-            else if (pieces[idx].shape.stateString != this.pieces[idx].voxel.stateString) {
+            else if (shape.stateString != this.pieces[idx].voxel.stateString) {
                 this.isDirty=true
                 // different shape, delete
                 let p = this.pieces[idx].parent
                 this.pieces[idx].dispose()
                 // and replace
-                let g = new Ghost(pieces[idx].shape, delta, bevel, p)
+                let g = new Ghost(shape, delta, bevel, p)
                 g.alpha = alpha
                 g.outline = outline
-                g.rotationIndex = pieces[idx].rotationIndex
+                g.rotationIndex = pieceMap[idx].rotation
                 g.render()
                 this.pieces[idx] = g
             }
             else {
                 // same shape, same index. check and set rotation
                 let g=this.pieces[idx]
-                if (g.rotationIndex != pieces[idx].rotationIndex) {
+                if (g.rotationIndex != pieceMap[idx].rotation) {
                     this.isDirty=true
-                    g.rotationIndex = pieces[idx].rotationIndex
+                    g.rotationIndex = pieceMap[idx].rotation
                 }
             }
         }
         // now delete extra pieces in old situation
-        for (let i = pieces.length; i<this.pieces.length; i++) {
-            this.isDirty=true
-            let p = this.pieces[i].parent
-            this.pieces[i].dispose()
-            p.dispose()
+        for ( let idx in this.pieces ) {
+            if (  !(idx in pieceMap) ) {
+                this.isDirty=true
+                let p = this.pieces[idx].parent
+                this.pieces[idx].dispose()
+                p.dispose()
+                delete this.pieces[idx]
+            }
         }
-        // and trim the cache to the correct length
-        this.pieces.length = pieces.length
     }
+
 
     execute(action, options) {
         switch (action) {
@@ -524,7 +529,7 @@ export class sceneBuilder {
 
     setOptions(options) {
         // Performance : only process changes
-        var { pieces = [], pieceColors = [], movePositions = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        var { puzzle, solution, problem, pieceColors = [], movePositions = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
         this.isDirty=false
         // Build the ghosts in this.pieces
         this.buildGhosts(options)

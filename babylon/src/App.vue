@@ -268,6 +268,8 @@ export default {
       // A shape with id=2 and count=3 means entity 2 is used three times. 
       // It will occur as ... 2, 2, 2 ... in the array
       // We return an array of entities, together with its position, and the rotation
+      return this.puzzle.getSolutionMap(this.problemIndex[0], this.solutionIndex[0])
+/*
       if (!this.solution) return []
       let shapeList = []
       let tempShapes = []
@@ -287,6 +289,7 @@ export default {
         }
       }
       return shapeList
+*/
     },
     solutionPositions() {
       return this.solution?this.solution.separation[0].movePositionsAll:[]
@@ -296,8 +299,9 @@ export default {
     },
     solutionDetail() {
       return { 
-        shape: this.puzzle.shapes.voxel[this.problem.result.id], 
-        pieces: this.solutionPieces,
+        puzzle: this.puzzle,
+        solution: this.solution,
+        problem: this.problem,
         pieceColors: this.pieceColors,
         movePositions: this.solutionPositions,
         delta: 0.01, 
