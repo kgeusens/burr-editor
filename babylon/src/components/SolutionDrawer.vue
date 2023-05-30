@@ -87,7 +87,7 @@
                 readonly
               ></v-text-field></v-col>
               <v-col class="pa-0 v-col-4"><v-text-field
-                v-model="colors[i]"
+                v-model="item.color"
                 hide-details
                 label="color"
                 density="compact"
@@ -96,7 +96,7 @@
                 readonly
               ></v-text-field></v-col>
               <v-col class = "pa-0" align="right">
-                <v-icon icon="mdi-square" :color="colors[i]" @click="colorClicked(i)"></v-icon>
+                <v-icon icon="mdi-square" :color="item.color" @click="colorClicked(i)"></v-icon>
               </v-col>
             </v-row></v-container></v-list-item-title>
             <v-expand-transition>
@@ -105,7 +105,7 @@
                   <v-card-text>
                     <v-color-picker
                       mode="rgb"
-                      v-model="colors[i]"
+                      v-model="item.color"
                       class="ma-0"
                       hide-canvas
                       hide-inputs
@@ -252,25 +252,15 @@
       // It will occur as ... 2, 2, 2 ... in the array
       // We return an array of entities, together with its position, and the rotation
       if (!selectedSolution.value) return []
-//      return selectedSolution.value.pieceNumbers.map((val, i) => {name: i + "." + val})
-      let shapeList = []
-      let tempShapes = []
-      let assembly = selectedSolution.value.assembly.text.split(" ")
-      for (let shape of selectedProblem.value.shapes.shape) {
-          tempShapes[shape.id] = shape.count
-      }
-      let j = 0
-      for (let idx=0; idx < tempShapes.length; idx++) {
-        for (let i=0; i<tempShapes[idx]; i++) {
-          shapeList.push( { 
-            shape: shapes.value[idx] , 
-            id: j, 
-            name: idx + "." + i + " " + shapes.value[idx].name
-          } )
-          j++
-        }
-      }
-      return shapeList
+      let run=0
+      let prev=-1
+      return selectedSolution.value.pieceNumbers.map((val, i) => { 
+        let shp = selectedProblem.value.shapeMap[val]
+        if (shp == prev) run++ 
+        else run = 0
+        prev = shp
+        return {name: selectedProblem.value.shapeMap[val] + "." + run, color: pieceColor(i, run).toHexString()} 
+      })
     }
   })
 
