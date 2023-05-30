@@ -29,11 +29,7 @@ export const rotationMatrix = [
 [0,1,3]  // OK
 ];
 
-export const KG = "Koen Geusens"
-
 export function rotationVector(idx) {
     const pie = Math.PI/2;
     return new Vector3(rotationMatrix[idx][0]*pie, rotationMatrix[idx][1]*pie, rotationMatrix[idx][2]*pie);
 };
-
-export function rotate(idx) { return rotationVector(idx); }
