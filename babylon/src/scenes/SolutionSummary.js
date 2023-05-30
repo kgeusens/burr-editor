@@ -87,6 +87,7 @@ class Ghost {
                 }
             }
         }
+        hole.parent = null
         hole.dispose
         // create bevel if needed
         if (this.bevel >0) this.renderBevel(shapeCSG)
@@ -394,20 +395,21 @@ export class sceneBuilder {
         }
         return new BoundingInfo(min,max)
     }
-    buildAnimationGroup() {
+    buildAnimationGroup(options) {
+        var { puzzle, solution, problem, delta = 0, bevel = 0, alpha = 1, outline = true } = options
         if (this.isDirty) {
             let mp = this.movePositions
             let solutionAnimationGroup = new AnimationGroup("solutionPlayer")
-            let positionKeyList= Array.from(Array(this.pieces.length), () => [])
-            let animationList=Array.from(Array(this.pieces.length), () => new Animation("pieceAnimation", "position", 30, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CYCLE))
+            let positionKeyList= Array.from(Array(solution.pieceNumbers.length), () => [])
+            let animationList=Array.from(Array(solution.pieceNumbers.length), (val, idx) => new Animation("pieceAnimation"+idx, "position", 30, Animation.ANIMATIONTYPE_VECTOR3, Animation.ANIMATIONLOOPMODE_CYCLE))
             let easingFunction = new QuadraticEase()
             easingFunction.setEasingMode(EasingFunction.EASINGMODE_EASEINOUT)
             // build animations
             // build the keyframe list for every piece
-            for (let pieceIdx in this.pieces) {
-                // for every piece
+            for (let pieceIdx in solution.pieceNumbers) {
+                // pieceIdx is sequential, need to map using solution.pieceNumbers[pieceIdx] to get the shapeID to use in this.pieces[]
                 for (let moveIdx in mp) {
-                    // for every move and every piece, add a frame to the piece for that move
+                    // for every move, add a frame to the piece for that move
                     if (mp[moveIdx][pieceIdx]) {
                         positionKeyList[pieceIdx].push({
                             frame: moveIdx * this.frameLength, 
@@ -424,7 +426,7 @@ export class sceneBuilder {
                 }
                 animationList[pieceIdx].setKeys(positionKeyList[pieceIdx])
                 animationList[pieceIdx].setEasingFunction(easingFunction)
-                solutionAnimationGroup.addTargetedAnimation(animationList[pieceIdx], this.pieces[pieceIdx].parent)
+                solutionAnimationGroup.addTargetedAnimation(animationList[pieceIdx], this.pieces[solution.pieceNumbers[pieceIdx]].parent)
             }
             return solutionAnimationGroup
         } 
@@ -488,6 +490,7 @@ export class sceneBuilder {
 
 
     execute(action, options) {
+        console.log("babylon", action, options)
         switch (action) {
             case "pause":
                 this.animationGroup.pause()
@@ -529,14 +532,14 @@ export class sceneBuilder {
 
     setOptions(options) {
         // Performance : only process changes
-        var { puzzle, solution, problem, pieceColors = [], movePositions = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
+        var { puzzle, solution, problem, pieceColors = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
         this.isDirty=false
         // Build the ghosts in this.pieces
         this.buildGhosts(options)
         // Process movePositions and build the player animation
-        this.movePositions = movePositions
+        this.movePositions = solution.separation[0]?solution.separation[0].movePositionsAll:undefined
         // Build the animation
-        this.animationGroup = this.buildAnimationGroup()
+        this.animationGroup = this.buildAnimationGroup(options)
         // Patch the colors
         for (let idx in this.pieces) {
             this.pieces[idx].mesh.material.diffuseColor=Color3.FromHexString(pieceColors[idx])

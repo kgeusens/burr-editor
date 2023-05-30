@@ -214,7 +214,8 @@ export default {
       this.solutionMove = 0
     },
     playerAction(action, options) {
-      if (this.player) this.player.execute(action, options)
+      console.log("playerAction", action, options)
+      if (this.$refs.player) this.$refs.player.execute(action, options)
     },
     setFilename(f) {
       this.fileName = f
@@ -310,7 +311,6 @@ export default {
     },
   },
   mounted() { 
-    this.player = this.$refs.player
   }
 };
 </script>
