@@ -252,6 +252,7 @@
       // It will occur as ... 2, 2, 2 ... in the array
       // We return an array of entities, together with its position, and the rotation
       if (!selectedSolution.value) return []
+//      return selectedSolution.value.pieceNumbers.map((val, i) => {name: i + "." + val})
       let shapeList = []
       let tempShapes = []
       let assembly = selectedSolution.value.assembly.text.split(" ")

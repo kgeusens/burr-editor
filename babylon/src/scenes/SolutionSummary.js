@@ -468,6 +468,7 @@ export class sceneBuilder {
                 g.alpha = alpha
                 g.outline = outline
                 g.rotationIndex = pieceMap[idx].rotation
+                g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
                 g.render()
                 this.pieces[idx] = g
             }
@@ -476,6 +477,7 @@ export class sceneBuilder {
                 let g=this.pieces[idx]
                 if (g.rotationIndex != pieceMap[idx].rotation) {
                     this.isDirty=true
+                    g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
                     g.rotationIndex = pieceMap[idx].rotation
                 }
             }
