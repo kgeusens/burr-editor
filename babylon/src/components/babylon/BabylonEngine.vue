@@ -4,10 +4,14 @@
 
 <script setup>
     import { onMounted, provide } from "@vue/runtime-core";
-    import { Engine } from "@babylonjs/core";
+    import { Engine, EngineFactory, WebGPUEngine } from "@babylonjs/core";
+
+    const webGPUSupported = await WebGPUEngine.IsSupportedAsync;
+    if (webGPUSupported) {console.log("WebGPU supported")}
 
     const workerCanvas = document.createElement("canvas");
-    const myEngine = new Engine(workerCanvas, true);
+    const myEngine = await EngineFactory.CreateAsync(workerCanvas)
+//    const myEngine = new Engine(workerCanvas, true);
     provide("engine", myEngine)
 
     myEngine.runRenderLoop(() => {
