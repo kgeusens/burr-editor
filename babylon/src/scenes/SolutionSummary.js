@@ -35,6 +35,7 @@ class Ghost {
     outline=true
     alpha=1
     _rotationIndex = 0
+    _position = new Vector3(0,0,0)
 
     get x() { return this.voxel.x }
     get y() { return this.voxel.y }
@@ -54,7 +55,11 @@ class Ghost {
         this._rotationIndex = Number(idx); 
         this.parent.rotation=rotationVector(this._rotationIndex)
     }
-
+    get position() { return this._position }
+    set position(vec) { 
+        this._position = vec
+        this.parent.position = vec
+    }
     constructor(voxel = new Voxel(), deltaWidth=0, bevelWidth=0, parent = null) {
         this._parent=parent
         this._voxel=voxel
@@ -313,7 +318,6 @@ const handler = {
     set(target, property, value) {
         target[property] = value
         if (property == "state") {
-//            console.log("intercepted", property, value)
         }
         return true
     }
@@ -383,21 +387,20 @@ export class sceneBuilder {
         }
     }
     get boundingInfo() {
-        this.pieces[0].mesh.computeWorldMatrix(true)
-        let min = this.pieces[0].mesh.getBoundingInfo().boundingBox.minimumWorld;
-        let max = this.pieces[0].mesh.getBoundingInfo().boundingBox.maximumWorld;
-        for(let i=0; i<this.pieces.length; i++){
+        let min = undefined
+        let max = undefined
+        for(let i in this.pieces){
             this.pieces[i].mesh.computeWorldMatrix(true)
             let meshMin = this.pieces[i].mesh.getBoundingInfo().boundingBox.minimumWorld;
             let meshMax = this.pieces[i].mesh.getBoundingInfo().boundingBox.maximumWorld;
-            min = Vector3.Minimize(min, meshMin);
-            max = Vector3.Maximize(max, meshMax);
+            min = Vector3.Minimize(min?min:meshMin, meshMin);
+            max = Vector3.Maximize(max?max:meshMax, meshMax);
         }
         return new BoundingInfo(min,max)
     }
     buildAnimationGroup(options) {
         var { puzzle, solution, problem, delta = 0, bevel = 0, alpha = 1, outline = true } = options
-        if (this.isDirty) {
+        if (this.isDirty && this.movePositions) {
             let mp = this.movePositions
             let solutionAnimationGroup = new AnimationGroup("solutionPlayer")
             let positionKeyList= Array.from(Array(solution.pieceNumbers.length), () => [])
@@ -451,8 +454,9 @@ export class sceneBuilder {
                 g.alpha = alpha
                 g.outline = outline
                 g.rotationIndex = pieceMap[idx].rotation
+                g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
                 g.render()
-                this.pieces.push(g)
+                this.pieces[idx]=g
             }
             else if (shape.stateString != this.pieces[idx].voxel.stateString) {
                 this.isDirty=true
@@ -490,7 +494,6 @@ export class sceneBuilder {
 
 
     execute(action, options) {
-        console.log("babylon", action, options)
         switch (action) {
             case "pause":
                 this.animationGroup.pause()

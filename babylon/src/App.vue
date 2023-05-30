@@ -282,7 +282,7 @@ export default {
         solution: this.solution,
         problem: this.problem,
         pieceColors: this.pieceColors,
-        movePositions: this.solutionPositions,
+//        movePositions: this.solutionPositions,
         delta: 0.01, 
         bevel: 0.04, 
         alpha: 1, 

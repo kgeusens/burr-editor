@@ -302,7 +302,8 @@
 
   const statePositions = computed({
     get: () => {
-      return selectedSolution.value.separation[0].movePositionsAll
+      if (selectedSolution.value.separation[0]) return selectedSolution.value.separation[0].movePositionsAll
+      else return []
     }
   })
 
