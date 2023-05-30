@@ -259,27 +259,8 @@
         if (shp == prev) run++ 
         else run = 0
         prev = shp
-        return {name: selectedProblem.value.shapeMap[val] + "." + run, color: pieceColor(i, run).toHexString()} 
+        return {name: shp + "." + run, color: pieceColor(shp, run).toHexString()} 
       })
-    }
-  })
-
-  const colors = computed({
-    get: () => { 
-      if (!selectedSolution.value) return []
-      let shapeList = []
-      let tempShapes = []
-      for (let shape of selectedProblem.value.shapes.shape) {
-          tempShapes[shape.id] = shape.count
-      }
-      let j = 0
-      for (let idx=0; idx < tempShapes.length; idx++) {
-        for (let i=0; i<tempShapes[idx]; i++) {
-          shapeList.push(pieceColor(idx, i).toHexString())
-          j++
-        }
-      }
-      return shapeList
     }
   })
 
@@ -299,7 +280,7 @@
   })
 
   const changeColor = function(val) {
-    emit("update:pieceColors", colors.value)
+    emit("update:pieceColors", pieces.value)
   }
   const colorClicked = function(val) {
     if (DATA.showColorPicker == val) DATA.showColorPicker=-1
@@ -318,5 +299,5 @@
 //  watch(selectedProblemIndex, (newval) => emit("update:problemIndex", newval))
   watch(selectedSolutionIndex, (newval) => { 
   })
-  watch(colors, (val) => emit("update:pieceColors", colors.value))
+  watch(pieces, (val) => emit("update:pieceColors", pieces.value))
 </script>

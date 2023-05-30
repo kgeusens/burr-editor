@@ -86,7 +86,9 @@ const r = [
   }
   
   export function pieceColor(index, instance=0) {
-    let color = { r: r[index], g: g[index], b: b[index] }
+    let color = {}
+    if (index < r.length) color = { r: r[index], g: g[index], b: b[index] }
+    else color = { r: (1+Math.sin(0.7*index))/2, g: (1+Math.sin(1.3*index+1.5)/2), b: (1+Math.sin(3.5*index+2.3))/2}
     let jitter = getJitter(color, instance)
     let result = { r: color.r + jitter.r*0.5*ramp(color.r), g: color.g + jitter.g*0.4*ramp(color.g), b: color.b + jitter.b*0.7*ramp(color.b)}
     return new Color3(result.r, result.g, result.b)

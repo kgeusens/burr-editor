@@ -214,7 +214,6 @@ export default {
       this.solutionMove = 0
     },
     playerAction(action, options) {
-      console.log("playerAction", action, options)
       if (this.$refs.player) this.$refs.player.execute(action, options)
     },
     setFilename(f) {

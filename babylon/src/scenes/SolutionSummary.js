@@ -550,7 +550,7 @@ export class sceneBuilder {
         // this.pieces is a sparse array [(), (), ghost0, (), ghost1, (), (), (), ghost2, ...]
         // use solution.pieceNumbers[] to map sequential to sparse
         for (let idx in pieceColors) {
-            this.pieces[solution.pieceNumbers[idx]].mesh.material.diffuseColor=Color3.FromHexString(pieceColors[idx])
+            this.pieces[solution.pieceNumbers[idx]].mesh.material.diffuseColor=Color3.FromHexString(pieceColors[idx].color)
         }
 
         // position the animation at frame of "move"
