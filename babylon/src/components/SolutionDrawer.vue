@@ -143,7 +143,7 @@
               label="move"
               density="compact"
               min="0"
-              :max="statePositions.length - 1"
+              :max="movePositions.length - 1"
               step="0.04"
             >
               <template v-slot:append>
@@ -156,7 +156,7 @@
                   variant="outlined"
                   style="width: 90px"
                   min="0"
-                  :max="statePositions.length - 1"
+                  :max="movePositions.length - 1"
                 ></v-text-field>                
               </template>
             </v-slider></v-col>
@@ -272,7 +272,7 @@
     get: () => selectedProblem.value.solutions.solution
   })
 
-  const statePositions = computed({
+  const movePositions = computed({
     get: () => {
       if (selectedSolution.value.separation[0]) return selectedSolution.value.separation[0].movePositionsAll
       else return []
