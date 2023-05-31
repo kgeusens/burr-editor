@@ -4,7 +4,7 @@
 
 <script setup>
   import { onMounted, inject, provide } from "@vue/runtime-core";
-  import { ArcRotateCamera, Vector3 } from "@babylonjs/core";
+  import { AnaglyphArcRotateCamera, ArcRotateCamera, Vector3 } from "@babylonjs/core";
 
   const props = defineProps({ 
     id: { type: String, default: "myCamera"}, 
@@ -13,6 +13,7 @@
   const theScene = inject("scene")
 
   const myCamera = new ArcRotateCamera(props.id, 1.3, 0.7, 30, new Vector3(0,0,0), theScene);
+//  const myCamera = new AnaglyphArcRotateCamera(props.id, 1.3, 0.7, 30, new Vector3(0,0,0), 0.01, theScene);
   provide("camera", myCamera)
 
   myCamera.layerMask=1
