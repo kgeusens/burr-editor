@@ -111,43 +111,6 @@ class Ghost {
         this.mesh.material=ghostMaterial
         this.mesh.isPickable=true
         if (this.outline) this.renderOutline()
-        this.mesh.actionManager = new ActionManager(scene);
-        this.mesh.actionManager
-            .registerAction(
-                new InterpolateValueAction(
-                    ActionManager.OnPickTrigger,
-                    this.mesh.material,
-                    "alpha", 
-                    0.4,
-                    500
-                )
-            )
-            .then(
-                new InterpolateValueAction(
-                    ActionManager.OnPickTrigger,
-                    this.mesh.material,
-                    "alpha", 
-                    1,
-                    500
-                )
-            )
-        this.mesh.actionManager
-            .registerAction(
-                new SetValueAction(
-                    ActionManager.OnPickTrigger,
-                    this,
-                    "outlineIsVisible", 
-                    false
-                )
-            )
-            .then(
-                new SetValueAction(
-                    ActionManager.OnPickTrigger,
-                    this,
-                    "outlineIsVisible", 
-                    true
-                )
-            )
     }
 
     renderBevel(shapeCSG) {
@@ -340,6 +303,7 @@ export class sceneBuilder {
     _framerate=25 // frames per second
     _moveTime=1.5 // time in seconds to make a move
     _movePause=0.5 // pause time between moves in seconds
+    playerVars={myPlayMode: true}
 
     constructor(sc, callbackFunction, options = {}) {
         scene = sc
@@ -347,6 +311,7 @@ export class sceneBuilder {
         const rootNode = new TransformNode("root");
         rootNode.position=new Vector3(0,0,0)
         this.result=new Ghost(new Voxel({}), 0, 0, rootNode)
+        // keep track of the animation and update the frame accordingly
         scene.registerBeforeRender( () => {
             let gf = this.getFrame()
             if (gf >=0) {
@@ -355,6 +320,42 @@ export class sceneBuilder {
                 }
             }
         })
+        // react to mouse events
+        scene.onPointerDown = (evt, result) => {
+            switch (true) {
+                case (result.hit && evt.button==0 && this.playerVars.myPlayMode) :
+                    this.playerVars.pickedMesh=result.pickedMesh
+                    scene.activeCamera.detachControl()
+                    this.playerVars.holdingX=scene.pointerX
+                    this.playerVars.holdingY=scene.pointerY
+                    this.playerVars.faceNormal = result.getNormal(true)
+                    let cameraNormal = scene.activeCamera.getDirection(Vector3.Forward())
+                    let dot = Vector3.Dot(this.playerVars.faceNormal, cameraNormal)
+                    this.playerVars.projectedFace = this.playerVars.faceNormal.subtract(cameraNormal.scale(dot))
+                    console.log(this.playerVars.projectedFace)
+                    break       
+                default:
+                    this.playerVars.pickedMesh = undefined
+            }
+        }
+        scene.onPointerMove = (evt, result) => {
+            //
+            // Shape Dragging logic
+            //
+            if (this.playerVars.myPlayMode == true && this.playerVars.pickedMesh ) {
+                let mouseMovement = new Vector3(scene.pointerX - this.playerVars.holdingX, 0, scene.pointerY - this.playerVars.holdingY)
+                let delta = Vector3.Dot(this.playerVars.projectedFace, mouseMovement)
+                let deltavector = this.playerVars.faceNormal.scale(delta)
+                deltavector.scaleInPlace(100)
+                deltavector=deltavector.floor()
+                deltavector.scaleInPlace(0.01)
+                console.log(deltavector)
+            }
+        }
+        scene.onPointerUp = (evt, result) => {
+            scene.activeCamera.attachControl(scene.getEngine().getRenderingCanvas())
+            this.playerVars.pickedMesh=undefined
+          }
     }
     get frame() {
         return this._frame
