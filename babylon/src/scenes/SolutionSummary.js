@@ -576,8 +576,17 @@ Requirements for interactive puzzle solver
   + voxel (to know the shape it occupies in the worldmap)
   + rotation (found in the ghost, based on solution assembly)
   + position (found on the ghost root, can change during gameplay)
-- only the position is dynamic. From the Ghost:
+- only the position is dynamic
+- store the ghost in mesh.metadata, so babylonjs can access the above context
   + Get the worldmap from the voxel, with value of pieceID
+        let g = mesh.metadata
+        let map=g.voxel.getWorldMap(g.pieceID)
   + Translate and rotate it to the correct place
+        map.rotate(g.rotationIndex)
+        map.translate(g.position)
+- We need to find a way to transform a worldmap into a "state" for comparing map identity
+- The full worldmap needs to be calculated as well. Meshes do not have access to the external context
+  + the scenebuilder has that visibility, so this needs to be done there.
+  + put the mouse handler code not on the meshes, but on the sceneBuilder level
 
 */
