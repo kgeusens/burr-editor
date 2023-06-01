@@ -75,6 +75,7 @@ class Ghost {
         // create the bounding box
         this.mesh = MeshBuilder.CreateBox("voxel",{width:this.x - 2*this.delta, depth:this.z - 2*this.delta, height:this.y - 2*this.delta}, scene)
         this.mesh.parent = this.parent
+        this.mesh.metadata=this
         this.mesh.setPivotMatrix(Matrix.Translation(this.x/2 - 0.5, this.y/2 - 0.5, this.z/2 - 0.5), false);
         const shapeCSG = CSG.FromMesh(this.mesh);
 
@@ -332,6 +333,7 @@ export class sceneBuilder {
     bevel
     alpha
     outline
+    pieceID
     stateCallback
     _frame
     _animationGroup = new AnimationGroup("solutionPlayer")
@@ -453,6 +455,7 @@ export class sceneBuilder {
                 let g = new Ghost(shape, delta, bevel,new TransformNode("root"))
                 g.alpha = alpha
                 g.outline = outline
+                g.pieceID = idx
                 g.rotationIndex = pieceMap[idx].rotation
                 g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
                 g.render()
@@ -467,6 +470,7 @@ export class sceneBuilder {
                 let g = new Ghost(shape, delta, bevel, p)
                 g.alpha = alpha
                 g.outline = outline
+                g.pieceID = idx
                 g.rotationIndex = pieceMap[idx].rotation
                 g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
                 g.render()
@@ -477,6 +481,7 @@ export class sceneBuilder {
                 let g=this.pieces[idx]
                 if (g.rotationIndex != pieceMap[idx].rotation) {
                     this.isDirty=true
+                    g.pieceID = idx
                     g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
                     g.rotationIndex = pieceMap[idx].rotation
                 }
@@ -493,7 +498,6 @@ export class sceneBuilder {
             }
         }
     }
-
 
     execute(action, options) {
         switch (action) {
@@ -562,3 +566,18 @@ export class sceneBuilder {
         }
     }
 }
+
+/*
+Requirements for interactive puzzle solver
+------------------------------------------
+- each mesh must be able to construct his proer worldmap.
+  To do that, it must know his own:
+  + pieceID (for the value in the worldmap)
+  + voxel (to know the shape it occupies in the worldmap)
+  + rotation (found in the ghost, based on solution assembly)
+  + position (found on the ghost root, can change during gameplay)
+- only the position is dynamic. From the Ghost:
+  + Get the worldmap from the voxel, with value of pieceID
+  + Translate and rotate it to the correct place
+
+*/
