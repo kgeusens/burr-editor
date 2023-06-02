@@ -398,6 +398,12 @@ export class sceneBuilder {
             if (this.playerVars.pickedMesh) {
                 this.playerVars.translationDistance = Math.round(this.playerVars.translationDistance)
                 this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
+                // update the worldmap
+                let oldMap = this.worldMap.filter(this.playerVars.pickedMesh.metadata.pieceID)
+                oldMap.translate(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
+                this.worldMap.delete(this.playerVars.pickedMesh.metadata.pieceID)
+                this.worldMap.place(oldMap)
+                // cleanup
                 scene.activeCamera.attachControl(scene.getEngine().getRenderingCanvas())
                 this.playerVars.pickedMesh=undefined
                 this.playerVars.translationDistance = 0
