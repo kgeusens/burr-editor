@@ -336,6 +336,7 @@ export class sceneBuilder {
                     this.playerVars.holdingY=scene.pointerY
                     this.playerVars.pickingPoint=result.pickedPoint
                     this.playerVars.translationDistance = 0
+                    this.playerVars.maxDistance = {}
 
                     let cameraNormal = scene.activeCamera.getDirection(Vector3.Forward())
                     let planeX=new Plane(1,0,0, -1*result.pickedPoint.x)
@@ -352,7 +353,6 @@ export class sceneBuilder {
                     if (dotZ > maxDot) {
                         maxDot = dotZ; this.playerVars.pickingPlane = planeZ
                     }
-
                     scene.activeCamera.detachControl()
                     break       
                 default:
@@ -389,8 +389,16 @@ export class sceneBuilder {
                 // translate
                 let draggingDistance = Vector3.Dot(this.playerVars.draggingAxis, translation)
                 if (this.worldMap.canMove([this.playerVars.pickedMesh.metadata.pieceID], this.playerVars.draggingAxis.scale(Math.sign(draggingDistance)*Math.ceil(Math.abs(draggingDistance))))) {
-                    this.playerVars.translationDistance = draggingDistance
+                    this.playerVars.translationDistance = this.playerVars.maxDistance[Math.sign(draggingDistance)]
+                    if (this.playerVars.translationDistance == undefined) this.playerVars.translationDistance = draggingDistance
                     this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
+                } 
+                else {
+                    if (this.playerVars.maxDistance[Math.sign(draggingDistance)] == undefined) {
+                        this.playerVars.maxDistance[Math.sign(draggingDistance)]=Math.sign(draggingDistance)*(Math.ceil(Math.abs(draggingDistance)) - 1)
+                        this.playerVars.translationDistance = this.playerVars.maxDistance[Math.sign(draggingDistance)]
+                        this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
+                        }
                 }
             }
         }
@@ -405,8 +413,7 @@ export class sceneBuilder {
                 this.worldMap.place(oldMap)
                 // cleanup
                 scene.activeCamera.attachControl(scene.getEngine().getRenderingCanvas())
-                this.playerVars.pickedMesh=undefined
-                this.playerVars.translationDistance = 0
+                this.playerVars={myPlayMode: true}
             }
         }
     }
