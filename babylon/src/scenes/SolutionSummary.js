@@ -18,6 +18,8 @@ import {
     VertexData,
     AnimationGroup,
     BoundingInfo,
+    Plane,
+    Mesh,
   } from "@babylonjs/core";
 import { Voxel } from "@kgeusens/burr-data"
 import { rotationVector } from '../utils/rotation'
@@ -320,19 +322,35 @@ export class sceneBuilder {
                 }
             }
         })
+
         // react to mouse events
         scene.onPointerDown = (evt, result) => {
             switch (true) {
                 case (result.hit && evt.button==0 && this.playerVars.myPlayMode) :
+                    this.playerVars.planeX = new Plane(1,0,0, -1*result.pickedPoint.x)
+                    this.playerVars.planeY = new Plane(0,1,0, -1*result.pickedPoint.y)
+                    this.playerVars.planeZ = new Plane(0,0,1, -1*result.pickedPoint.z)
                     this.playerVars.pickedMesh=result.pickedMesh
-                    scene.activeCamera.detachControl()
+                    this.playerVars.pickedPoint=result.pickedPoint
+                    this.playerVars.pickedMeshStartingPosition = result.pickedMesh.parent.position
                     this.playerVars.holdingX=scene.pointerX
                     this.playerVars.holdingY=scene.pointerY
-                    this.playerVars.faceNormal = result.getNormal(true)
+                    this.playerVars.pickingPoint=result.pickedPoint
+
                     let cameraNormal = scene.activeCamera.getDirection(Vector3.Forward())
-                    let dot = Vector3.Dot(this.playerVars.faceNormal, cameraNormal)
-                    this.playerVars.projectedFace = this.playerVars.faceNormal.subtract(cameraNormal.scale(dot))
-                    console.log(this.playerVars.projectedFace)
+                    this.playerVars.pickingPlane = this.playerVars.planeX
+                    let dotX = Math.abs(Vector3.Dot(this.playerVars.planeX.normal, cameraNormal))
+                    let maxDot=dotX
+                    let dotY= Math.abs(Vector3.Dot(this.playerVars.planeY.normal, cameraNormal))
+                    if (dotY > maxDot) {
+                        maxDot = dotY; this.playerVars.pickingPlane = this.playerVars.planeY
+                    }
+                    let dotZ= Math.abs(Vector3.Dot(this.playerVars.planeZ.normal, cameraNormal))
+                    if (dotZ > maxDot) {
+                        maxDot = dotZ; this.playerVars.pickingPlane = this.playerVars.planeZ
+                    }
+
+                    scene.activeCamera.detachControl()
                     break       
                 default:
                     this.playerVars.pickedMesh = undefined
@@ -343,19 +361,20 @@ export class sceneBuilder {
             // Shape Dragging logic
             //
             if (this.playerVars.myPlayMode == true && this.playerVars.pickedMesh ) {
-                let mouseMovement = new Vector3(scene.pointerX - this.playerVars.holdingX, 0, scene.pointerY - this.playerVars.holdingY)
-                let delta = Vector3.Dot(this.playerVars.projectedFace, mouseMovement)
-                let deltavector = this.playerVars.faceNormal.scale(delta)
-                deltavector.scaleInPlace(100)
-                deltavector=deltavector.floor()
-                deltavector.scaleInPlace(0.01)
-                console.log(deltavector)
+                let ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), scene.activeCamera)
+                let rayDistance = ray.intersectsPlane(this.playerVars.pickingPlane)
+                let pickingPoint = ray.origin.add(ray.direction.scale(rayDistance))
+                // change position of picked mesh
+                let translation = pickingPoint.subtract(this.playerVars.pickedPoint)
+                this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(translation)
             }
         }
         scene.onPointerUp = (evt, result) => {
-            scene.activeCamera.attachControl(scene.getEngine().getRenderingCanvas())
-            this.playerVars.pickedMesh=undefined
-          }
+            if (this.playerVars.pickedMesh) {
+                this.playerVars.pickedMesh=undefined
+                scene.activeCamera.attachControl(scene.getEngine().getRenderingCanvas())
+            }
+        }
     }
     get frame() {
         return this._frame
