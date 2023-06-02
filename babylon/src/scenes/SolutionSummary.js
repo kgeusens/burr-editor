@@ -362,12 +362,33 @@ export class sceneBuilder {
             // Shape Dragging logic
             //
             if (this.playerVars.myPlayMode == true && this.playerVars.pickedMesh ) {
+                // calculate the translation vector
                 let ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), scene.activeCamera)
                 let rayDistance = ray.intersectsPlane(this.playerVars.pickingPlane)
                 let pickingPoint = ray.origin.add(ray.direction.scale(rayDistance))
-                // change position of picked mesh
                 let translation = pickingPoint.subtract(this.playerVars.pickedPoint)
-                this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(translation)
+
+                // check along which axis we should be dragging
+                let vecX=new Vector3(1,0,0)
+                this.playerVars.draggingAxis = vecX
+                let dotX = Math.abs(Vector3.Dot(vecX, translation))
+                let maxDot=dotX
+                let vecY=new Vector3(0,1,0)
+                let dotY = Math.abs(Vector3.Dot(vecY, translation))
+                if (dotY > maxDot) {
+                    maxDot = dotY; this.playerVars.draggingAxis=vecY
+                }
+                let vecZ=new Vector3(0,0,1)
+                let dotZ= Math.abs(Vector3.Dot(vecZ, translation))
+                if (dotZ > maxDot) {
+                    maxDot = dotZ; this.playerVars.draggingAxis=vecZ
+                }
+                console.log(this.playerVars.draggingAxis)
+
+                // translate
+                let draggingDistance = Vector3.Dot(this.playerVars.draggingAxis, translation)
+                this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(draggingDistance))
+//                this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(translation)
             }
         }
         scene.onPointerUp = (evt, result) => {
