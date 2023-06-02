@@ -300,6 +300,7 @@ export class sceneBuilder {
     outline
     pieceID
     stateCallback
+    worldMap
     _frame
     _animationGroup = new AnimationGroup("solutionPlayer")
     _framerate=25 // frames per second
@@ -334,6 +335,7 @@ export class sceneBuilder {
                     this.playerVars.holdingX=scene.pointerX
                     this.playerVars.holdingY=scene.pointerY
                     this.playerVars.pickingPoint=result.pickedPoint
+                    this.playerVars.translationDistance = 0
 
                     let cameraNormal = scene.activeCamera.getDirection(Vector3.Forward())
                     let planeX=new Plane(1,0,0, -1*result.pickedPoint.x)
@@ -386,14 +388,19 @@ export class sceneBuilder {
 
                 // translate
                 let draggingDistance = Vector3.Dot(this.playerVars.draggingAxis, translation)
-                this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(draggingDistance))
-//                this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(translation)
+                if (this.worldMap.canMove([this.playerVars.pickedMesh.metadata.pieceID], this.playerVars.draggingAxis.scale(Math.sign(draggingDistance)*Math.ceil(Math.abs(draggingDistance))))) {
+                    this.playerVars.translationDistance = draggingDistance
+                    this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
+                }
             }
         }
         scene.onPointerUp = (evt, result) => {
             if (this.playerVars.pickedMesh) {
-                this.playerVars.pickedMesh=undefined
+                this.playerVars.translationDistance = Math.round(this.playerVars.translationDistance)
+                this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
                 scene.activeCamera.attachControl(scene.getEngine().getRenderingCanvas())
+                this.playerVars.pickedMesh=undefined
+                this.playerVars.translationDistance = 0
             }
         }
     }
@@ -605,6 +612,9 @@ export class sceneBuilder {
         if (scene.activeCamera && this.isDirty) {
             scene.activeCamera.setTarget(this.boundingInfo.boundingBox.center);
         }
+
+        // build the worldMap
+        if (this.isDirty) this.worldMap = puzzle.getWorldMap({solution: solution, problem: problem})
     }
 }
 
