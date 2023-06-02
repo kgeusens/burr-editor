@@ -327,9 +327,7 @@ export class sceneBuilder {
         scene.onPointerDown = (evt, result) => {
             switch (true) {
                 case (result.hit && evt.button==0 && this.playerVars.myPlayMode) :
-                    this.playerVars.planeX = new Plane(1,0,0, -1*result.pickedPoint.x)
-                    this.playerVars.planeY = new Plane(0,1,0, -1*result.pickedPoint.y)
-                    this.playerVars.planeZ = new Plane(0,0,1, -1*result.pickedPoint.z)
+                    // calculate the pickingPlane
                     this.playerVars.pickedMesh=result.pickedMesh
                     this.playerVars.pickedPoint=result.pickedPoint
                     this.playerVars.pickedMeshStartingPosition = result.pickedMesh.parent.position
@@ -338,16 +336,19 @@ export class sceneBuilder {
                     this.playerVars.pickingPoint=result.pickedPoint
 
                     let cameraNormal = scene.activeCamera.getDirection(Vector3.Forward())
-                    this.playerVars.pickingPlane = this.playerVars.planeX
-                    let dotX = Math.abs(Vector3.Dot(this.playerVars.planeX.normal, cameraNormal))
+                    let planeX=new Plane(1,0,0, -1*result.pickedPoint.x)
+                    this.playerVars.pickingPlane = planeX
+                    let dotX = Math.abs(Vector3.Dot(planeX.normal, cameraNormal))
                     let maxDot=dotX
-                    let dotY= Math.abs(Vector3.Dot(this.playerVars.planeY.normal, cameraNormal))
+                    let planeY=new Plane(0,1,0, -1*result.pickedPoint.y)
+                    let dotY= Math.abs(Vector3.Dot(planeY.normal, cameraNormal))
                     if (dotY > maxDot) {
-                        maxDot = dotY; this.playerVars.pickingPlane = this.playerVars.planeY
+                        maxDot = dotY; this.playerVars.pickingPlane = planeY
                     }
-                    let dotZ= Math.abs(Vector3.Dot(this.playerVars.planeZ.normal, cameraNormal))
+                    let planeZ=new Plane(0,0,1, -1*result.pickedPoint.z)
+                    let dotZ= Math.abs(Vector3.Dot(planeZ.normal, cameraNormal))
                     if (dotZ > maxDot) {
-                        maxDot = dotZ; this.playerVars.pickingPlane = this.playerVars.planeZ
+                        maxDot = dotZ; this.playerVars.pickingPlane = planeZ
                     }
 
                     scene.activeCamera.detachControl()
