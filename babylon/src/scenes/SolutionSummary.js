@@ -383,7 +383,6 @@ export class sceneBuilder {
                 if (dotZ > maxDot) {
                     maxDot = dotZ; this.playerVars.draggingAxis=vecZ
                 }
-                console.log(this.playerVars.draggingAxis)
 
                 // translate
                 let draggingDistance = Vector3.Dot(this.playerVars.draggingAxis, translation)
