@@ -20,6 +20,7 @@ import {
     BoundingInfo,
     Plane,
     Mesh,
+    ExecuteCodeAction,
   } from "@babylonjs/core";
 import { Voxel } from "@kgeusens/burr-data"
 import { rotationVector } from '../utils/rotation'
@@ -38,7 +39,11 @@ class Ghost {
     alpha=1
     _rotationIndex = 0
     _position = new Vector3(0,0,0)
+    _pieceID
+    playerVars={}
 
+    get pieceID() {return this._pieceID}
+    set pieceID(val) { this._pieceID = val}
     get x() { return this.voxel.x }
     get y() { return this.voxel.y }
     get z() { return this.voxel.z }
@@ -370,51 +375,63 @@ export class sceneBuilder {
                 let pickingPoint = ray.origin.add(ray.direction.scale(rayDistance))
                 let translation = pickingPoint.subtract(this.playerVars.pickedPoint)
 
-                // check along which axis we should be dragging
-                let vecX=new Vector3(1,0,0)
-                this.playerVars.draggingAxis = vecX
-                let dotX = Math.abs(Vector3.Dot(vecX, translation))
-                let maxDot=dotX
-                let vecY=new Vector3(0,1,0)
-                let dotY = Math.abs(Vector3.Dot(vecY, translation))
-                if (dotY > maxDot) {
-                    maxDot = dotY; this.playerVars.draggingAxis=vecY
-                }
-                let vecZ=new Vector3(0,0,1)
-                let dotZ= Math.abs(Vector3.Dot(vecZ, translation))
-                if (dotZ > maxDot) {
-                    maxDot = dotZ; this.playerVars.draggingAxis=vecZ
+                // Check along which axis we should be dragging.
+                // Only check if we do not know this yet.
+                if (!this.playerVars.draggingAxis) {
+                    let vecX=new Vector3(1,0,0)
+                    this.playerVars.draggingAxis = vecX
+                    let dotX = Math.abs(Vector3.Dot(vecX, translation))
+                    let maxDot=dotX
+
+                    let vecY=new Vector3(0,1,0)
+                    let dotY = Math.abs(Vector3.Dot(vecY, translation))
+                    if (dotY > maxDot) {
+                        maxDot = dotY; this.playerVars.draggingAxis=vecY
+                    }
+
+                    let vecZ=new Vector3(0,0,1)
+                    let dotZ= Math.abs(Vector3.Dot(vecZ, translation))
+                    if (dotZ > maxDot) {
+                        maxDot = dotZ; this.playerVars.draggingAxis=vecZ
+                    }
+                    let draggingDistance = Vector3.Dot(this.playerVars.draggingAxis, translation)
+                    if (! this.worldMap.canMove([this.playerVars.pickedMesh.metadata.pieceID], this.playerVars.draggingAxis.scale(Math.sign(draggingDistance)))) {
+                        delete this.playerVars.draggingAxis
+                    }                    
                 }
 
                 // translate
-                let draggingDistance = Vector3.Dot(this.playerVars.draggingAxis, translation)
-                if (this.worldMap.canMove([this.playerVars.pickedMesh.metadata.pieceID], this.playerVars.draggingAxis.scale(Math.sign(draggingDistance)*Math.ceil(Math.abs(draggingDistance))))) {
-                    this.playerVars.translationDistance = this.playerVars.maxDistance[Math.sign(draggingDistance)]
-                    if (this.playerVars.translationDistance == undefined) this.playerVars.translationDistance = draggingDistance
-                    this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
-                } 
-                else {
-                    if (this.playerVars.maxDistance[Math.sign(draggingDistance)] == undefined) {
-                        this.playerVars.maxDistance[Math.sign(draggingDistance)]=Math.sign(draggingDistance)*(Math.ceil(Math.abs(draggingDistance)) - 1)
-                        this.playerVars.translationDistance = this.playerVars.maxDistance[Math.sign(draggingDistance)]
+                if (this.playerVars.draggingAxis) {
+                    let draggingDistance = Vector3.Dot(this.playerVars.draggingAxis, translation)
+                    if (this.worldMap.canMove([this.playerVars.pickedMesh.metadata.pieceID], this.playerVars.draggingAxis.scale(Math.sign(draggingDistance)*Math.ceil(Math.abs(draggingDistance))))) {
+                        if (this.playerVars.maxDistance[Math.sign(draggingDistance)] == undefined) this.playerVars.translationDistance = draggingDistance
+                        else this.playerVars.translationDistance = Math.sign(draggingDistance)*Math.min(this.playerVars.maxDistance[Math.sign(draggingDistance)], Math.abs(draggingDistance))
                         this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
+                    } 
+                    else {
+                        // KG. We hit a barrier, move no further. Logic needs to be reviewed I think.
+                        if (this.playerVars.maxDistance[Math.sign(draggingDistance)] == undefined) {
+                            this.playerVars.maxDistance[Math.sign(draggingDistance)]=(Math.ceil(Math.abs(draggingDistance)) - 1)
+                            this.playerVars.translationDistance = Math.sign(draggingDistance)*Math.min(this.playerVars.maxDistance[Math.sign(draggingDistance)], Math.abs(draggingDistance))
+                            this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
                         }
+                    }
                 }
             }
         }
         scene.onPointerUp = (evt, result) => {
-            if (this.playerVars.pickedMesh) {
-                this.playerVars.translationDistance = Math.round(this.playerVars.translationDistance)
-                this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
-                // update the worldmap
-                let oldMap = this.worldMap.filter(this.playerVars.pickedMesh.metadata.pieceID)
-                oldMap.translate(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
-                this.worldMap.delete(this.playerVars.pickedMesh.metadata.pieceID)
-                this.worldMap.place(oldMap)
+            if (this.playerVars.draggingAxis) {
+                    this.playerVars.translationDistance = Math.round(this.playerVars.translationDistance)
+                    this.playerVars.pickedMesh.parent.position = this.playerVars.pickedMeshStartingPosition.add(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
+                    // update the worldmap
+                    let oldMap = this.worldMap.filter(this.playerVars.pickedMesh.metadata.pieceID)
+                    oldMap.translate(this.playerVars.draggingAxis.scale(this.playerVars.translationDistance))
+                    this.worldMap.delete(this.playerVars.pickedMesh.metadata.pieceID)
+                    this.worldMap.place(oldMap)
                 // cleanup
-                scene.activeCamera.attachControl(scene.getEngine().getRenderingCanvas())
-                this.playerVars={myPlayMode: true}
             }
+            this.playerVars={myPlayMode: true}
+            scene.activeCamera.attachControl(scene.getEngine().getRenderingCanvas())
         }
     }
     get frame() {
