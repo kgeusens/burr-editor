@@ -28,8 +28,6 @@
         if (props.enabled) theCamera.attachControl(canvas, true)
     };
 
-    console.log(props.enabled, theCamera)
-
     watch(theCanvas, (newv, oldv) => {if (newv) register(newv)} )
     watch(() => props.enabled, (newval) => { 
         theView.value.enabled = newval;

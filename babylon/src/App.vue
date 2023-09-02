@@ -105,7 +105,7 @@
                 </BabylonView>
               </BabylonCamera>
             </BabylonScene>
-            <BabylonScene v-if="solution">
+            <BabylonScene>
               <BabylonSceneModel ref="player" :model=SolutionViewer :detail=solutionDetail>
               </BabylonSceneModel>
               <BabylonCamera id="3">

@@ -523,45 +523,47 @@ export class sceneBuilder {
         var { puzzle, solution, problem, delta = 0, bevel = 0, alpha = 1, outline = true } = options
         // turn the pieces (voxel data) into ghosts (3D representations)
         // rotate to the correct position
-        let pieceMap = solution.pieceMap
-        for (let idx of solution.pieceNumbers) {
-            let shapeID=problem.shapeMap[idx]
-            let shape=puzzle.shapes.voxel[shapeID]
-            if (!this.pieces[idx]) {
-                // new piece, need to create
-                this.isDirty=true
-                let g = new Ghost(shape, delta, bevel,new TransformNode("root"))
-                g.alpha = alpha
-                g.outline = outline
-                g.pieceID = idx
-                g.rotationIndex = pieceMap[idx].rotation
-                g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
-                g.render()
-                this.pieces[idx]=g
-            }
-            else if (shape.stateString != this.pieces[idx].voxel.stateString) {
-                this.isDirty=true
-                // different shape, delete
-                let p = this.pieces[idx].parent
-                this.pieces[idx].dispose()
-                // and replace
-                let g = new Ghost(shape, delta, bevel, p)
-                g.alpha = alpha
-                g.outline = outline
-                g.pieceID = idx
-                g.rotationIndex = pieceMap[idx].rotation
-                g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
-                g.render()
-                this.pieces[idx] = g
-            }
-            else {
-                // same shape, same index. check and set rotation
-                let g=this.pieces[idx]
-                if (g.rotationIndex != pieceMap[idx].rotation) {
+        let pieceMap = solution?.pieceMap
+        if (solution) {
+            for (let idx of solution.pieceNumbers) {
+                let shapeID=problem.shapeMap[idx]
+                let shape=puzzle.shapes.voxel[shapeID]
+                if (!this.pieces[idx]) {
+                    // new piece, need to create
                     this.isDirty=true
+                    let g = new Ghost(shape, delta, bevel,new TransformNode("root"))
+                    g.alpha = alpha
+                    g.outline = outline
                     g.pieceID = idx
-                    g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
                     g.rotationIndex = pieceMap[idx].rotation
+                    g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
+                    g.render()
+                    this.pieces[idx]=g
+                }
+                else if (shape.stateString != this.pieces[idx].voxel.stateString) {
+                    this.isDirty=true
+                    // different shape, delete
+                    let p = this.pieces[idx].parent
+                    this.pieces[idx].dispose()
+                    // and replace
+                    let g = new Ghost(shape, delta, bevel, p)
+                    g.alpha = alpha
+                    g.outline = outline
+                    g.pieceID = idx
+                    g.rotationIndex = pieceMap[idx].rotation
+                    g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
+                    g.render()
+                    this.pieces[idx] = g
+                }
+                else {
+                    // same shape, same index. check and set rotation
+                    let g=this.pieces[idx]
+                    if (g.rotationIndex != pieceMap[idx].rotation) {
+                        this.isDirty=true
+                        g.pieceID = idx
+                        g.position = new Vector3(pieceMap[idx].position.x, pieceMap[idx].position.y, pieceMap[idx].position.z)
+                        g.rotationIndex = pieceMap[idx].rotation
+                    }
                 }
             }
         }
@@ -618,11 +620,12 @@ export class sceneBuilder {
     }
 
     setOptions(options) {
-        // Performance : only process changes
         var { puzzle, solution, problem, pieceColors = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
         this.isDirty=false
         // Build the ghosts in this.pieces
         this.buildGhosts(options)
+        // if there is no solution, there is nothing more to do. Return.
+        if (!solution) return
         // Process movePositions and build the player animation
         this.movePositions = solution.separation[0]?solution.separation[0].movePositionsAll:undefined
         // Build the animation
@@ -651,7 +654,7 @@ export class sceneBuilder {
 /*
 Requirements for interactive puzzle solver
 ------------------------------------------
-- each mesh must be able to construct his proer worldmap.
+- each mesh must be able to construct his proper worldmap.
   To do that, it must know his own:
   + pieceID (for the value in the worldmap)
   + voxel (to know the shape it occupies in the worldmap)
