@@ -11,8 +11,8 @@
     const webGPUSupported = await WebGPUEngine.IsSupportedAsync;
     if (webGPUSupported) {console.log("WebGPU supported")}
     const myEngine = await EngineFactory.CreateAsync(workerCanvas)
-    myEngine.views=[]
 //    const myEngine = new Engine(workerCanvas, true);
+    myEngine.views=[]
 
     provide("engine", myEngine)
 

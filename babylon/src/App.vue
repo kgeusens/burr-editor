@@ -13,7 +13,7 @@
           <v-tab key="2" value="problems" :border="tab == 'problems'">
             Problems
           </v-tab>
-          <v-tab key="3" value="solutions" :border="tab == 'solutions'">
+          <v-tab v-if="solution" key="3" value="solutions" :border="tab == 'solutions'">
             Solution
           </v-tab>
         </v-tabs>
@@ -105,7 +105,7 @@
                 </BabylonView>
               </BabylonCamera>
             </BabylonScene>
-            <BabylonScene>
+            <BabylonScene v-if="solution">
               <BabylonSceneModel ref="player" :model=SolutionViewer :detail=solutionDetail>
               </BabylonSceneModel>
               <BabylonCamera id="3">
