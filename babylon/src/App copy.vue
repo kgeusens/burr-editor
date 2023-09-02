@@ -39,9 +39,8 @@
     <PWBPDialog :show="showPWBPDialog" @newShape="loadPuzzle" @newName="setFilename">
     </PWBPDialog>
 
-    <v-main >
-      <v-navigation-drawer 
-        v-if="tab == 'puzzle' && puzzle.shapes"
+    <v-main v-show="tab == 'puzzle' && puzzle.shapes">
+      <v-navigation-drawer
         id="puzzleDrawer"
         key="puzzleDrawer"
         width="450"
@@ -53,8 +52,30 @@
         <PuzzleDrawer :puzzle="puzzle" @newShape="loadShape" @setReadOnly="setReadOnly">
         </PuzzleDrawer>
       </v-navigation-drawer>
-      <v-navigation-drawer 
-        v-if="tab == 'problems' && puzzle.shapes"
+      <v-layout-item position="top" class="text-start" size="0">
+        <div class="ma-4">
+          <span v-if=drawer style="display:inline-block;width:450px"></span>
+          <v-btn @click.stop="drawer = !drawer" icon="mdi-arrow-left-right" size="small" elevation="4" />
+        </div>
+      </v-layout-item>
+      <v-card width="100%" height="100%">
+        <Suspense>
+        <BabylonEngine>
+          <BabylonScene>
+            <BabylonSceneModel :model=VoxelEditor :detail=shapeDetail @newState=updateShapeState>
+            </BabylonSceneModel>
+            <BabylonCamera id="1">
+              <BabylonView width="parent" height="parent">
+              </BabylonView>
+            </BabylonCamera>
+          </BabylonScene>
+        </BabylonEngine>
+        </Suspense>
+      </v-card>
+    </v-main>
+
+    <v-main v-show="tab == 'problems' && puzzle.shapes">
+      <v-navigation-drawer
         id="problemDrawer"
         key="problemDrawer"
         width="450"
@@ -65,8 +86,30 @@
         >
         <ProblemDrawer :puzzle="puzzle" v-model:problemIndex="problemIndex"/>
       </v-navigation-drawer>
-      <v-navigation-drawer 
-        v-if="tab == 'solutions' && puzzle.shapes"
+      <v-layout-item model-value position="top" class="text-start" size="0">
+        <div class="ma-4">
+          <span v-if=drawer style="display:inline-block;width:450px"></span>
+          <v-btn @click.stop="drawer = !drawer" icon="mdi-arrow-left-right" size="small" elevation="4" />
+        </div>
+      </v-layout-item>
+      <v-card width="100%" height="100%">
+        <Suspense>
+        <BabylonEngine>
+          <BabylonScene>
+            <BabylonSceneModel :model=ProblemViewer :detail=problemDetail>
+            </BabylonSceneModel>
+            <BabylonCamera id="1">
+              <BabylonView width="parent" height="parent">
+              </BabylonView>
+            </BabylonCamera>
+          </BabylonScene>
+        </BabylonEngine>
+        </Suspense>
+      </v-card>
+    </v-main>
+
+    <v-main v-show="tab == 'solutions' && puzzle.shapes">
+      <v-navigation-drawer
         id="solutionDrawer"
         key="solutionDrawer"
         width="450"
@@ -77,46 +120,25 @@
         >
         <SolutionDrawer :puzzle="puzzle" @playerAction="playerAction" @update:pieceColors="updatePieceColors" v-model:problemIndex="problemIndex" v-model:solutionIndex="solutionIndex" v-model:playerMove="solutionMove"/>
       </v-navigation-drawer>
-
-      <v-layout-item position="top" class="text-start" size="0">
+      <v-layout-item model-value position="top" class="text-start" size="0">
         <div class="ma-4">
           <span v-if=drawer style="display:inline-block;width:450px"></span>
           <v-btn @click.stop="drawer = !drawer" icon="mdi-arrow-left-right" size="small" elevation="4" />
         </div>
       </v-layout-item>
-
       <v-card width="100%" height="100%">
         <Suspense>
         <BabylonEngine>
-          <BabylonCanvas width="parent" height="parent">
-            <BabylonScene>
-              <BabylonSceneModel :model=VoxelEditor :detail=shapeDetail @newState=updateShapeState>
-              </BabylonSceneModel>
-              <BabylonCamera id="1">
-                <BabylonView :enabled="tab == 'puzzle'">
-                </BabylonView>
-              </BabylonCamera>
-            </BabylonScene>
-            <BabylonScene>
-              <BabylonSceneModel :model=ProblemViewer :detail=problemDetail>
-              </BabylonSceneModel>
-              <BabylonCamera id="2">
-                <BabylonView :enabled="tab == 'problems'">
-                </BabylonView>
-              </BabylonCamera>
-            </BabylonScene>
-            <BabylonScene>
-              <BabylonSceneModel ref="player" :model=SolutionViewer :detail=solutionDetail>
-              </BabylonSceneModel>
-              <BabylonCamera id="3">
-                <BabylonView :enabled="tab == 'solutions'">
-                </BabylonView>
-              </BabylonCamera>
-            </BabylonScene>
-          </BabylonCanvas>
-        </BabylonEngine>
-        </Suspense>
-
+          <BabylonScene>
+            <BabylonSceneModel ref="player" :model=SolutionViewer :detail=solutionDetail>
+            </BabylonSceneModel>
+            <BabylonCamera id="1">
+              <BabylonView width="parent" height="parent">
+              </BabylonView>
+            </BabylonCamera>
+          </BabylonScene>
+          </BabylonEngine>
+      </Suspense>
       </v-card>
     </v-main>
 
@@ -134,7 +156,6 @@ import BabylonScene from "./components/babylon/BabylonScene.vue";
 import BabylonSceneModel from "./components/babylon/BabylonSceneModel.vue";
 import BabylonCamera from "./components/babylon/BabylonCamera.vue";
 import BabylonView from "./components/babylon/BabylonView.vue";
-import BabylonCanvas from "./components/babylon/BabylonCanvas.vue";
 import { sceneBuilder } from "./scenes/ShapeEditor.js";
 // import { sceneBuilder as bodyBuilder } from "./scenes/ShapeBody.js";
 import { sceneBuilder as problemBuilder } from "./scenes/ProblemSummary.js";
@@ -178,7 +199,6 @@ export default {
     BabylonEngine,
     BabylonCamera,
     BabylonView,
-    BabylonCanvas,
   },
   methods: {
     loadShape(i) {
