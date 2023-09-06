@@ -7,10 +7,6 @@
       <v-btn icon @click="addShape">
         <v-icon>mdi-playlist-plus</v-icon>
       </v-btn>
-      <v-btn icon @click="DATA.readOnly = !DATA.readOnly">
-        <v-icon v-if="DATA.readOnly">mdi-lock-outline</v-icon>
-        <v-icon v-if="!DATA.readOnly">mdi-lock-open-variant-outline</v-icon>
-      </v-btn>
     </v-toolbar>
     <v-card class="overflow-y-auto" max-height="400"  >
       <v-list mandatory v-model:selected="DATA.selectedItem">
@@ -36,6 +32,7 @@
             >
             </v-text-field></v-col>
             <v-col class = "pa-0" align="right">
+              <v-icon v-if="DATA.selectedItem[0] == i" @click.stop="cloneShape" icon="mdi-camera-plus-outline"></v-icon>
               <v-icon v-if="DATA.selectedItem[0] == i && props.puzzle.shapes.voxel.length > 1" @click.stop="deleteShape" icon="mdi-delete"></v-icon>
             </v-col>
           </v-row></v-container></v-list-item-title>
@@ -49,16 +46,21 @@
   import { reactive, computed, watch, nextTick } from 'vue'
 //  import { Puzzle, Voxel } from "@kgeusens/burr-data"
 
-  const emit = defineEmits(["newShape", "setReadOnly"])
+  const emit = defineEmits(["newShape"])
   const props = defineProps(
     { 
         puzzle: { type: Object, default: null }, 
     }
     );
-  const DATA= reactive({ selectedItem: [0], readOnly: true })
+  const DATA= reactive({ selectedItem: [0] })
 
   function addShape() {
     let idx=props.puzzle.addShape()
+    DATA.selectedItem=[idx]
+  }
+  function cloneShape() {
+    console.log(selectedShape.value)
+    let idx=props.puzzle.addShape(selectedShape.value)
     DATA.selectedItem=[idx]
   }
   function deleteShape() {
@@ -86,7 +88,4 @@
     emit("newShape", newval)
     })
   watch(() => props.puzzle, (newval) => DATA.selectedItem=[0])
-  watch(() => DATA.readOnly, (newval) => {
-    emit("setReadOnly", newval)
-    })
 </script>

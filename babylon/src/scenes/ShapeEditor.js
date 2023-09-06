@@ -12,14 +12,102 @@ import {
   HighlightLayer,
   CSG,
   VertexData,
+  CubicEase,
+  Animation,
 } from "@babylonjs/core";
-import { AdvancedDynamicTexture, Rectangle, TextBlock } from "@babylonjs/gui";
+import { AdvancedDynamicTexture, Rectangle, TextBlock, Control, Ellipse, Image, Grid as GUIGrid, Button } from "@babylonjs/gui";
 import { Voxel } from "@kgeusens/burr-data"
 
 var scene
 var BoxMaterials
 var ControlMaterials
 var advancedTexture
+var isPainting = false
+var theMenuPanel
+
+// hack to allow animation of menu
+Control.prototype.getScene = function () { return scene };
+class MenuPanel {
+    _item=null
+    _panel=null
+    _showing=false
+    _ease=null
+    _width=320
+    _gutter=40
+    _margin=8
+    get control() { return this._item }
+    get menuPanel() { return this._panel}
+    get isShowing() { return this._showing }
+    get width() { return this._width }
+    get ease() { return this._ease }
+    get panelWidth() { return (this._width - this._gutter - this._margin) }
+    get width() { return this._width }
+    set isShowing(val) {
+        if (val != this._showing) {
+            if (val) Animation.CreateAndStartAnimation("VisAnim", this.control, "left", 10, 10, this.panelWidth, 0, 0, this._ease)
+            else     Animation.CreateAndStartAnimation("VisAnim", this.control, "left", 10, 10, 0, this.panelWidth, 0, this._ease)
+            this._showing = val
+        }
+    }
+    toggle() { this.isShowing = !this.isShowing }
+    addControl(control, row=1) { 
+        this._panel.addControl(control,row,0)
+    }
+    constructor(control=null) {
+        var container = new Rectangle("menu");
+        var mleft = new GUIGrid("menu panel");
+        var bt = new Button("menu button");
+        var btCircle = new Ellipse()
+        var btIcon = new Image("arrow","https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/icons/arrow-left-right.svg#")
+
+        this._ease = new CubicEase();
+        this._ease.setEasingMode(CubicEase.EASINGMODE_EASEINOUT)
+        this._item=container
+        this._panel=mleft
+
+        bt.widthInPixels = this._gutter
+        bt.heightInPixels = this._gutter
+        bt.thickness = 2;
+        bt.background = "white";
+        bt.verticalAlignment=2
+        bt.horizontalAlignment=0
+        bt.cornerRadius = this._gutter/2
+
+        btCircle.widthInPixels = 40
+        btCircle.heightInPixels = 40
+
+        btIcon.scaleX=.6
+        btIcon.scaleY=.6
+
+        btCircle.addControl(btIcon)
+        bt.addControl(btCircle)
+
+        mleft.widthInPixels = this.panelWidth
+        mleft.addRowDefinition(50, true)
+        mleft.addRowDefinition(1)
+        mleft.addRowDefinition(50, true)
+        mleft.addRowDefinition(50, true)
+        mleft.horizontalAlignment=1
+        mleft.color = "Orange";
+        mleft.thickness = 2;
+        mleft.background = "white";
+//        mleft.alpha=0.7
+
+        container.widthInPixels = this.width
+        container.height = 1
+        container.thickness = 0
+        container.horizontalAlignment=1
+        container.left=this.panelWidth
+        container.background = "transparent"
+        container.addControl(mleft)
+        container.addControl(bt)
+        container.isPointerBlocker=true
+
+        bt.onPointerClickObservable.add((evt) => {this.toggle()})
+
+        if (control !== null) { control.addControl(container) }
+    }
+}
 
 class Box {
     //position
@@ -57,6 +145,7 @@ class Box {
             new ExecuteCodeAction(
                 ActionManager.OnLeftPickTrigger, (evt) => {
                     if (this.readOnly) return
+                    isPainting = true
                     x=evt.source.position.x
                     y=evt.source.position.y
                     z=evt.source.position.z
@@ -67,9 +156,24 @@ class Box {
         )
         this._mesh.actionManager.registerAction(
             new ExecuteCodeAction(
-                ActionManager.OnPointerOverTrigger, (evt) => {
-                        this.highlight("highlightBox", true)
+                ActionManager.OnPickUpTrigger, (evt) => {
+                    isPainting = false;
+//                    this.highlight("highlightBox", false)
                 }
+            )
+        )
+        this._mesh.actionManager.registerAction(
+            new ExecuteCodeAction(
+                ActionManager.OnPointerOverTrigger, (evt) => {
+                    if (!this.readOnly && isPainting) {
+                        this.highlight("highlightBox", true)
+                        x=evt.source.position.x
+                        y=evt.source.position.y
+                        z=evt.source.position.z
+                        this.state+=1;
+                        this.render()
+                    }
+            }
             )
         )
         this._mesh.actionManager.registerAction(
@@ -454,6 +558,8 @@ class GridControls {
         this.setSize(this.x, this.y, this.z)
     } 
     setSize(x, y, z) {
+        function showMenu(axis, idx, show=true) {
+        }
         for (let axis of ["x","y","z"]) {
             for (let idx=0; idx < this.dimensions[axis];idx++) {
                 // create the layer selectors (only) if needed
@@ -471,6 +577,7 @@ class GridControls {
                             ActionManager.OnLeftPickTrigger, (evt) => {
                                 this._grid._layerIsActive[axis][idx]=!oldHighlight
                                 oldHighlight=this._grid._layerIsActive[axis][idx]
+                                showMenu(axis, idx)
                                 this.render()
                             }
                         )
@@ -666,6 +773,10 @@ export class sceneBuilder {
         }
         advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("BurrUI");
         advancedTexture.layer.layerMask=1
+
+        theMenuPanel = new MenuPanel
+        advancedTexture.addControl(theMenuPanel.control)
+
         ControlMaterials={ x: {material: new StandardMaterial("xMaterial", scene), alpha: 1, color: new Color3(1, 0, 0), rotation: new Vector3(0,0,-Math.PI/2)},
                         y: {material: new StandardMaterial("yMaterial", scene), alpha: 1, color: new Color3(0, 1, 0), rotation: new Vector3(0,0,0)},
                         z: {material: new StandardMaterial("zMaterial", scene), alpha: 1, color: new Color3(0, 0, 1), rotation: new Vector3(Math.PI/2,0,0)},
@@ -679,13 +790,29 @@ export class sceneBuilder {
         rootNode.position=new Vector3(0,0,0)
         this.grid=new Grid(new Voxel({}), rootNode)
         this.setOptions(options)
+
+        //  Following logic prevents the camera from rotating when click starts on a mesh
+        scene.onPointerObservable.add((pointerInfo) => {
+            if (this.grid.readOnly) return
+            switch (pointerInfo.type) {
+                case PointerEventTypes.POINTERDOWN:
+                    if (pointerInfo.pickInfo.pickedMesh) { 
+                        scene.activeCamera.detachControl() 
+                    }
+                    break;
+                case PointerEventTypes.POINTERUP:
+                    isPainting=false
+                    scene.activeCamera.attachControl()
+                    break;
+            }
+        });
+
     }
     get state() { return { stateString: this.grid.voxel.stateString, size: {x:this.grid.voxel.x,y:this.grid.voxel.y,z:this.grid.voxel.z}}}
     setOptions(options) {
-        var { shape, readOnly, size} = options
+        var { shape, size} = options
         let vox=new Voxel(shape)
         vox.callback = this.stateCallback
-        this.grid.readOnly = readOnly
         this.grid.voxel = new Proxy(vox,handler)
         this.grid.render()
     }
