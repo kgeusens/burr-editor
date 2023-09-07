@@ -19,7 +19,6 @@
     myEngine.runRenderLoop(() => {
         if (myEngine.activeView?.camera) {
             myEngine.activeView.camera.getScene().render()
-//            console.log("activeView", myEngine.activeView)
         };
     });
 

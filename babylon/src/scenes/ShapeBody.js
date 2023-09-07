@@ -256,7 +256,6 @@ const handler = {
     set(target, property, value) {
         target[property] = value
         if (property == "state") {
-            console.log("intercepted", property, value)
         }
         return true
     }
