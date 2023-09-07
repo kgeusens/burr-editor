@@ -2,7 +2,7 @@
 <!--
   Problems
  -->
-  <v-btn @click="solve">
+  <v-btn @click="solvePuzzle">
       Solve
   </v-btn>
   <v-card class="my-2" variant="outlined" v-if="props.puzzle.problems">
@@ -99,7 +99,7 @@
     burrtools = myModule
   });
 
-  const emit = defineEmits(["newShape", "update:problemIndex"])
+  const emit = defineEmits(["update:problemIndex", "solvedPuzzle"])
   const props = defineProps(
     { 
         puzzle: { type: Object, default: null }, 
@@ -158,6 +158,11 @@
   function addProblem() {
     let idx=props.puzzle.addProblem()
     selectedProblemIndex.value = idx
+  }
+  function solvePuzzle() {
+//    burrtools.solve(something)
+      let outcome = burrtools.solve(props.puzzle.saveToXML())
+      emit("solvedPuzzle", Puzzle.puzzleFromXML(outcome))
   }
   function deleteProblem() {
     if (problems.value.length > 1) { 
