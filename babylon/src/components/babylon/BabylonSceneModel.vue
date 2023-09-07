@@ -25,7 +25,6 @@ import { reactive, inject, watch, onMounted } from "@vue/runtime-core";
     }
 
     onMounted(() => {
-        console.log(props.detail)
 //        myModel.setOptions(props.detail)
     });
 

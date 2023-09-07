@@ -2,6 +2,9 @@
 <!--
   Problems
  -->
+  <v-btn @click="solve">
+      Solve
+  </v-btn>
   <v-card class="my-2" variant="outlined" v-if="props.puzzle.problems">
     <v-toolbar density="compact" color="primary">
       <v-toolbar-title>
@@ -94,8 +97,6 @@
 
   Module().then(myModule => {  
     burrtools = myModule
-    console.log(burrtools)
-//    console.log(burrtools.solve(xmlFile))
   });
 
   const emit = defineEmits(["newShape", "update:problemIndex"])

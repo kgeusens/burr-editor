@@ -59,7 +59,6 @@
     DATA.selectedItem=[idx]
   }
   function cloneShape() {
-    console.log(selectedShape.value)
     let idx=props.puzzle.addShape(selectedShape.value)
     DATA.selectedItem=[idx]
   }
