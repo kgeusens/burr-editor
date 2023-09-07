@@ -89,6 +89,14 @@
 <script setup>
   import { Puzzle } from '@kgeusens/burr-data';
   import { reactive, computed, watch } from 'vue'
+  import Module from '@kgeusens/burr-tools'
+  var burrtools = null
+
+  Module().then(myModule => {  
+    burrtools = myModule
+    console.log(burrtools)
+//    console.log(burrtools.solve(xmlFile))
+  });
 
   const emit = defineEmits(["newShape", "update:problemIndex"])
   const props = defineProps(

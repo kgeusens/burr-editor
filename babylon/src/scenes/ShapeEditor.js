@@ -106,6 +106,17 @@ class MenuPanel {
         bt.onPointerClickObservable.add((evt) => {this.toggle()})
 
         if (control !== null) { control.addControl(container) }
+
+        //
+        let btRO = new Button("button");
+        btRO.text = "test"
+        btRO.widthInPixels = this._gutter
+        btRO.heightInPixels = this._gutter
+        btRO.thickness = 2;
+        btRO.background = "orange";
+        btRO.verticalAlignment=0
+        this.addControl(btRO)
+
     }
 }
 

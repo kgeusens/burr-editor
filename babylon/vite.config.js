@@ -8,7 +8,8 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      'burr-tools.wasm': fileURLToPath(new URL('./node_modules/@kgeusens/burr-tools/wasm/burr-tools.wasm', import.meta.url))
     }
   }
 })
