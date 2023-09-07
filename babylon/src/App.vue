@@ -63,7 +63,7 @@
         temporary
         :scrim=false
         >
-        <ProblemDrawer :puzzle="puzzle" v-model:problemIndex="problemIndex"/>
+        <ProblemDrawer :puzzle="puzzle" v-model:problemIndex="problemIndex" @solvedPuzzle="setSolutions"/>
       </v-navigation-drawer>
       <v-navigation-drawer 
         v-if="tab == 'solutions' && puzzle.shapes"
@@ -183,6 +183,10 @@ export default {
   methods: {
     loadShape(i) {
       this.shapeIndex = i
+    },
+    setSolutions(p) {
+      console.log(p)
+      this.puzzle=p
     },
     setReadOnly(b) {
       this.readOnly = b
