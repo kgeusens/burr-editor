@@ -56,31 +56,23 @@ class MenuPanel {
     constructor(control=null) {
         var container = new Rectangle("menu");
         var mleft = new GUIGrid("menu panel");
-        var bt = new Button("menu button");
-        var btCircle = new Ellipse()
-        var btIcon = new Image("arrow","https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/icons/arrow-left-right.svg#")
-
         this._ease = new CubicEase();
         this._ease.setEasingMode(CubicEase.EASINGMODE_EASEINOUT)
         this._item=container
         this._panel=mleft
 
+        let bt = Button.CreateSimpleButton("button","⮂");
         bt.widthInPixels = this._gutter
         bt.heightInPixels = this._gutter
-        bt.thickness = 2;
+        bt.color="black"
+        bt.textBlock.verticalAlignment=2
+        bt.textBlock.horizontalAlignment=2
+        bt.textBlock.fontSize=30
+        bt.thickness = 0;
         bt.background = "white";
         bt.verticalAlignment=2
         bt.horizontalAlignment=0
-        bt.cornerRadius = this._gutter/2
-
-        btCircle.widthInPixels = 40
-        btCircle.heightInPixels = 40
-
-        btIcon.scaleX=.6
-        btIcon.scaleY=.6
-
-        btCircle.addControl(btIcon)
-        bt.addControl(btCircle)
+        bt.cornerRadius=this._gutter/2
 
         mleft.widthInPixels = this.panelWidth
         mleft.addRowDefinition(50, true)
@@ -106,17 +98,6 @@ class MenuPanel {
         bt.onPointerClickObservable.add((evt) => {this.toggle()})
 
         if (control !== null) { control.addControl(container) }
-
-        //
-        let btRO = new Button("button");
-        btRO.text = "test"
-        btRO.widthInPixels = this._gutter
-        btRO.heightInPixels = this._gutter
-        btRO.thickness = 2;
-        btRO.background = "orange";
-        btRO.verticalAlignment=0
-        this.addControl(btRO)
-
     }
 }
 
