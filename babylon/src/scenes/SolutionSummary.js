@@ -523,7 +523,7 @@ export class sceneBuilder {
         var { puzzle, solution, problem, delta = 0, bevel = 0, alpha = 1, outline = true } = options
         // turn the pieces (voxel data) into ghosts (3D representations)
         // rotate to the correct position
-        let pieceMap = solution?.pieceMap
+        let pieceMap = solution?solution.pieceMap:[]
         if (solution) {
             for (let idx of solution.pieceNumbers) {
                 let shapeID=problem.shapeMap[idx]
@@ -568,6 +568,7 @@ export class sceneBuilder {
             }
         }
         // now delete extra pieces in old situation
+        console.log(this.pieces)
         for ( let idx in this.pieces ) {
             if (  !(idx in pieceMap) ) {
                 this.isDirty=true

@@ -185,8 +185,7 @@ export default {
       this.shapeIndex = i
     },
     setSolutions(p) {
-      console.log(p)
-      this.puzzle=p
+      this.loadPuzzle(p)
     },
     setReadOnly(b) {
       this.readOnly = b
