@@ -124,14 +124,13 @@
   }
   function filterComplex (value, query, item) {
     let q=JSON.parse(query)
-
-    return (!q.designer || q.designer == item.columns.designer) && (!q.name || (value.toString().indexOf(q.name) !== -1) )
+    return (!q.designer || q.designer == item.designer) && (!q.name || (value.toString().indexOf(q.name) !== -1) )
   }
   function clickRow(event,row) {
     selectedPuzzle.value = ''
     let p = new Puzzle()
     const res = 
-      fetch('http://localhost:3001/api/PWBP/puzzle/'+row.item.value.uri, { mode: "cors" })
+      fetch('http://localhost:3001/api/PWBP/puzzle/'+row.item.raw.uri, { mode: "cors" })
       .catch(error => console.log(error))
       .then(res => res.json())
       .then(obj => { 
@@ -141,7 +140,7 @@
           p.getShape(i).setSize(el.converted.x,el.converted.y,el.converted.z)
           p.getShape(i).stateString=el.converted.stateString
         })
-        selectedPuzzle.value=row.item.value.name
+        selectedPuzzle.value=row.item.raw.name
         DATA.puzzle = p
       })
       .catch(error => console.log(error))
