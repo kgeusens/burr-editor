@@ -568,7 +568,6 @@ export class sceneBuilder {
             }
         }
         // now delete extra pieces in old situation
-        console.log(this.pieces)
         for ( let idx in this.pieces ) {
             if (  !(idx in pieceMap) ) {
                 this.isDirty=true

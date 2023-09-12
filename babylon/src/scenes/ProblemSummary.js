@@ -122,6 +122,7 @@ export class sceneBuilder {
         var { shape, pieces = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
 
         let vox=new Voxel(shape)
+        console.log(vox)
         vox.callback = this.stateCallback
         this.result.voxel = new Proxy(vox,handler)
         this.result.delta=delta
@@ -139,6 +140,9 @@ export class sceneBuilder {
          }
         this.pieces=[]
         let radius = shape?Math.max(shape.x, shape.y):1
+        for (let idx in pieces) {
+            radius = Math.max(radius, pieces[idx].x)
+        }
         for (let idx in pieces) {
             let angle = (idx*Math.PI*2)/pieces.length
             let p = new Ghost(pieces[idx], delta, bevel, new TransformNode("subRoot"))
