@@ -129,6 +129,7 @@
   function clickRow(event,row) {
     selectedPuzzle.value = ''
     let p = new Puzzle()
+    p.deleteShape(0)
     const res = 
       fetch('http://localhost:3001/api/PWBP/puzzle/'+row.item.raw.uri, { mode: "cors" })
       .catch(error => console.log(error))
@@ -136,11 +137,20 @@
       .then(obj => { 
         let i=0
         obj.forEach(el => {
+          console.log(el)
           i=p.addShape();
           p.getShape(i).setSize(el.converted.x,el.converted.y,el.converted.z)
           p.getShape(i).stateString=el.converted.stateString
+          p.getShape(i).name= "p" + i.toString()
+          let ps=p.problems.problem[0].getShapeFromId(i)
+          ps.count = el.count
+          p.problems.problem[0].setShape(ps)
         })
         selectedPuzzle.value=row.item.raw.name
+        let solIDX = p.addShape()
+        p.getShape(solIDX).name="Solution"
+        let sol = p.problems.problem[0].getShapeFromId(solIDX)
+        p.problems.problem[0].result.id=solIDX
         DATA.puzzle = p
       })
       .catch(error => console.log(error))

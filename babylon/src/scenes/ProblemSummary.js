@@ -128,6 +128,8 @@ export class sceneBuilder {
         this.result.bevel=bevel
         this.result.alpha=alpha
         this.result.outline=outline
+        this.result.parent.position.x=-(vox.x-1)/2
+        this.result.parent.position.y=-(vox.y-1)/2
         this.result.render()
 
         for (let piece of this.pieces) { 
@@ -145,9 +147,10 @@ export class sceneBuilder {
             this.pieces.push(p)
             p.parent.position.x=Math.cos(angle)*radius*Math.sqrt(2)
             p.parent.position.y=Math.sin(angle)*radius*Math.sqrt(2)
-            p.render()
+            p.parent.rotation.z=angle
             p.parent.computeWorldMatrix(true)
             p.mesh.computeWorldMatrix(true)
+            p.render()
         }
 
         if (scene.activeCamera) { 
