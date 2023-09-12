@@ -148,6 +148,7 @@
         selectedPuzzle.value=row.item.raw.name
         let solIDX = p.addShape()
         p.getShape(solIDX).name="Solution"
+        p.getShape(solIDX).stateString="#"
         let sol = p.problems.problem[0].getShapeFromId(solIDX)
         p.problems.problem[0].result.id=solIDX
         DATA.puzzle = p
