@@ -17,11 +17,19 @@
         </v-autocomplete>
         <v-text-field v-model="DATA.filterObjects.name" class="mx-3" label="Quicksearch" prepend-inner-icon="mdi-magnify" clearable>
         </v-text-field>
-        <v-card class="overflow-y-auto" max-height="400"  >
+        <v-card class="overflow-y-auto" max-height="600"  >
           <v-container >
-            <v-row>
+            <v-row align-content="center" >
               <v-col cols="2" v-for="p in puzzleList">
-                <v-img :src="'https://www.puzzlewillbeplayed.com/'+p.uri+p.goal"></v-img>
+                <v-card height="100%" class="d-flex flex-column">
+                  <div class="pa-2" style="color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;">
+                    {{ p.name }}
+                  </div>
+                  <div class="pa-3 mt-auto mb-auto">
+                    <v-img :src="'https://www.puzzlewillbeplayed.com/'+p.uri+p.goal">
+                    </v-img>
+                  </div>
+              </v-card>
               </v-col>
             </v-row>
           </v-container>
