@@ -17,6 +17,15 @@
         </v-autocomplete>
         <v-text-field v-model="DATA.filterObjects.name" class="mx-3" label="Quicksearch" prepend-inner-icon="mdi-magnify" clearable>
         </v-text-field>
+        <v-card class="overflow-y-auto" max-height="400"  >
+          <v-container >
+            <v-row>
+              <v-col cols="2" v-for="p in puzzleList">
+                <v-img :src="'https://www.puzzlewillbeplayed.com/'+p.uri+p.goal"></v-img>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card>
         <v-data-table-virtual
           hover
           :headers="puzzleHeaders"
