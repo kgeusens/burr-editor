@@ -26,10 +26,10 @@
                     <v-lazy height="100%">
                       <v-hover v-slot="{ isHovering, props }">
                         <v-card v-bind="props" variant="outlined" height="100%" class="d-flex flex-column">
-                          <div class="pa-2" style="color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;">
+                          <div class="pa-2" :style="isHovering?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
                             {{ puzzle.name }}
                           </div>
-                          <div class="px-7 py-3 mt-auto mb-auto">
+                          <div :class="isHovering?'px-7 py-3 mt-auto':'px-9 py-3 mt-auto'">
                             <v-img :src="'https://www.puzzlewillbeplayed.com/'+puzzle.uri+puzzle.goal">
                             </v-img>
                           </div>
