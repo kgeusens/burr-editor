@@ -20,10 +20,10 @@
         <v-card class="overflow-y-auto" max-height="600"  >
           <v-container >
             <v-row align-content="center" >
-              <v-col cols="2" v-for="p in puzzleList">
+              <v-col v-show="filterComplex('Eyckmans', filterString, p)" cols="2" v-for="p in puzzleList">
                 <v-responsive :aspect-ratio="1">
                 <v-lazy height="100%">
-                  <v-card height="100%" class="d-flex flex-column">
+                  <v-card variant="outlined" height="100%" class="d-flex flex-column">
                     <div class="pa-2" style="color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;">
                       {{ p.name }}
                     </div>
@@ -145,7 +145,8 @@
   }
   function filterComplex (value, query, item) {
     let q=JSON.parse(query)
-    return (!q.designer || q.designer == item.designer) && (!q.name || (value.toString().indexOf(q.name) !== -1) )
+    return (!q.designer || q.designer == item.designer) && (!q.name || (item.name.indexOf(q.name) !== -1) )
+//    return (!q.designer || q.designer == item.designer) && (!q.name || (value.toString().indexOf(q.name) !== -1) )
   }
   function clickRow(event,row) {
     selectedPuzzle.value = ''
