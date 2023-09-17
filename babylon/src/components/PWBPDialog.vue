@@ -21,15 +21,19 @@
           <v-container >
             <v-row align-content="center" >
               <v-col cols="2" v-for="p in puzzleList">
-                <v-card height="100%" class="d-flex flex-column">
-                  <div class="pa-2" style="color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;">
-                    {{ p.name }}
-                  </div>
-                  <div class="pa-3 mt-auto mb-auto">
-                    <v-img :src="'https://www.puzzlewillbeplayed.com/'+p.uri+p.goal">
-                    </v-img>
-                  </div>
-              </v-card>
+                <v-responsive :aspect-ratio="1">
+                <v-lazy height="100%">
+                  <v-card height="100%" class="d-flex flex-column">
+                    <div class="pa-2" style="color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;">
+                      {{ p.name }}
+                    </div>
+                    <div class="px-7 py-3 mt-auto mb-auto">
+                      <v-img :src="'https://www.puzzlewillbeplayed.com/'+p.uri+p.goal">
+                      </v-img>
+                    </div>
+                </v-card>
+              </v-lazy>
+              </v-responsive>
               </v-col>
             </v-row>
           </v-container>
