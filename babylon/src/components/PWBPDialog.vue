@@ -19,13 +19,13 @@
         </v-text-field>
         <v-card class="overflow-y-auto" max-height="600"  >
           <v-container >
-            <v-row align-content="center" >
+            <v-row dense align-content="center" >
               <template v-for="(puzzle, i) in puzzleList" :key="i">
                 <v-col v-show="filterComplex('', filterString, puzzle)" cols="2">
                   <v-responsive :aspect-ratio="1">
                     <v-hover v-slot="{ isHovering, props }">
-                      <v-lazy height="100%">
-                        <v-card v-bind="props" variant="outlined" height="100%" class="d-flex flex-column">
+                      <v-lazy class="pa-2" height="100%">
+                        <v-card :elevation="isHovering?5:2" v-bind="props" variant="elevated" height="100%" class="d-flex flex-column">
                           <div class="pa-2" :style="isHovering?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
                             {{ puzzle.name }}
                           </div>
