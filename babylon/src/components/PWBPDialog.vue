@@ -18,8 +18,7 @@
         <v-text-field v-model="DATA.filterObjects.name" class="mx-3" label="Quicksearch" prepend-inner-icon="mdi-magnify" clearable>
         </v-text-field>
         <v-card class="overflow-y-auto" max-height="600"  >
-          <v-container >
-            <v-row dense align-content="center" >
+            <v-row dense>
               <template v-for="(puzzle, i) in puzzleList" :key="i">
                 <v-col v-show="filterComplex('', filterString, puzzle)" cols="2">
                   <v-responsive :aspect-ratio="1">
@@ -40,7 +39,6 @@
                 </v-col>
             </template>
             </v-row>
-          </v-container>
         </v-card>
         <v-data-table-virtual
           hover
