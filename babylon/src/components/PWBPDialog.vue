@@ -20,15 +20,15 @@
         <v-card class="overflow-y-auto" max-height="600"  >
             <v-row dense>
               <template v-for="(puzzle, i) in puzzleList" :key="i">
-                <v-col v-show="filterComplex('', filterString, puzzle)" cols="2">
+                <v-col v-show="filterComplex('', filterString, puzzle)" md="2" sm="4" xs="6">
                   <v-responsive :aspect-ratio="1">
                     <v-hover v-slot="{ isHovering, props }">
                       <v-lazy class="pa-2" height="100%">
-                        <v-card :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
+                        <v-card @click.stop="selectCard($event, puzzle)" :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
                           <div class="pa-2" :style="isHovering?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
                             {{ puzzle.name }}
                           </div>
-                          <div :class="isHovering?'px-8 py-3 mt-auto':'px-9 py-3 mt-auto'">
+                          <div :class="isHovering?'px-8 py-2 mt-auto':'px-9 py-3 mt-auto'">
                             <v-img :src="'https://www.puzzlewillbeplayed.com/'+puzzle.uri+puzzle.goal">
                             </v-img>
                           </div>
@@ -40,7 +40,7 @@
             </template>
             </v-row>
         </v-card>
-        <v-data-table-virtual
+<!--        <v-data-table-virtual
           hover
           :headers="puzzleHeaders"
           :items="puzzleList"
@@ -52,6 +52,7 @@
           @click:row="clickRow"
         >
         </v-data-table-virtual>
+-->
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
@@ -170,6 +171,35 @@
           p.problems.problem[0].setShape(ps)
         })
         selectedPuzzle.value=row.item.raw.name
+        let solIDX = p.addShape()
+        p.getShape(solIDX).name="Solution"
+        p.getShape(solIDX).stateString="#"
+        let sol = p.problems.problem[0].getShapeFromId(solIDX)
+        p.problems.problem[0].result.id=solIDX
+        DATA.puzzle = p
+      })
+      .catch(error => console.log(error))
+  }
+  function selectCard(evt,item) {
+    selectedPuzzle.value = ''
+    let p = new Puzzle()
+    p.deleteShape(0)
+    const res = 
+      fetch('http://localhost:3001/api/PWBP/puzzle/'+item.uri, { mode: "cors" })
+      .catch(error => console.log(error))
+      .then(res => res.json())
+      .then(obj => { 
+        let i=0
+        obj.forEach(el => {
+          i=p.addShape();
+          p.getShape(i).setSize(el.converted.x,el.converted.y,el.converted.z)
+          p.getShape(i).stateString=el.converted.stateString
+          p.getShape(i).name= "p" + i.toString()
+          let ps=p.problems.problem[0].getShapeFromId(i)
+          ps.count = el.count
+          p.problems.problem[0].setShape(ps)
+        })
+        selectedPuzzle.value=item.name
         let solIDX = p.addShape()
         p.getShape(solIDX).name="Solution"
         p.getShape(solIDX).stateString="#"
