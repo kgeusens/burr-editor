@@ -47,7 +47,7 @@
           items-per-page="-1"
         >
             <template v-slot:default="{ items }">
-              <v-card class="overflow-y-auto" max-height="600"  >
+              <v-card class="overflow-y-auto" max-height="400"  >
                 <v-row>
                   <template v-for="(puzzle, i) in items" :key="i">
                     <v-col md="2" sm="4" xs="6">
