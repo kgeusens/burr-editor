@@ -45,6 +45,8 @@
         <v-data-iterator
           :items="puzzleList"
           items-per-page="-1"
+          :search="filterString"
+          :custom-filter="filterComplex"
         >
             <template v-slot:default="{ items }">
               <v-card class="overflow-y-auto" max-height="400"  >
@@ -168,8 +170,8 @@
   }
   function filterComplex (value, query, item) {
     let q=JSON.parse(query)
-    return (!q.designer || q.designer == item.designer) && (!q.name || (item.name.indexOf(q.name) !== -1) )
-//    return (!q.designer || q.designer == item.designer) && (!q.name || (value.toString().indexOf(q.name) !== -1) )
+//    return (!q.designer || q.designer == item.designer) && (!q.name || (item.name.indexOf(q.name) !== -1) )
+    return (!q.designer || q.designer == item.raw.designer) && (!q.name || (value.toString().indexOf(q.name) !== -1) )
   }
   function clickRow(event,row) {
     selectedPuzzle.value = ''
