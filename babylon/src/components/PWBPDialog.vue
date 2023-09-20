@@ -55,7 +55,7 @@
                   <template v-for="group in groupedItems">
                     <v-expansion-panel>
                       <v-expansion-panel-title>
-                        {{ group.value }}
+                        {{ group.value }} ({{ group.items.length }})
                       </v-expansion-panel-title>
                       <v-expansion-panel-text>
                         <v-row>
