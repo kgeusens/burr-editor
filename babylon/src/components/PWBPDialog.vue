@@ -10,7 +10,14 @@
         size="64"
       ></v-progress-circular>
     </v-overlay>    
-    <v-toolbar color="primary" title="Puzzle Will Be Played"></v-toolbar>
+    <v-toolbar color="primary" title="Puzzle Will Be Played">
+      <v-spacer></v-spacer>
+      <v-btn icon @click="dialog = false">
+        <v-icon>
+          mdi-close
+        </v-icon>
+      </v-btn>
+    </v-toolbar>
     <v-card>
       <v-card class="ma-3">
         <v-autocomplete v-model="DATA.filterObjects.designer" class="mx-3 mt-3" variant=outlined :items="designers" label="Designer" chips clearable>
@@ -88,11 +95,6 @@
         </v-data-iterator>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-              @click="dialog = false"
-            >
-            Cancel
-          </v-btn>
           <v-btn
               :disabled="!DATA.puzzle.shapes"
               @click="loadFile()"
