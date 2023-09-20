@@ -47,11 +47,14 @@
           items-per-page="-1"
           :search="filterString"
           :custom-filter="filterComplex"
+          :group-by="groupBy"
         >
-            <template v-slot:default="{ items }">
-              <v-card class="overflow-y-auto" max-height="400"  >
+            <template v-slot:default="{ items, groupedItems }">
+              <v-card class="overflow-y-auto" max-height="400">
+                <template v-for="group in groupedItems">
+                  {{ group.value }}
                 <v-row>
-                  <template v-for="(puzzle, i) in items" :key="i">
+                  <template v-for="(puzzle, i) in group.items" :key="i">
                     <v-col md="2" sm="4" xs="6">
                       <v-responsive :aspect-ratio="1">
                         <v-hover v-slot="{ isHovering, props }">
@@ -71,6 +74,7 @@
                     </v-col>
                   </template>
                 </v-row>
+                </template>
               </v-card>
             </template>
         </v-data-iterator>
@@ -119,6 +123,7 @@
   const dialog = ref(false)
   const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null} })
   const searchName = ref("")
+  const groupBy=[ { key: "designer", order: "asc" } ]
 
   const puzzleHeaders = [
           {
