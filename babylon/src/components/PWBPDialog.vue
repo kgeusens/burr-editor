@@ -10,7 +10,10 @@
         size="64"
       ></v-progress-circular>
     </v-overlay>    
-    <v-toolbar color="primary" title="Puzzle Will Be Played">
+    <v-toolbar color="primary">
+      <v-toolbar-title>
+        {{ selectedPuzzle.value?selectedPuzzle.value:"Puzzle Will Be Played"}}
+      </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon @click="dialog = false">
         <v-icon>
