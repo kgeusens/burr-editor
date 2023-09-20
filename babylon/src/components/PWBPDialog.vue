@@ -42,6 +42,7 @@
             </v-row>
         </v-card>
         -->
+<!--
         <v-data-iterator
           :items="puzzleList"
           :search="filterString"
@@ -74,6 +75,7 @@
             </v-card>
           </template>
         </v-data-iterator>
+-->
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
@@ -103,6 +105,7 @@
 <script setup>
   import { ref, reactive, computed, watch, popScopeId } from 'vue'
   import { VDataTableVirtual } from 'vuetify/labs/VDataTable'
+  import { VDataIterator } from 'vuetify/labs/VDataIterator'
   import { Puzzle } from '@kgeusens/burr-data'
   import { XMLParser } from 'fast-xml-parser'
 
