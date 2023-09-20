@@ -42,15 +42,12 @@
             </v-row>
         </v-card>
         -->
-<!--
         <v-data-iterator
           :items="puzzleList"
-          :search="filterString"
-          height="400"
-          :custom-filter="filterComplex"
+          items-per-page="-1"
         >
-          <template v-slot:default="{ items }">
-            <v-card class="overflow-y-auto" max-height="400"  >
+            <template v-slot:default="{ items }">
+              <v-card class="overflow-y-auto" max-height="600"  >
                 <v-row>
                   <template v-for="(puzzle, i) in items" :key="i">
                     <v-col md="2" sm="4" xs="6">
@@ -59,10 +56,10 @@
                           <v-lazy class="pa-2" height="100%">
                             <v-card @click.stop="selectCard($event, puzzle)" :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
                               <div class="pa-2" :style="isHovering?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
-                                {{ puzzle.name }}
+                                {{ puzzle.raw.name }}
                               </div>
                               <div :class="isHovering?'px-8 py-2 mt-auto':'px-9 py-3 mt-auto'">
-                                <v-img :src="'https://www.puzzlewillbeplayed.com/'+puzzle.uri+puzzle.goal">
+                                <v-img :src="'https://www.puzzlewillbeplayed.com/'+puzzle.raw.uri+puzzle.raw.goal">
                                 </v-img>
                               </div>
                             </v-card>
@@ -72,10 +69,9 @@
                     </v-col>
                   </template>
                 </v-row>
-            </v-card>
-          </template>
+              </v-card>
+            </template>
         </v-data-iterator>
--->
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
