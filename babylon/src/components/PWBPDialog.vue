@@ -51,30 +51,38 @@
         >
             <template v-slot:default="{ items, groupedItems }">
               <v-card class="overflow-y-auto" max-height="400">
-                <template v-for="group in groupedItems">
-                  {{ group.value }}
-                <v-row>
-                  <template v-for="(puzzle, i) in group.items" :key="i">
-                    <v-col md="2" sm="4" xs="6">
-                      <v-responsive :aspect-ratio="1">
-                        <v-hover v-slot="{ isHovering, props }">
-                          <v-lazy class="pa-2" height="100%">
-                            <v-card @click.stop="selectCard($event, puzzle)" :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
-                              <div class="pa-2" :style="isHovering?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
-                                {{ puzzle.raw.name }}
-                              </div>
-                              <div :class="isHovering?'px-8 py-2 mt-auto':'px-9 py-3 mt-auto'">
-                                <v-img :src="'https://www.puzzlewillbeplayed.com/'+puzzle.raw.uri+puzzle.raw.goal">
-                                </v-img>
-                              </div>
-                            </v-card>
-                          </v-lazy>
-                        </v-hover>
-                      </v-responsive>
-                    </v-col>
+                <v-expansion-panels>
+                  <template v-for="group in groupedItems">
+                    <v-expansion-panel>
+                      <v-expansion-panel-title>
+                        {{ group.value }}
+                      </v-expansion-panel-title>
+                      <v-expansion-panel-text>
+                        <v-row>
+                          <template v-for="(puzzle, i) in group.items" :key="i">
+                            <v-col md="2" sm="4" xs="6">
+                              <v-responsive :aspect-ratio="1">
+                                <v-hover v-slot="{ isHovering, props }">
+                                  <v-lazy class="pa-2" height="100%">
+                                    <v-card @click.stop="selectCard($event, puzzle)" :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
+                                      <div class="pa-2" :style="isHovering?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
+                                        {{ puzzle.raw.name }}
+                                      </div>
+                                      <div :class="isHovering?'px-8 py-2 mt-auto':'px-9 py-3 mt-auto'">
+                                        <v-img :src="'https://www.puzzlewillbeplayed.com/'+puzzle.raw.uri+puzzle.raw.goal">
+                                        </v-img>
+                                      </div>
+                                    </v-card>
+                                  </v-lazy>
+                                </v-hover>
+                              </v-responsive>
+                            </v-col>
+                          </template>
+                        </v-row>
+                      </v-expansion-panel-text>
+                    </v-expansion-panel>
                   </template>
-                </v-row>
-                </template>
+                </v-expansion-panels>
               </v-card>
             </template>
         </v-data-iterator>
