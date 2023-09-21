@@ -61,12 +61,13 @@
           :items="puzzleList"
           item-value="name"
           v-model:model-value="modelValue"
+          select-strategy="single"
           items-per-page="-1"
           :search="filterString"
           :custom-filter="filterComplex"
           :group-by="groupBy"
         >
-            <template v-slot:default="{ items, groupedItems }">
+            <template v-slot:default="{ items, groupedItems, toggleSelect }">
               <v-card class="overflow-y-auto" max-height="400">
                 <v-expansion-panels>
                   <template v-for="group in groupedItems">
@@ -81,7 +82,7 @@
                               <v-responsive :aspect-ratio="1">
                                 <v-hover v-slot="{ isHovering, props }">
                                   <v-lazy class="pa-2" height="100%">
-                                    <v-card @click.stop="selectCard($event, puzzle.raw)" :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
+                                    <v-card @click.stop="toggleSelect(puzzle);selectCard($event, puzzle.raw)" :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
                                       <div class="pa-2" :style="isHovering?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
                                         {{ puzzle.raw.name }}
                                       </div>
