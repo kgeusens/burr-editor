@@ -12,7 +12,7 @@
     </v-overlay>    
     <v-toolbar color="primary">
       <v-toolbar-title>
-        {{ selectedPuzzle?modelValue:"Puzzle Will Be Played"}}
+        {{ selectedPuzzle?modelValue[0].name:"Puzzle Will Be Played"}}
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn @click="loadFile()" icon v-if="DATA.puzzle.shapes">
@@ -33,48 +33,26 @@
     </v-toolbar>
     <v-card>
       <v-card class="ma-3">
+        <v-autocomplete v-model="DATA.sortKey" class="mx-3 mt-3" variant=outlined :items="sortKeys" label="Sort by" chips clearable>
+        </v-autocomplete>
         <v-autocomplete v-model="DATA.filterObjects.designer" class="mx-3 mt-3" variant=outlined :items="designers" label="Designer" chips clearable>
         </v-autocomplete>
         <v-text-field v-model="DATA.filterObjects.name" class="mx-3" label="Quicksearch" prepend-inner-icon="mdi-magnify" clearable>
         </v-text-field>
-        <!--
-        <v-card class="overflow-y-auto" max-height="600"  >
-            <v-row dense>
-              <template v-for="(puzzle, i) in puzzleList" :key="i">
-                <v-col v-show="filterComplex('', filterString, puzzle)" md="2" sm="4" xs="6">
-                  <v-responsive :aspect-ratio="1">
-                    <v-hover v-slot="{ isHovering, props }">
-                      <v-lazy class="pa-2" height="100%">
-                        <v-card @click.stop="selectCard($event, puzzle)" :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
-                          <div class="pa-2" :style="isHovering?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
-                            {{ puzzle.name }}
-                          </div>
-                          <div :class="isHovering?'px-8 py-2 mt-auto':'px-9 py-3 mt-auto'">
-                            <v-img :src="'https://www.puzzlewillbeplayed.com/'+puzzle.uri+puzzle.goal">
-                            </v-img>
-                          </div>
-                        </v-card>
-                      </v-lazy>
-                    </v-hover>
-                  </v-responsive>
-                </v-col>
-            </template>
-            </v-row>
-        </v-card>
-        -->
         <v-data-iterator
           :items="puzzleList"
           item-value="name"
-          return-object=true
+          :return-object=true
           v-model:model-value="modelValue"
           select-strategy="single"
           items-per-page="-1"
           :search="filterString"
           :custom-filter="filterComplex"
           :group-by="groupBy"
+          :sort-by="sortKey"
         >
             <template v-slot:default="{ items, groupedItems, toggleSelect, isSelected }">
-              <v-card class="overflow-y-auto" max-height="400">
+              <v-card class="overflow-y-auto" max-height="600">
                 <v-expansion-panels>
                   <template v-for="group in groupedItems">
                     <v-expansion-panel>
@@ -83,12 +61,12 @@
                       </v-expansion-panel-title>
                       <v-expansion-panel-text>
                         <v-row>
-                          <template v-for="(puzzle, i) in group.items" :key="i">
+                          <template v-for="(puzzle, i) in group.items" :key="group.value">
                             <v-col md="2" sm="4" xs="6">
                               <v-responsive :aspect-ratio="1">
                                 <v-hover v-slot="{ isHovering, props }">
                                   <v-lazy class="pa-2" height="100%">
-                                    <v-card @click.stop="toggleSelect(puzzle);selectCard($event, puzzle.raw)" :elevation="isSelected(puzzle)?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
+                                    <v-card :key=puzzle.uri @click.stop="toggleSelect(puzzle);selectCard($event, puzzle.raw)" :elevation="isSelected(puzzle)?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
                                       <div class="pa-2" :style="isSelected(puzzle)?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
                                         {{ puzzle.raw.name }}
                                       </div>
@@ -130,6 +108,7 @@
   const apiServer=import.meta.env.MODE=='development'?'http://localhost:3001':''
 
   const emit = defineEmits(["newShape", "newName"])
+  const sortKeys = [ "name", "designer", "date", "moves", "shape"]
   
   const props = defineProps(
     { 
@@ -140,7 +119,7 @@
   const selectedPuzzle = ref({})
   const dialog = ref(false)
   const modelValue = ref([])
-  const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null} })
+  const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null}, sortKey: "designer" })
   const searchName = ref("")
   const groupBy=[ { key: "designer", order: "asc" } ]
 
@@ -280,5 +259,8 @@
   })
   const designers = computed({
     get: () => getUniqueAttrVals('designer')
+  })
+  const sortKey = computed({
+    get: () => { console.log(DATA.sortKey);return [ { key: DATA.sortKey, order: "asc" } ] }
   })
 </script>
