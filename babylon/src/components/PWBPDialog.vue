@@ -15,7 +15,12 @@
         {{ selectedPuzzle?modelValue:"Puzzle Will Be Played"}}
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon v-if="selectedPuzzle" target='_blank' :href="'http://www.puzzlewillbeplayed.com/' + modelValue[0].uri">
+      <v-btn @click="loadFile()" icon v-if="DATA.puzzle.shapes">
+        <v-icon>
+          mdi-cloud-download
+        </v-icon>
+      </v-btn>
+      <v-btn icon v-if="modelValue.length > 0" target='_blank' :href="'http://www.puzzlewillbeplayed.com/' + modelValue[0].uri">
         <v-icon>
           mdi-web
         </v-icon>
