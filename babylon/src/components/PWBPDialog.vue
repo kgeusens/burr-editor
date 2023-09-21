@@ -12,9 +12,14 @@
     </v-overlay>    
     <v-toolbar color="primary">
       <v-toolbar-title>
-        {{ selectedPuzzle?selectedPuzzle:"Puzzle Will Be Played"}}
+        {{ selectedPuzzle?modelValue:"Puzzle Will Be Played"}}
       </v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn icon v-if="selectedPuzzle" href="http://www.puzzlewillbeplayed.com/">
+        <v-icon>
+          mdi-web
+        </v-icon>
+      </v-btn>
       <v-btn icon @click="dialog = false">
         <v-icon>
           mdi-close
@@ -54,6 +59,8 @@
         -->
         <v-data-iterator
           :items="puzzleList"
+          item-value="name"
+          v-model:model-value="modelValue"
           items-per-page="-1"
           :search="filterString"
           :custom-filter="filterComplex"
@@ -134,6 +141,7 @@
   const puzzleList = ref([])
   const selectedPuzzle = ref({})
   const dialog = ref(false)
+  const modelValue = ref([])
   const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null} })
   const searchName = ref("")
   const groupBy=[ { key: "designer", order: "asc" } ]
