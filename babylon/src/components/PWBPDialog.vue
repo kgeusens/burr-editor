@@ -110,16 +110,6 @@
               </v-card>
             </template>
         </v-data-iterator>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-              :disabled="!DATA.puzzle.shapes"
-              @click="loadFile()"
-              variant="tonal"
-            >
-            Load file
-          </v-btn>
-        </v-card-actions>
       </v-card>
       <v-card  class="ma-3" v-if="DATA.puzzle.shapes" 
           title="Puzzle" 
