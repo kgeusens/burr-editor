@@ -15,7 +15,7 @@
         {{ selectedPuzzle?modelValue:"Puzzle Will Be Played"}}
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon v-if="selectedPuzzle" href="http://www.puzzlewillbeplayed.com/">
+      <v-btn icon v-if="selectedPuzzle" target='_blank' :href="'http://www.puzzlewillbeplayed.com/' + modelValue[0].uri">
         <v-icon>
           mdi-web
         </v-icon>
@@ -60,6 +60,7 @@
         <v-data-iterator
           :items="puzzleList"
           item-value="name"
+          return-object=true
           v-model:model-value="modelValue"
           select-strategy="single"
           items-per-page="-1"
@@ -67,7 +68,7 @@
           :custom-filter="filterComplex"
           :group-by="groupBy"
         >
-            <template v-slot:default="{ items, groupedItems, toggleSelect }">
+            <template v-slot:default="{ items, groupedItems, toggleSelect, isSelected }">
               <v-card class="overflow-y-auto" max-height="400">
                 <v-expansion-panels>
                   <template v-for="group in groupedItems">
@@ -82,8 +83,8 @@
                               <v-responsive :aspect-ratio="1">
                                 <v-hover v-slot="{ isHovering, props }">
                                   <v-lazy class="pa-2" height="100%">
-                                    <v-card @click.stop="toggleSelect(puzzle);selectCard($event, puzzle.raw)" :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
-                                      <div class="pa-2" :style="isHovering?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
+                                    <v-card @click.stop="toggleSelect(puzzle);selectCard($event, puzzle.raw)" :elevation="isSelected(puzzle)?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
+                                      <div class="pa-2" :style="isSelected(puzzle)?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
                                         {{ puzzle.raw.name }}
                                       </div>
                                       <div :class="isHovering?'px-8 py-2 mt-auto':'px-9 py-3 mt-auto'">
