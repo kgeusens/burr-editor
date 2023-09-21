@@ -292,7 +292,8 @@ export default {
         this.solutionMove=0;
     },
   },
-  mounted() { 
+  mounted() {
+    console.log('mode:', import.meta.env.MODE)
   }
 };
 </script>

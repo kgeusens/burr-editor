@@ -127,6 +127,7 @@
   import { VDataIterator } from 'vuetify/labs/VDataIterator'
   import { Puzzle } from '@kgeusens/burr-data'
   import { XMLParser } from 'fast-xml-parser'
+  const apiServer=import.meta.env.MODE=='development'?'http://localhost:3001':''
 
   const emit = defineEmits(["newShape", "newName"])
   
@@ -159,9 +160,10 @@
   const puzzleGroup = [ {key: 'designer' }]
 
   function loadPuzzleList() {
+    console.log(apiServer)
     selectedPuzzle.value = ''
     const res = 
-      fetch('/api/PWBP/index', { mode: "cors" })
+      fetch(apiServer + '/api/PWBP/index', { mode: "cors" })
       .catch(error => console.log(error))
       .then(res => res.json())
       .then(obj => {puzzleList.value = obj.filter(el => el.attributes.cat === "I").map(el => 
@@ -201,7 +203,7 @@
     let p = new Puzzle()
     p.deleteShape(0)
     const res = 
-      fetch('/api/PWBP/puzzle/'+row.item.raw.uri, { mode: "cors" })
+      fetch(apiServer+'/api/PWBP/puzzle/'+row.item.raw.uri, { mode: "cors" })
       .catch(error => console.log(error))
       .then(res => res.json())
       .then(obj => { 
@@ -230,7 +232,7 @@
     let p = new Puzzle()
     p.deleteShape(0)
     const res = 
-      fetch('/api/PWBP/puzzle/'+item.uri, { mode: "cors" })
+      fetch(apiServer+'/api/PWBP/puzzle/'+item.uri, { mode: "cors" })
       .catch(error => console.log(error))
       .then(res => res.json())
       .then(obj => { 
