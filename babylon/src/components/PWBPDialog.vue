@@ -12,7 +12,7 @@
     </v-overlay>    
     <v-toolbar color="primary">
       <v-toolbar-title>
-        {{ selectedPuzzle.value?selectedPuzzle.value:"Puzzle Will Be Played"}}
+        {{ selectedPuzzle?selectedPuzzle:"Puzzle Will Be Played"}}
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon @click="dialog = false">
@@ -74,7 +74,7 @@
                               <v-responsive :aspect-ratio="1">
                                 <v-hover v-slot="{ isHovering, props }">
                                   <v-lazy class="pa-2" height="100%">
-                                    <v-card @click.stop="selectCard($event, puzzle)" :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
+                                    <v-card @click.stop="selectCard($event, puzzle.raw)" :elevation="isHovering?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
                                       <div class="pa-2" :style="isHovering?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
                                         {{ puzzle.raw.name }}
                                       </div>
