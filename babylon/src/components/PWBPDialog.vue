@@ -114,7 +114,7 @@
   const modelValue = ref([])
   const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null}, sortKey: "designer" })
   const searchName = ref("")
-  const groupBy=[ { key: "designer", order: "asc" } ]
+  const groupBy=[ { key: "none", order: "asc" } ]
 
   const puzzleHeaders = [
           {
@@ -148,7 +148,8 @@
             uri: el.attributes.uri,
             goal: el.attributes.goal,
             category: el.attributes.cat,
-            subcategory: el.attributes.subcat
+            subcategory: el.attributes.subcat,
+            none: "overview"
           } }
         )})
       .catch(error => console.log(error))
