@@ -89,7 +89,7 @@
                 </v-expansion-panels>
               </v-card>
             </template>
-            <template v-slot:footer>
+            <template v-slot:footer="{ itemsPerPage }">
               <v-slider
                 class="ma-2"
                 hide-details
@@ -97,7 +97,7 @@
                 thumb-label
                 step="1"
                 min="1"
-                max="35"
+                :max="Math.ceil(groupCount / itemsPerPage)"
                 show-ticks>
               </v-slider>
             </template>
@@ -160,7 +160,7 @@
             designer : el.attributes.dsgn,
             date: el.attributes.date,
             shape: el.attributes.shape,
-            moves: el.attributes.moves ?el.attributes.moves.match(/\d*/):0,
+            moves: el.attributes.moves?el.attributes.moves.match(/\d*/)[0]:0,
             uri: el.attributes.uri,
             goal: el.attributes.goal,
             category: el.attributes.cat,
@@ -279,5 +279,8 @@
   })
   const groupKey = computed({
     get: () => { return [ { key: DATA.groupKey, order: "asc" } ] }
+  })
+  const groupCount = computed({
+    get: () => {return getUniqueAttrVals(DATA.groupKey).length}
   })
 </script>
