@@ -33,6 +33,8 @@
     </v-toolbar>
     <v-card>
       <v-card class="ma-3">
+        <v-autocomplete hide-details v-model="DATA.groupKey" class="ma-3" variant=outlined :items="groupKeys" label="Group by" chips>
+        </v-autocomplete>
         <v-autocomplete hide-details v-model="DATA.sortKey" class="ma-3" variant=outlined :items="sortKeys" label="Sort by" chips clearable>
         </v-autocomplete>
         <v-autocomplete hide-details v-model="DATA.filterObjects.designer" class="ma-3" variant=outlined :items="designers" label="Designer" chips clearable>
@@ -49,7 +51,7 @@
           items-per-page="10"
           :search="filterString"
           :custom-filter="filterComplex"
-          :group-by="groupBy"
+          :group-by="groupKey"
           :sort-by="sortKey"
         >
             <template v-slot:default="{ items, groupedItems, toggleSelect, isSelected }">
@@ -101,7 +103,8 @@
   const apiServer=import.meta.env.MODE=='development'?'http://localhost:3001':''
 
   const emit = defineEmits(["newShape", "newName"])
-  const sortKeys = [ "name", "designer", "date", "moves", "shape"]
+  const sortKeys = [ "name", "designer", "date", "moves", "shape" ]
+  const groupKeys = [ "none", "designer", "date", "moves", "shape" ]
   
   const props = defineProps(
     { 
@@ -112,9 +115,9 @@
   const selectedPuzzle = ref({})
   const dialog = ref(false)
   const modelValue = ref([])
-  const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null}, sortKey: "designer" })
+  const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null}, sortKey: "designer", groupKey: "designer" })
   const searchName = ref("")
-  const groupBy=[ { key: "none", order: "asc" } ]
+//  const groupBy=[ { key: "none", order: "asc" } ]
 
   const puzzleHeaders = [
           {
@@ -259,6 +262,9 @@
     get: () => getUniqueAttrVals('designer')
   })
   const sortKey = computed({
-    get: () => { console.log(DATA.sortKey);return [ { key: DATA.sortKey, order: "asc" } ] }
+    get: () => { return [ { key: DATA.sortKey, order: "asc" } ] }
+  })
+  const groupKey = computed({
+    get: () => { return [ { key: DATA.groupKey, order: "asc" } ] }
   })
 </script>
