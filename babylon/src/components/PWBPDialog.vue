@@ -33,13 +33,14 @@
     </v-toolbar>
     <v-card>
       <v-card class="ma-3">
-        <v-autocomplete v-model="DATA.sortKey" class="mx-3 mt-3" variant=outlined :items="sortKeys" label="Sort by" chips clearable>
+        <v-autocomplete hide-details v-model="DATA.sortKey" class="ma-3" variant=outlined :items="sortKeys" label="Sort by" chips clearable>
         </v-autocomplete>
-        <v-autocomplete v-model="DATA.filterObjects.designer" class="mx-3 mt-3" variant=outlined :items="designers" label="Designer" chips clearable>
+        <v-autocomplete hide-details v-model="DATA.filterObjects.designer" class="ma-3" variant=outlined :items="designers" label="Designer" chips clearable>
         </v-autocomplete>
-        <v-text-field v-model="DATA.filterObjects.name" class="mx-3" label="Quicksearch" prepend-inner-icon="mdi-magnify" clearable>
+        <v-text-field hide-details v-model="DATA.filterObjects.name" class="ma-3" label="Quicksearch" prepend-inner-icon="mdi-magnify" clearable>
         </v-text-field>
         <v-data-iterator
+          class="ma-3"
           :items="puzzleList"
           item-value="name"
           :return-object=true
@@ -52,7 +53,7 @@
           :sort-by="sortKey"
         >
             <template v-slot:default="{ items, groupedItems, toggleSelect, isSelected }">
-              <v-card class="overflow-y-auto" max-height="600">
+              <v-card class="overflow-y-auto" max-height="calc(100vh - 48px - 400px)">
                 <v-expansion-panels>
                   <template v-for="group in groupedItems">
                     <v-expansion-panel>
@@ -60,23 +61,21 @@
                         {{ group.value }} ({{ group.items.length }})
                       </v-expansion-panel-title>
                       <v-expansion-panel-text>
-                        <v-row>
+                        <v-row >
                           <template v-for="(puzzle, i) in group.items" :key="group.value">
                             <v-col md="2" sm="4" xs="6">
                               <v-responsive :aspect-ratio="1">
-                                <v-hover v-slot="{ isHovering, props }">
                                   <v-lazy class="pa-2" height="100%">
-                                    <v-card :key=puzzle.uri @click.stop="toggleSelect(puzzle);selectCard($event, puzzle.raw)" :elevation="isSelected(puzzle)?6:0" v-bind="props" :variant="isHovering?'elevated':'outlined'" height="100%" class="d-flex flex-column">
+                                    <v-card :key=puzzle.uri @click.stop="selectCard($event, puzzle.raw, isSelected(puzzle));toggleSelect(puzzle)" :elevation="isSelected(puzzle)?6:0" :variant="'outlined'" height="100%" class="d-flex flex-column">
                                       <div class="pa-2" :style="isSelected(puzzle)?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
                                         {{ puzzle.raw.name }}
                                       </div>
-                                      <div :class="isHovering?'px-8 py-2 mt-auto':'px-9 py-3 mt-auto'">
+                                      <div :class="'px-9 py-3 mt-auto'">
                                         <v-img :src="'https://www.puzzlewillbeplayed.com/'+puzzle.raw.uri+puzzle.raw.goal">
                                         </v-img>
                                       </div>
                                     </v-card>
                                   </v-lazy>
-                                </v-hover>
                               </v-responsive>
                             </v-col>
                           </template>
@@ -89,22 +88,16 @@
             </template>
         </v-data-iterator>
       </v-card>
-      <v-card  class="ma-3" v-if="DATA.puzzle.shapes" 
-          title="Puzzle" 
-          :subtitle="DATA.puzzle.shapes.voxel.length + ' shapes defined'"
-          :text="DATA.puzzle.largestShape.x + 'x' + DATA.puzzle.largestShape.y + 'x' + DATA.puzzle.largestShape.z"
-          >
       </v-card>
-    </v-card>
   </v-dialog>
 </template>
 
 <script setup>
-  import { ref, reactive, computed, watch, popScopeId } from 'vue'
-  import { VDataTableVirtual } from 'vuetify/labs/VDataTable'
+  import { ref, reactive, computed, watch } from 'vue'
   import { VDataIterator } from 'vuetify/labs/VDataIterator'
   import { Puzzle } from '@kgeusens/burr-data'
   import { XMLParser } from 'fast-xml-parser'
+  import { VDataTableVirtual } from 'vuetify/labs/VDataTable'
   const apiServer=import.meta.env.MODE=='development'?'http://localhost:3001':''
 
   const emit = defineEmits(["newShape", "newName"])
@@ -178,7 +171,7 @@
     return (!q.designer || q.designer == item.raw.designer) && (!q.name || (value.toString().indexOf(q.name) !== -1) )
   }
   function clickRow(event,row) {
-    selectedPuzzle.value = ''
+    selectedPuzzle.value = null
     let p = new Puzzle()
     p.deleteShape(0)
     const res = 
@@ -206,15 +199,19 @@
       })
       .catch(error => console.log(error))
   }
-  function selectCard(evt,item) {
-    selectedPuzzle.value = ''
+  function selectCard(evt,item, wasSelected) {
+    if (wasSelected) {
+      selectedPuzzle.value = null
+      DATA.puzzle = {}
+      return
+    }
     let p = new Puzzle()
     p.deleteShape(0)
     const res = 
       fetch(apiServer+'/api/PWBP/puzzle/'+item.uri, { mode: "cors" })
       .catch(error => console.log(error))
       .then(res => res.json())
-      .then(obj => { 
+      .then(obj => {
         let i=0
         obj.forEach(el => {
           i=p.addShape();
