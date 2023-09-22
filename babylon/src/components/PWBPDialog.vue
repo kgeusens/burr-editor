@@ -46,7 +46,7 @@
           :return-object=true
           v-model:model-value="modelValue"
           select-strategy="single"
-          items-per-page="-1"
+          items-per-page="10"
           :search="filterString"
           :custom-filter="filterComplex"
           :group-by="groupBy"
