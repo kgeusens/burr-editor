@@ -49,13 +49,14 @@
           v-model:model-value="modelValue"
           select-strategy="single"
           items-per-page="10"
+          :page="DATA.page"
           :search="filterString"
           :custom-filter="filterComplex"
           :group-by="groupKey"
           :sort-by="sortKey"
         >
             <template v-slot:default="{ items, groupedItems, toggleSelect, isSelected }">
-              <v-card class="overflow-y-auto" max-height="calc(100vh - 48px - 400px)">
+              <v-card class="overflow-y-auto" max-height="calc(100vh - 48px - 420px)">
                 <v-expansion-panels>
                   <template v-for="group in groupedItems">
                     <v-expansion-panel>
@@ -88,6 +89,18 @@
                 </v-expansion-panels>
               </v-card>
             </template>
+            <template v-slot:footer>
+              <v-slider
+                class="ma-2"
+                hide-details
+                v-model="DATA.page"
+                thumb-label
+                step="1"
+                min="1"
+                max="35"
+                show-ticks>
+              </v-slider>
+            </template>
         </v-data-iterator>
       </v-card>
       </v-card>
@@ -115,7 +128,7 @@
   const selectedPuzzle = ref({})
   const dialog = ref(false)
   const modelValue = ref([])
-  const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null}, sortKey: "designer", groupKey: "designer" })
+  const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null}, sortKey: "designer", groupKey: "designer", page: 1 })
   const searchName = ref("")
 //  const groupBy=[ { key: "none", order: "asc" } ]
 
