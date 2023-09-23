@@ -249,6 +249,7 @@
         p.comment.name = item.name
         p.comment.date = item.date
         p.comment.set("uri", item.uri)
+        p.comment.set("source", "PWBP")
         DATA.puzzle = p
       })
       .catch(error => console.log(error))
