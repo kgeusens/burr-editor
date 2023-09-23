@@ -245,6 +245,10 @@
         p.getShape(solIDX).stateString="#"
         let sol = p.problems.problem[0].getShapeFromId(solIDX)
         p.problems.problem[0].result.id=solIDX
+        p.comment.designer = item.designer
+        p.comment.name = item.name
+        p.comment.date = item.date
+        p.comment.set("uri", item.uri)
         DATA.puzzle = p
       })
       .catch(error => console.log(error))

@@ -122,7 +122,6 @@ export class sceneBuilder {
         var { shape, pieces = [], delta = 0, bevel = 0, alpha = 1, outline = true } = options
 
         let vox=new Voxel(shape)
-        console.log(vox)
         vox.callback = this.stateCallback
         this.result.voxel = new Proxy(vox,handler)
         this.result.delta=delta
