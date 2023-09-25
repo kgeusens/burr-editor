@@ -122,8 +122,46 @@ async function loadPWBPpuzzle(shape, name) {
 //////////
 // app.get
 //////////
-
+app.use(express.json())
 app.use(express.static(path.resolve(__dirname, '../babylon/dist')))
+
+app.get(
+	"/api/test", 
+	(req, res) => {
+		console.log(req.query)
+		console.log(req.body)
+		res.send("get done")
+	}
+);
+app.post(
+	"/api/test", 
+	(req, res) => {
+		console.log(req.query)
+		console.log(req.body)
+		res.send("post done")
+	}
+);
+
+// 2 tables:
+// Table 1 = uri -> uid mapping
+//    if a uri (from PWBP) is present in this table, it means it has been uploaded as xmpuzzle file to this server.
+// Table 2 = uid -> metadata
+//    metadata contains info such as designer, name, #pieces, moves, date, ...
+// the uid should be the basename for files related to the puzzle
+// in order for the tables to be reconstructable from the puzzle files:
+//    the uid can be recovered from the file names
+//	  topology related data can also be recovered from the puzzle (pieces, moves)
+//    all other fields need to be stored in the comments field of the xmpuzzle file! (designer, name, date, ..?)
+
+// suggested api for individual puzzles (uri on PWBP can be used as unique ID)
+// a PWBP puzzle that has an uploaded xml file will have both an id a uri and can be accessed using both api's
+// /api/puzzle?uid=xxx (get/put) id must exist to update file
+// /api/puzzle?uri=xxx (get) use Table 1 to map uri to uid. If not present, (get) creates xmpuzzle file, caches, and returns it including uid. (put) should alwas refer to the uid?
+// /api/puzzle (put) upload new puzzle and return id (no query specified)
+// /api/puzzle/thumb?uid=xxx (get/put)
+// /api/puzzle/thumb?uri=xxx (get)
+// /api/index (get) = only puzzles that have an id = puzzles with an xmpuzzle file uploaded
+// /api/index/PWBP (get) = overview of puzzles on PWBP
 
 app.get("/api/puzzles/list", (req, res) => {
   listFiles(puzzleDir).then(
