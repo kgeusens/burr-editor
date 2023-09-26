@@ -5,6 +5,9 @@
   <v-btn @click="solvePuzzle">
       Solve
   </v-btn>
+  <v-btn @click="savePuzzle">
+      Save
+  </v-btn>
   <v-card class="my-2" variant="outlined" v-if="props.puzzle.problems">
     <v-toolbar density="compact" color="primary">
       <v-toolbar-title>
@@ -91,9 +94,10 @@
 
 <script setup>
   import { Puzzle } from '@kgeusens/burr-data';
-  import { reactive, computed, watch } from 'vue'
+  import { reactive, computed, watch, normalizeStyle } from 'vue'
   import Module from '@kgeusens/burr-tools'
   var burrtools = null
+  const apiServer=import.meta.env.MODE=='development'?'http://localhost:3001':''
 
   Module().then(myModule => {  
     burrtools = myModule
@@ -163,6 +167,26 @@
 //    burrtools.solve(something)
       let outcome = burrtools.solve(props.puzzle.saveToXML())
       emit("solvedPuzzle", Puzzle.puzzleFromXML(outcome))
+  }
+  function savePuzzle() {
+    var ans = {meta:{}}
+    ans.meta.id=""
+    ans.meta.designer="Geusens"
+    ans.meta.date="20230921"
+    ans.meta.name="Little Puzzle"
+    ans.puzzle = props.puzzle.saveToXML()
+    const res = 
+      fetch(apiServer + '/api/puzzle', { 
+        method: "post", 
+        mode: "cors", 
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        }, 
+        body: JSON.stringify(ans)})
+      .then(obj => { return obj.json() })
+      .then(obj => console.log(obj))
+      .catch(error => console.log(error))
   }
   function deleteProblem() {
     if (problems.value.length > 1) { 

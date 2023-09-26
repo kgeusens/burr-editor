@@ -1,21 +1,47 @@
-const express = require("express");
-const fs = require("fs");
-const path = require("path");
-const ZIP = require('zlib');
-const XML = require('fast-xml-parser');
-const PWBP = require('./PWBP/convert.js')
-const cors = require("cors")
+import express from "express"
+import {readdirSync, readFileSync, writeFileSync} from 'fs'
+import {resolve} from 'node:path'
+import {gzipSync, gunzipSync} from 'zlib'
+import { XMLParser } from "fast-xml-parser"
+import { convert } from "./PWBP/convert.js"
+import cors from "cors"
+import path from 'path'
+import { fileURLToPath } from 'url';
+import {Low} from "lowdb"
+import {JSONFile} from "lowdb/node"
+import { init } from '@paralleldrive/cuid2';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = 3001;
-const puzzleDir = "./xmpuzzles"
+const puzzleDir = "./cache/puzzles/"
+
+//////////
+// setup
+//////////
+const lowAdapter=new JSONFile(resolve(__dirname, './cache', 'puzzles.json'))
+const DB=new Low(lowAdapter, {version: "1", puzzles:[]})
+await DB.read()
+await DB.write()
+
+// The init function returns a custom createId function with the specified
+// configuration. All configuration properties are optional.
+const createId = init({
+	random: Math.random,
+	length: 12,
+	fingerprint: 'zweinstein-forever',
+  });
+  
 
 //////////
 // functions
 //////////
 
 async function listFiles(path) {
-  let result = fs.readdirSync(path)
+  let result = readdirSync(path)
   return result;
 }
 
@@ -41,9 +67,9 @@ function loadPuzzle(xmpuzzle) {
 			if( XMLAlwaysArrayName.indexOf(name) !== -1) return true;
 		}
 	}
-    const xmpuzzleFile = fs.readFileSync(xmpuzzle);
-	const parser = new XML.XMLParser(XMLoptions);
-	const xmlContent = ZIP.gunzipSync(xmpuzzleFile)
+    const xmpuzzleFile = readFileSync(xmpuzzle);
+	const parser = new XMLParser(XMLoptions);
+	const xmlContent = gunzipSync(xmpuzzleFile)
 	var result = parser.parse(xmlContent)
 	return result
 }
@@ -59,7 +85,7 @@ async function loadPWBPindex() {
 		attributesGroupName: "attributes", 
 		attributeNamePrefix: '',
 	}
-	const parser = new XML.XMLParser(XMLoptions)
+	const parser = new XMLParser(XMLoptions)
 	let result=fetch('https://puzzlewillbeplayed.com/-/puzzle-index.xml', { mode: "cors" })
 		.catch(error => console.log(error))
 		.then(res => res.text())
@@ -86,7 +112,7 @@ async function loadPWBPpuzzle(shape, name) {
 			if( XMLAlwaysArrayName.indexOf(name) !== -1) return true;
 		}
 	}
-	const parser = new XML.XMLParser(XMLoptions)
+	const parser = new XMLParser(XMLoptions)
 	let result=fetch('https://puzzlewillbeplayed.com/'+shape+"/"+name, { mode: "no-cors" })
 		.catch(error => console.log(error))
 		.then(res => res.text())
@@ -113,7 +139,7 @@ async function loadPWBPpuzzle(shape, name) {
 				})))
 				return img.map(el => { 
 					let p=el.replaceAll("../","").split('/')
-					return {path : p, count: count[el], converted: PWBP.convert(p)} 
+					return {path : p, count: count[el], converted: convert(p)} 
 				})
 			}
 		)
@@ -125,7 +151,7 @@ async function loadPWBPpuzzle(shape, name) {
 //////////
 app.use(express.json())
 app.use(cors())
-app.use(express.static(path.resolve(__dirname, '../babylon/dist')))
+app.use(express.static(resolve(__dirname, '../babylon/dist')))
 
 app.get(
 	"/api/puzzle", 
@@ -201,7 +227,7 @@ app.get(
 			}
 );
 		
-app.get('*', (req, res) => {res.sendFile(path.resolve(__dirname, '../babylon/dist', 'index.html'))})
+app.get('*', (req, res) => {res.sendFile(resolve(__dirname, '../babylon/dist', 'index.html'))})
 
 //////////
 // app.post
@@ -209,13 +235,16 @@ app.get('*', (req, res) => {res.sendFile(path.resolve(__dirname, '../babylon/dis
 
 app.post(
 	"/api/puzzle", 
+	// body contains metadata (object) and puzzle (xml string) and optional id
 	(req, res) => {
-		reply={}
-		puzzleXML=req.body.puzzle
-		reply.id=req.body.id
-		if (reply.id == "") reply.id = "113-22214-23"
-		console.log(req.body)
+		let reply=req.body.meta?req.body.meta:{}
+		let puzzleXML=req.body.puzzle
+		if (reply.id == "" || reply.id === undefined ) reply.id = createId()
+		let xmpuzzle=gzipSync(puzzleXML)
+		writeFileSync(puzzleDir + reply.id + ".xmpuzzle",xmpuzzle)
+		DB.data.puzzles.push(reply)
 		res.send(JSON.stringify(reply))
+		console.log(reply)
 	}
 );
 
