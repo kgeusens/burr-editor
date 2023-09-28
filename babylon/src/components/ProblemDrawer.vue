@@ -168,8 +168,24 @@
       let outcome = burrtools.solve(props.puzzle.saveToXML())
       emit("solvedPuzzle", Puzzle.puzzleFromXML(outcome))
   }
-  function savePuzzle() {
+  
+  async function savePuzzle() {
     var ans = {meta:props.puzzle.meta}
+    // make sure there is an id in the meta data. If not, ask one from the server and add it to the puzzle.
+    if ( !ans.id || ans.id=="") {
+      const id = await fetch(apiServer + '/api/puzzle/id', { 
+        method: "get", 
+        mode: "cors", 
+        headers: {
+          "Accept": "application/json"
+        }, 
+      })
+      .then(obj => { return obj.json() })
+      .then(obj => { return obj.id})
+      .catch(error => console.log(error))
+      ans.meta["id"]=id
+    }
+    // now the puzzle has an id. Generate the xml and add it to the server request.
     ans.puzzle = props.puzzle.saveToXML()
     const res = 
       fetch(apiServer + '/api/puzzle', { 
@@ -181,9 +197,9 @@
         }, 
         body: JSON.stringify(ans)})
       .then(obj => { return obj.json() })
-      .then(obj => { props.puzzle.comment.id=obj.id;console.log(obj) })
       .catch(error => console.log(error))
   }
+
   function deleteProblem() {
     if (problems.value.length > 1) { 
       let idx = selectedProblemIndex.value

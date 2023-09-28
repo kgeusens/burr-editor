@@ -23,7 +23,7 @@ const puzzleDir = "./cache/puzzles/"
 // setup
 //////////
 const lowAdapter=new JSONFile(resolve(__dirname, './cache', 'puzzles.json'))
-const DB=new Low(lowAdapter, {version: "1", puzzles:{}})
+const DB=new Low(lowAdapter, {version: "1", puzzles:{}, uriToId: {}})
 await DB.read()
 await DB.write()
 
@@ -126,14 +126,14 @@ async function loadPWBPpuzzle(shape, name) {
 				let subTables=[]
 				arr.forEach(t => t.tr.forEach(tr => tr.td.forEach(td =>  { 
 					if (td.img) {
-						idx=td.img.attributes.src.replace(/(-.)?\.gif/,"")
+						let idx=td.img.attributes.src.replace(/(-.)?\.gif/,"")
 						if (img.indexOf(idx)== -1 ) {img.push(idx);count[idx]=1} else count[idx]++ 
 					}
 					if (td.table) subTables.push(...td.table)
 				})))
 				subTables.forEach(t => t.tr.forEach(tr => tr.td.forEach(td =>  { 
 					if (td.img) {
-						idx=td.img.attributes.src.replace(/(-.)?\.gif/,"")
+						let idx=td.img.attributes.src.replace(/(-.)?\.gif/,"")
 						if (img.indexOf(idx)== -1 ) {img.push(idx);count[idx]=1} else count[idx]++ 
 					}
 				})))
@@ -153,10 +153,13 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static(resolve(__dirname, '../babylon/dist')))
 
+// query for existing id (provide query), or get new id (no query)
 app.get(
-	"/api/puzzle", 
+	"/api/puzzle/id", 
 	(req, res) => {
-		res.send("get done")
+		let reply={}
+		reply.id = createId()
+		res.send(JSON.stringify(reply))
 	}
 );
 
@@ -235,17 +238,24 @@ app.get('*', (req, res) => {res.sendFile(resolve(__dirname, '../babylon/dist', '
 
 app.post(
 	"/api/puzzle", 
-	// body contains metadata (object) and puzzle (xml string) and optional id
+	// body contains:
+	//   metadata (object) and 
+	//   puzzle (xml string) and 
+	//   optional id (allthough client shoud check for id and make sure it's present)
 	(req, res) => {
 		let reply=req.body.meta?req.body.meta:{}
 		let puzzleXML=req.body.puzzle
 		if (reply.id == "" || reply.id === undefined ) reply.id = createId()
+		// body is now parsed into reply, puzzleXML, and reply.id is forced
+		// compress to xmpuzzle and save to disk as id.xmpuzzle
 		let xmpuzzle=gzipSync(puzzleXML)
 		writeFileSync(puzzleDir + reply.id + ".xmpuzzle",xmpuzzle)
+		// save the metadata to the database
 		DB.data.puzzles[reply.id]=reply
-		DB.write
+		// map the uri (if present) to the id (needed to recover the xmpuzzle file) and add to the DB
+		if (reply.uri) DB.data.uriToId[reply.uri]=reply.id
+		DB.write()
 		res.send(JSON.stringify(reply))
-		console.log(reply)
 	}
 );
 
