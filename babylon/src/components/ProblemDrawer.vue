@@ -169,11 +169,7 @@
       emit("solvedPuzzle", Puzzle.puzzleFromXML(outcome))
   }
   function savePuzzle() {
-    var ans = {meta:{}}
-    ans.meta.id=""
-    ans.meta.designer="Geusens"
-    ans.meta.date="20230921"
-    ans.meta.name="Little Puzzle"
+    var ans = {meta:props.puzzle.meta}
     ans.puzzle = props.puzzle.saveToXML()
     const res = 
       fetch(apiServer + '/api/puzzle', { 
@@ -185,7 +181,7 @@
         }, 
         body: JSON.stringify(ans)})
       .then(obj => { return obj.json() })
-      .then(obj => console.log(obj))
+      .then(obj => { props.puzzle.comment.id=obj.id;console.log(obj) })
       .catch(error => console.log(error))
   }
   function deleteProblem() {

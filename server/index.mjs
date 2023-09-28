@@ -23,7 +23,7 @@ const puzzleDir = "./cache/puzzles/"
 // setup
 //////////
 const lowAdapter=new JSONFile(resolve(__dirname, './cache', 'puzzles.json'))
-const DB=new Low(lowAdapter, {version: "1", puzzles:[]})
+const DB=new Low(lowAdapter, {version: "1", puzzles:{}})
 await DB.read()
 await DB.write()
 
@@ -242,7 +242,8 @@ app.post(
 		if (reply.id == "" || reply.id === undefined ) reply.id = createId()
 		let xmpuzzle=gzipSync(puzzleXML)
 		writeFileSync(puzzleDir + reply.id + ".xmpuzzle",xmpuzzle)
-		DB.data.puzzles.push(reply)
+		DB.data.puzzles[reply.id]=reply
+		DB.write
 		res.send(JSON.stringify(reply))
 		console.log(reply)
 	}
