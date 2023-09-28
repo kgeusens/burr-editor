@@ -69,8 +69,8 @@
                             <v-col md="2" sm="4" xs="6">
                               <v-responsive :aspect-ratio="1">
                                   <v-lazy class="pa-2" height="100%">
-                                    <v-card :key=puzzle.uri @click.stop="selectCard($event, puzzle.raw, isSelected(puzzle));toggleSelect(puzzle)" :elevation="isSelected(puzzle)?6:0" :variant="'outlined'" height="100%" class="d-flex flex-column">
-                                      <div class="pa-2" :style="isSelected(puzzle)?'color:white;background-color:rgba(0,0,200,0.7);position:absolute;width:100%;z-index:1;':'color:white;background-color:rgba(0,0,0,0.4);position:absolute;width:100%;z-index:1;'">
+                                    <v-card :key=puzzle.uri @click.stop="selectCard($event, puzzle.raw, isSelected(puzzle));toggleSelect(puzzle)" :elevation="isSelected(puzzle)?6:0" :variant="'outlined'" height="100%" :class="(('d-flex flex-column ') + (puzzle.raw.id?'bg-light-green-lighten-4':''))">
+                                      <div class="pa-2" :style="((isSelected(puzzle)?'background-color:rgba(0,0,200,0.7);':'background-color:rgba(0,0,0,0.4);') + 'color:White;position:absolute;width:100%;z-index:1;')">
                                         {{ puzzle.raw.name }}
                                       </div>
                                       <div :class="'px-9 py-3 mt-auto'">
@@ -154,20 +154,7 @@
       fetch(apiServer + '/api/PWBP/index', { mode: "cors" })
       .catch(error => console.log(error))
       .then(res => res.json())
-      .then(obj => {puzzleList.value = obj.filter(el => el.attributes.cat === "I").map(el => 
-        { return { 
-            name: el.attributes.ename, 
-            designer : el.attributes.dsgn,
-            date: el.attributes.date,
-            shape: el.attributes.shape,
-            moves: el.attributes.moves?el.attributes.moves.match(/\d*/)[0]:0,
-            uri: el.attributes.uri,
-            goal: el.attributes.goal,
-            category: el.attributes.cat,
-            subcategory: el.attributes.subcat,
-            none: "overview"
-          } }
-        )})
+      .then(obj => {puzzleList.value = obj.map(el => {el.none = "all"; return el})})
       .catch(error => console.log(error))
   }
   function getUniqueAttrVals(attrName) {
@@ -247,6 +234,7 @@
         p.problems.problem[0].result.id=solIDX
         p.meta=item
         p.meta["source"]="PWBP"
+        console.log(p)
         DATA.puzzle = p
       })
       .catch(error => console.log(error))

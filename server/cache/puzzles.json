@@ -1,0 +1,37 @@
+{
+  "version": "1",
+  "puzzles": {
+    "s1bnnnc74j95": {
+      "name": "Wobbe",
+      "designer": "Eyckmans",
+      "date": "20230817",
+      "shape": "888-448",
+      "moves": "24",
+      "uri": "18PieceBurr/Wobbe/",
+      "goal": "0.gif",
+      "category": "I",
+      "subcategory": "18",
+      "none": "all",
+      "source": "PWBP",
+      "id": "s1bnnnc74j95"
+    },
+    "n5igzoxlcz87": {
+      "name": "Octomom",
+      "designer": "Eyckmans",
+      "date": "20230616",
+      "shape": "776",
+      "moves": "32",
+      "uri": "776/Octomom/",
+      "goal": "00.gif",
+      "category": "I",
+      "subcategory": "8f",
+      "none": "all",
+      "source": "PWBP",
+      "id": "n5igzoxlcz87"
+    }
+  },
+  "uriToId": {
+    "18PieceBurr/Wobbe/": "s1bnnnc74j95",
+    "776/Octomom/": "n5igzoxlcz87"
+  }
+}

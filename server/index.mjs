@@ -89,7 +89,19 @@ async function loadPWBPindex() {
 	let result=fetch('https://puzzlewillbeplayed.com/-/puzzle-index.xml', { mode: "cors" })
 		.catch(error => console.log(error))
 		.then(res => res.text())
-		.then(xml => parser.parse(xml)["puzzle-index"].puzzle)
+		.then(xml => parser.parse(xml)["puzzle-index"].puzzle.filter(el => el.attributes.cat === "I").map(el => 
+        { return { 
+            name: el.attributes.ename, 
+            designer : el.attributes.dsgn,
+            date: el.attributes.date,
+            shape: el.attributes.shape,
+            moves: el.attributes.moves?el.attributes.moves.match(/\d*/)[0]:0,
+            uri: el.attributes.uri,
+            goal: el.attributes.goal,
+            category: el.attributes.cat,
+            subcategory: el.attributes.subcat,
+          } })
+		)
 	return result
 }
 
@@ -153,15 +165,6 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static(resolve(__dirname, '../babylon/dist')))
 
-// query for existing id (provide query), or get new id (no query)
-app.get(
-	"/api/puzzle/id", 
-	(req, res) => {
-		let reply={}
-		reply.id = createId()
-		res.send(JSON.stringify(reply))
-	}
-);
 
 // 2 tables:
 // Table 1 = uri -> uid mapping
@@ -207,12 +210,14 @@ app.get(
 	(req, res) => {
 			loadPWBPindex().then
 			(
-				(r) =>  { 
-				  res.set('Access-Control-Allow-Origin', '*');
-				  res.send(r)
+				(obj) =>  {
+					for (let i in obj) {
+						obj[i].id=DB.data.uriToId[obj[i].uri]
+					}
+					res.send(obj)
 				}
-				);
-			}
+			);
+		}
 );
 
 app.get(
@@ -229,7 +234,17 @@ app.get(
 				);
 			}
 );
-		
+
+// query for existing id (provided query), or get new id (no query)
+app.get(
+	"/api/puzzle/id", 
+	(req, res) => {
+		let reply={}
+		reply.id = createId()
+		res.send(JSON.stringify(reply))
+	}
+);
+
 app.get('*', (req, res) => {res.sendFile(resolve(__dirname, '../babylon/dist', 'index.html'))})
 
 //////////
