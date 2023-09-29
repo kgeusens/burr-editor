@@ -250,10 +250,11 @@ app.get(
 app.get(
 	"/api/puzzle/", 
 	(req, res) => {
-		let obj = {filename: ""}
-		if (req.query.id && DB.data.puzzles[req.query.id]) {
-			obj.filename = req.query.id + '.xmpuzzle';
-			obj.meta=DB.data.puzzles[req.query.id]
+		let id=req.query.id?req.query.id:DB.data.uriToId[req.query.uri]
+		let obj = {}
+		if (id) {
+			obj.filename = id + '.xmpuzzle';
+			obj.meta=DB.data.puzzles[id]
 			obj.content = loadPuzzle(puzzleDir + "/" + obj.filename);
 			res.send(obj);
 		} else if (req.query.uri) { 
@@ -286,7 +287,6 @@ app.get(
 		}
 	}
 );
-
 
 // proxy to gui (babylonjs)
 app.get('*', (req, res) => {res.sendFile(resolve(__dirname, '../babylon/dist', 'index.html'))})

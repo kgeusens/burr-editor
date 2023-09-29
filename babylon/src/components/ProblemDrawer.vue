@@ -165,14 +165,16 @@
   }
   function solvePuzzle() {
 //    burrtools.solve(something)
+      console.log("problem", props.puzzle.saveToXML())
       let outcome = burrtools.solve(props.puzzle.saveToXML())
+      console.log("outcome", outcome)
       emit("solvedPuzzle", Puzzle.puzzleFromXML(outcome))
   }
   
   async function savePuzzle() {
     var ans = {meta:props.puzzle.meta}
     // make sure there is an id in the meta data. If not, ask one from the server and add it to the puzzle.
-    if ( !ans.id || ans.id=="") {
+    if ( !ans.meta.id || ans.meta.id=="") {
       const id = await fetch(apiServer + '/api/puzzle/id', { 
         method: "get", 
         mode: "cors", 

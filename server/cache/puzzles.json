@@ -28,10 +28,38 @@
       "none": "all",
       "source": "PWBP",
       "id": "n5igzoxlcz87"
+    },
+    "o9ey5qvd61l2": {
+      "name": "Joshua's Cube",
+      "designer": "Eyckmans",
+      "date": "20230409",
+      "shape": "886",
+      "moves": "18",
+      "uri": "886/JoshuasCube/",
+      "goal": "0.gif",
+      "category": "I",
+      "subcategory": "rect",
+      "id": "o9ey5qvd61l2",
+      "none": "all"
+    },
+    "jb3x6ko7y8v5": {
+      "name": "Closed Box",
+      "designer": "Lohe",
+      "date": "20141219",
+      "shape": "555",
+      "moves": "15",
+      "uri": "555/ClosedBox/",
+      "goal": "0.gif",
+      "category": "I",
+      "subcategory": "3f",
+      "none": "all",
+      "id": "jb3x6ko7y8v5"
     }
   },
   "uriToId": {
     "18PieceBurr/Wobbe/": "s1bnnnc74j95",
-    "776/Octomom/": "n5igzoxlcz87"
+    "776/Octomom/": "n5igzoxlcz87",
+    "886/JoshuasCube/": "o9ey5qvd61l2",
+    "555/ClosedBox/": "jb3x6ko7y8v5"
   }
 }
