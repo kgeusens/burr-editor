@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@kgeusens/burr-data": "^0.1.51",
+    "@kgeusens/burr-data": "^0.1.52",
     "@paralleldrive/cuid2": "^2.2.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",

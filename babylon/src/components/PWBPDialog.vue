@@ -163,32 +163,17 @@
       DATA.puzzle = {}
       return
     }
-    let p = new Puzzle()
-    p.deleteShape(0)
+    let query = new URLSearchParams
+    if (item.id) query.set('id', item.id)
+    else query.set('uri', item.uri)
     const res = 
-      fetch(apiServer+'/api/PWBP/puzzle/'+item.uri, { mode: "cors" })
+      fetch(apiServer+'/api/puzzle?'+ query.toString(), { mode: "cors" })
       .catch(error => console.log(error))
-      .then(res => res.json())
+      .then(res => { return res.json() })
       .then(obj => {
-        let i=0
-        obj.forEach(el => {
-          i=p.addShape();
-          p.getShape(i).setSize(el.converted.x,el.converted.y,el.converted.z)
-          p.getShape(i).stateString=el.converted.stateString
-          p.getShape(i).name= "p" + i.toString()
-          let ps=p.problems.problem[0].getShapeFromId(i)
-          ps.count = el.count
-          p.problems.problem[0].setShape(ps)
-        })
-        selectedPuzzle.value=item.name
-        let solIDX = p.addShape()
-        p.getShape(solIDX).name="Solution"
-        p.getShape(solIDX).stateString="#"
-        let sol = p.problems.problem[0].getShapeFromId(solIDX)
-        p.problems.problem[0].result.id=solIDX
+        let p = new Puzzle(obj.content.puzzle)
         p.meta=item
-        p.meta["source"]="PWBP"
-        console.log(p)
+        selectedPuzzle.value=item.name
         DATA.puzzle = p
       })
       .catch(error => console.log(error))

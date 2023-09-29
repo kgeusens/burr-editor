@@ -276,7 +276,6 @@ app.get(
 					p.getShape(solIDX).name="Solution"
 					p.getShape(solIDX).stateString="#"
 					p.problems.problem[0].result.id=solIDX
-//						p.meta=item
 					p.meta["source"]="PWBP"
 					obj.content = p.saveToJSON()
 				  	res.send(obj)
