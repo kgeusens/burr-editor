@@ -129,23 +129,6 @@
   const dialog = ref(false)
   const modelValue = ref([])
   const DATA = reactive( { puzzle: {}, filterObjects: {name:null, designer:null}, sortKey: "designer", groupKey: "designer", page: 1 })
-  const searchName = ref("")
-//  const groupBy=[ { key: "none", order: "asc" } ]
-
-  const puzzleHeaders = [
-          {
-            title: 'Puzzle name',
-            align: 'start',
-            sortable: true,
-            key: 'name',
-            width: "250"
-          },
-          { title: 'Designer', key: 'designer', width: "150" },
-          { title: 'Moves', key: 'moves', width: "50"},
-          { title: 'Date', key: 'date', width: "50"},
-          { title: 'Subtype', key: 'subcategory', width: "50"},
-        ]
-  const puzzleGroup = [ {key: 'designer' }]
 
   function loadPuzzleList() {
     console.log(apiServer)
@@ -173,35 +156,6 @@
     let q=JSON.parse(query)
 //    return (!q.designer || q.designer == item.designer) && (!q.name || (item.name.indexOf(q.name) !== -1) )
     return (!q.designer || q.designer == item.raw.designer) && (!q.name || (value.toString().indexOf(q.name) !== -1) )
-  }
-  function clickRow(event,row) {
-    selectedPuzzle.value = null
-    let p = new Puzzle()
-    p.deleteShape(0)
-    const res = 
-      fetch(apiServer+'/api/PWBP/puzzle/'+row.item.raw.uri, { mode: "cors" })
-      .catch(error => console.log(error))
-      .then(res => res.json())
-      .then(obj => { 
-        let i=0
-        obj.forEach(el => {
-          i=p.addShape();
-          p.getShape(i).setSize(el.converted.x,el.converted.y,el.converted.z)
-          p.getShape(i).stateString=el.converted.stateString
-          p.getShape(i).name= "p" + i.toString()
-          let ps=p.problems.problem[0].getShapeFromId(i)
-          ps.count = el.count
-          p.problems.problem[0].setShape(ps)
-        })
-        selectedPuzzle.value=row.item.raw.name
-        let solIDX = p.addShape()
-        p.getShape(solIDX).name="Solution"
-        p.getShape(solIDX).stateString="#"
-        let sol = p.problems.problem[0].getShapeFromId(solIDX)
-        p.problems.problem[0].result.id=solIDX
-        DATA.puzzle = p
-      })
-      .catch(error => console.log(error))
   }
   function selectCard(evt,item, wasSelected) {
     if (wasSelected) {

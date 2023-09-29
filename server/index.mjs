@@ -27,15 +27,12 @@ const DB=new Low(lowAdapter, {version: "1", puzzles:{}, uriToId: {}})
 await DB.read()
 await DB.write()
 
-// The init function returns a custom createId function with the specified
-// configuration. All configuration properties are optional.
 const createId = init({
 	random: Math.random,
 	length: 12,
 	fingerprint: 'zweinstein-forever',
   });
   
-
 //////////
 // functions
 //////////
@@ -206,21 +203,6 @@ app.get("/api/puzzles/get/:file", (req, res) => {
 });
 
 app.get(
-	"/api/PWBP/index", 
-	(req, res) => {
-			loadPWBPindex().then
-			(
-				(obj) =>  {
-					for (let i in obj) {
-						obj[i].id=DB.data.uriToId[obj[i].uri]
-					}
-					res.send(obj)
-				}
-			);
-		}
-);
-
-app.get(
 	"/api/PWBP/puzzle/:shape/:name/:optional?", 
 	(req, res) => {
 			let p = req.params.name
@@ -245,6 +227,39 @@ app.get(
 	}
 );
 
+// Get index from PWBP, and patch with id from local cache.
+// ID can be used to retrieve cached file.
+// Need to take out the PWBP in the path and make it more generic
+app.get(
+	"/api/PWBP/index", 
+	(req, res) => {
+			loadPWBPindex().then
+			(
+				(obj) =>  {
+					for (let i in obj) {
+						obj[i].id=DB.data.uriToId[obj[i].uri]
+					}
+					res.send(obj)
+				}
+			);
+		}
+);
+
+app.get(
+	"/api/puzzle/", 
+	(req, res) => {
+		let obj = {filename: ""}
+		if (req.query.id && DB.data.puzzles[req.query.id]) {
+			obj.filename = req.query.id + '.xmpuzzle';
+			obj.meta=DB.data.puzzles[req.query.id]
+			obj.content = loadPuzzle(puzzleDir + "/" + obj.filename);
+		}
+		res.send(obj);
+	}
+);
+
+
+// proxy to gui (babylonjs)
 app.get('*', (req, res) => {res.sendFile(resolve(__dirname, '../babylon/dist', 'index.html'))})
 
 //////////
