@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import {Low} from "lowdb"
 import {JSONFile} from "lowdb/node"
 import { init } from '@paralleldrive/cuid2';
+import { Puzzle } from '@kgeusens/burr-data'
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -102,7 +103,7 @@ async function loadPWBPindex() {
 	return result
 }
 
-async function loadPWBPpuzzle(shape, name) {
+async function loadPWBPpuzzle(uri) {
 	const XMLAlwaysArrayName = [
 		"table",
 		"tr",
@@ -122,7 +123,7 @@ async function loadPWBPpuzzle(shape, name) {
 		}
 	}
 	const parser = new XMLParser(XMLoptions)
-	let result=fetch('https://puzzlewillbeplayed.com/'+shape+"/"+name, { mode: "no-cors" })
+	let result=fetch('https://puzzlewillbeplayed.com/'+uri, { mode: "no-cors" })
 		.catch(error => console.log(error))
 		.then(res => res.text())
 		.then(
@@ -207,7 +208,7 @@ app.get(
 	(req, res) => {
 			let p = req.params.name
 			if (req.params.optional) p=p+"/"+req.params.optional
-			loadPWBPpuzzle(req.params.shape, p).then
+			loadPWBPpuzzle(req.params.shape + "/" + p).then
 			(
 				(r) =>  { 
 				  	res.set('Access-Control-Allow-Origin', '*');
@@ -245,6 +246,7 @@ app.get(
 		}
 );
 
+// Return a puzzle
 app.get(
 	"/api/puzzle/", 
 	(req, res) => {
@@ -253,8 +255,36 @@ app.get(
 			obj.filename = req.query.id + '.xmpuzzle';
 			obj.meta=DB.data.puzzles[req.query.id]
 			obj.content = loadPuzzle(puzzleDir + "/" + obj.filename);
+			res.send(obj);
+		} else if (req.query.uri) { 
+			loadPWBPpuzzle(req.query.uri).then
+			(
+				(r) =>  {
+					let p = new Puzzle()
+					p.deleteShape(0)
+					let i=0
+					r.forEach(el => {
+						i=p.addShape();
+						p.getShape(i).setSize(el.converted.x,el.converted.y,el.converted.z)
+						p.getShape(i).stateString=el.converted.stateString
+						p.getShape(i).name= "p" + i.toString()
+						let ps=p.problems.problem[0].getShapeFromId(i)
+						ps.count = el.count
+						p.problems.problem[0].setShape(ps)
+					})
+					let solIDX = p.addShape()
+					p.getShape(solIDX).name="Solution"
+					p.getShape(solIDX).stateString="#"
+					p.problems.problem[0].result.id=solIDX
+//						p.meta=item
+					p.meta["source"]="PWBP"
+					obj.content = p.saveToJSON()
+				  	res.send(obj)
+				}
+			)
+		} else {
+			res.send(obj);
 		}
-		res.send(obj);
 	}
 );
 
