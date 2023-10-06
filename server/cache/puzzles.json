@@ -54,12 +54,26 @@
       "subcategory": "3f",
       "none": "all",
       "id": "jb3x6ko7y8v5"
+    },
+    "cmc68zseih7s": {
+      "name": "Greyhound",
+      "designer": "Eyckmans",
+      "date": "20180904",
+      "shape": "140606-416",
+      "moves": "32",
+      "uri": "FramedBurr8/Greyhound/",
+      "goal": "00.gif",
+      "category": "I",
+      "subcategory": "6f",
+      "none": "all",
+      "id": "cmc68zseih7s"
     }
   },
   "uriToId": {
     "18PieceBurr/Wobbe/": "s1bnnnc74j95",
     "776/Octomom/": "n5igzoxlcz87",
     "886/JoshuasCube/": "o9ey5qvd61l2",
-    "555/ClosedBox/": "jb3x6ko7y8v5"
+    "555/ClosedBox/": "jb3x6ko7y8v5",
+    "FramedBurr8/Greyhound/": "cmc68zseih7s"
   }
 }

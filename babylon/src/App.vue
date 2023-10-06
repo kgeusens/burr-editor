@@ -29,6 +29,7 @@
         <v-list-item value="loadServer" prependIcon="mdi-folder-open" title="Load from server" @click="showServerDialog++"/>
         <v-divider></v-divider>
         <v-list-item :disabled="!puzzle.shapes" value="download" prependIcon="mdi-download" title="Download puzzle" @click="saveLocal"/>
+        <v-list-item :disabled="!puzzle.shapes" value="export" prependIcon="mdi-export" title="Export to OBJ" @click="exportOBJ"/>
         <v-list-item :disabled=true value="upload" prependIcon="mdi-upload" title="Upload puzzle"/>
       </v-list>
     </v-menu>
@@ -226,6 +227,19 @@ export default {
       a.download = this.fileName + ".xmpuzzle"
       a.click()
       window.URL.revokeObjectURL(url)
+    },
+    async exportOBJ() {
+      let a = document.createElement("a")
+
+      for (let shape of this.puzzle.shapes.voxel) {
+        console.log(shape.name)
+        let blob = new Blob([shape.toOBJ()], { type: 'text/plain' });
+        let url = window.URL.createObjectURL(blob)
+        a.href = url
+        a.download = this.fileName + " - " + shape.name + ".obj"
+        a.click()
+        window.URL.revokeObjectURL(url)
+      }
     },
   },
   computed: {
