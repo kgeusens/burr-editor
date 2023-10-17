@@ -221,7 +221,6 @@ export default {
       const cs = new CompressionStream("gzip")
       const gzipStream = blob.stream().pipeThrough(cs)
       const xmpuzzle = await new Response(gzipStream).blob()
-
       let url = window.URL.createObjectURL(xmpuzzle)
       a.href = url
       a.download = this.fileName + ".xmpuzzle"
@@ -230,9 +229,7 @@ export default {
     },
     async exportOBJ() {
       let a = document.createElement("a")
-
       for (let shape of this.puzzle.shapes.voxel) {
-        console.log(shape.name)
         let blob = new Blob([shape.toOBJ()], { type: 'text/plain' });
         let url = window.URL.createObjectURL(blob)
         a.href = url
